@@ -22,9 +22,15 @@ export const updateUser = async (updateUserForm) => {
 export const deleteUser = async (id) => {
   const { error } = await axios.delete('/users', id);
   if (error) throw new Error(error.message);
+  return id;
 };
 export const findUserByEmail = async (email) => {
-  const { data, error } = await axios.post('/users/find', email);
+  const { data, error } = await axios.get(`/users/email/${email}`);
   if (error) throw new Error(error.message);
   return data;
 };
+export const findUserById = async(id)=>{
+  const {data,error}=await axios.get(`/users/id/${id}`);
+  if(error)throw new Error(error.message);
+  return data;
+}

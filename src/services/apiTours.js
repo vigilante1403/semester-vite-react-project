@@ -1,7 +1,6 @@
 import axios from 'axios';
 export const getAllTours = async () => {
   const { data, error } = await axios.get('/tours');
-  console.log(data);
   if (error) throw new Error(error.message);
   return data;
 };
@@ -29,6 +28,7 @@ export const updateTour = async (tour) => {
 export const deleteTour = async (id) => {
   const { error } = await axios.delete('/tours', id);
   if (error) throw new Error(error.message);
+  return id;
 };
 export const getTourNearMe = async (locationForm) => {
   const { data, error } = await axios.post('/tours/tourNearByMe', locationForm);
