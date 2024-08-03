@@ -7,6 +7,7 @@ import Menus from '../../ui/Menus';
 import { useSearchParams } from 'react-router-dom';
 import Empty from '../../ui/Empty'
 import { useTours } from './useTours';
+import TourRow from './TourRow'
 // const Table = styled.div`
 //   border: 1px solid var(--color-grey-200);
 
@@ -44,7 +45,7 @@ return (
           <div>Discount</div>
           <div></div>
         </Table.Header>
-        
+        <Table.Body data={tours} render={(tour)=><TourRow />}/>
       </Table>
     </Menus>
   );
