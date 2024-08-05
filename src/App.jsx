@@ -13,6 +13,10 @@ import Users from "./pages/Users"
 import Bookings from "./pages/Bookings"
 import Accounts from "./pages/Accounts"
 import { DarkModeProvider } from "./context/DarkModeContext"
+import HomePage from './pages/userpages/HomePage';
+import TourPage from './pages/userpages/TourPage';
+import ContactPage from './pages/userpages/ContactPage';
+import UserLayout from './ui/userLayout/UserLayout';
 
 const queryClient = new QueryClient({
   defaultOptions:{
@@ -31,7 +35,15 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<AppLayout />}>
-            <Route index element={<Navigate replace to="login" />} />
+          <Route index element={<Navigate replace to="home" />} />
+                <Route path="" element={<UserLayout />}>
+                <Route index element={<Navigate replace to="home" />} />
+                <Route path="home" element={<HomePage />} />
+                {/* <Route path="login" element={<Login />} /> */}
+
+                <Route path="tours" element={<TourPage />} />
+                <Route path="contact" element={<ContactPage />} />
+                  </Route> 
             {/* phan cho admin se co filter role va authentication sau */}
             <Route path="admin" element={<AdminLayout />}>
             <Route index element={<Navigate replace to="dashboard" />} />
