@@ -5,15 +5,13 @@ import toast from "react-hot-toast";
 export function useDeleteTour(){
     const queryClient=useQueryClient();
     const {mutate:deleteTour,isLoading:isDeleting}=useMutation({
-        mutationFn: deleteTourApi,
+        mutationFn:(id)=> deleteTourApi(id),
         onError:(err)=>toast.error(err.message),
         onSuccess:(id)=>{toast.success('Tour deleted');
             queryClient.invalidateQueries({
                 queryKey:['tours']
             })
-            queryClient.removeQueries({
-                queryKey:['tour',id]
-            })
+           
         }
     })
     return {deleteTour,isDeleting}

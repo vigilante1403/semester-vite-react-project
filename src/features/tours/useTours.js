@@ -4,6 +4,7 @@ import { getAllTours } from "../../services/apiTours";
 export function useTours(){
     const {data:tours,isLoading}=useQuery({
         queryKey:['tours'],
+        retry:false,
         queryFn: getAllTours
     })
     return {tours,isLoading}

@@ -45,7 +45,7 @@ return (
           <div>Discount</div>
           <div></div>
         </Table.Header>
-        <Table.Body data={tours} render={(tour)=><TourRow />}/>
+        <Table.Body data={tours} render={(tour)=><TourRow tour={tour} />}/>
       </Table>
     </Menus>
   );

@@ -186,7 +186,7 @@ function Header() {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
     }, 3000);
     return () => clearInterval(interval);
-  }, []);
+  }, [images.length]);
 
   const handlePrevClick = () => {
     setCurrentIndex((prevIndex) => (prevIndex === 0 ? images.length - 1 : prevIndex - 1));
@@ -224,7 +224,7 @@ function Header() {
                 transition: 'transform 0.5s ease-in-out',
                 transform: `translateX(-${(currentIndex * 100) / slidesToShow}%)`,
                 width: `${(images.length + 2) * 100 / slidesToShow}%`,
-                display: 'flex',
+                
               }}
             >
               {/* Clone the first and last images for infinite loop effect */}

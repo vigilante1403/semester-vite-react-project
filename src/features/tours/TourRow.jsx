@@ -1,18 +1,16 @@
 /* eslint-disable react/prop-types */
 import styled from 'styled-components'
 import { formatCurrency } from '../../utils/helpers'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { deleteCabin, getCabins } from '../../services/apiCabins'
 import toast from 'react-hot-toast'
 import Table from '../../ui/Table'
-
-import CreateCabinForm from './CreateCabinForm'
-import { useDeleteCabin } from './useDeleteCabin'
 import { HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2'
-import { useCreateCabin } from './useCreateCabin'
 import Modal from '../../ui/Modal'
 import ConfirmDelete from '../../ui/ConfirmDelete'
 import Menus from '../../ui/Menus'
+import CreateTourForm from './CreateTourForm'
+import { useUpdateTour } from './useUpdateTour'
+import { useDeleteTour } from './useDeleteTour'
+import { useCreateTour } from './userCreateTour'
 
 // const TableRow = styled.div`
 //   display: grid;
@@ -35,7 +33,7 @@ const Img = styled.img`
   transform: scale(1.5) translateX(-7px);
 `
 
-const Cabin = styled.div`
+const Tour = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--color-grey-600);
@@ -53,59 +51,62 @@ const Discount = styled.div`
   color: var(--color-green-700);
 `
 function TourRow({ tour }) {
-//   const { isLoading, mutate } = useCreateCabin()
-//   const {
-//     id: cabinId,
-//     name,
-//     maxCapacity,
-//     regularPrice,
-//     discount,
-//     image,
-//     description,
-//   } = cabin
-//   const { isDeleting, deleteCabin } = useDeleteCabin()
+const {updateTour,isUpdating}=useUpdateTour()
+const {deleteTour,isDeleting}=useDeleteTour()
+const {createTour,isCreating}=useCreateTour()
+const {id,name,slug,maxGroupSize,price,priceDiscount,imageCover,guides,description,summary}=tour
   function handleDuplicate() {
-   
-    
+   const formData = new FormData()
+   formData.append("name","Copy of "+name+" "+Math.floor(Math.random() * 100));
+    formData.append("maxGroupSize",maxGroupSize);
+    formData.append("imageCoverCopy",imageCover)
+    formData.append("description",description);
+    formData.append("summary",summary);
+    formData.append("price",price)
+    formData.append("priceDiscount",priceDiscount)
+    formData.append("guides",guides[0].id)
+    createTour(formData)
   }
   return (
     <Table.Row>
-      <Img  />
-      <Cabin></Cabin>
-      <div>Fits up guests</div>
-      <Price>{formatCurrency()}</Price>
-      {/* {discount > 0 ? (
-        <Discount>{formatCurrency(discount)}</Discount>
+    
+      <Img src={'http://localhost:8080/api/v1/file/image/'+imageCover||''}  />
+      <Tour>{name}</Tour>
+      <div>Fits up {maxGroupSize} guests</div>
+      <Price>{formatCurrency(price)}</Price>
+      {priceDiscount > 0 ? (
+        <Discount>{formatCurrency(priceDiscount)}</Discount>
       ) : (
         <span>&mdash;</span>
-      )} */}
+      )}
       <div>
         <Modal>
         <Menus.Menu>
-          <Menus.Toggle id />
-          <Menus.List id>
+          <Menus.Toggle id={id} />
+          <Menus.List id={id}>
             <Menus.Button icon={<HiSquare2Stack />} onClick={() => handleDuplicate()}>
               Duplicate
             </Menus.Button>
-          <Modal.Open opens="edit">
+          <Modal.Open opens={`edit-${id}`}>
           <Menus.Button icon={<HiPencil/>}>
               Edit
             </Menus.Button>
           </Modal.Open>
-          <Modal.Open opens="delete">
+          <Modal.Open opens={`delete-${id}`}>
             <Menus.Button icon={<HiTrash />}>
               Delete
             </Menus.Button>
           </Modal.Open>
           </Menus.List>
-          <Modal.Window name="edit">
-            {/* <CreateCabinForm cabinToEdit={cabin} /> */}
+          <Modal.Window name={`edit-${id}`}>
+           <CreateTourForm editTour={tour} />
           </Modal.Window>
-          <Modal.Window name="delete">
+          <Modal.Window name={`delete-${id}`}>
             <ConfirmDelete
-            //   resourceName={name}
-            //   onConfirm={() => deleteCabin(cabinId)}
-            //   disabled={isDeleting}
+              resourceName={name}
+              onConfirm={() => deleteTour(id)}
+              disabled={isDeleting}
+           
             />
           </Modal.Window>
           </Menus.Menu>
