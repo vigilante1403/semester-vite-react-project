@@ -6,6 +6,8 @@ import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
 import { useSearchParams } from 'react-router-dom';
 import Empty from '../../ui/Empty'
+import { useTours } from './useTours';
+import TourRow from './TourRow'
 // const Table = styled.div`
 //   border: 1px solid var(--color-grey-200);
 
@@ -30,7 +32,8 @@ const TableHeader = styled.header`
   padding: 1.6rem 2.4rem;
 `;
 function TourTable() {
-  
+  const {tours,isLoading}=useTours();
+  if(isLoading) return <Spinner/>
 return (
     <Menus>
       <Table columns="0.6fr 1.8fr 2.2fr 1fr 1fr 1fr">
@@ -42,7 +45,7 @@ return (
           <div>Discount</div>
           <div></div>
         </Table.Header>
-        
+        <Table.Body data={tours} render={(tour)=><TourRow />}/>
       </Table>
     </Menus>
   );
