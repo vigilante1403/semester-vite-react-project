@@ -51,7 +51,7 @@ const Discount = styled.div`
   color: var(--color-green-700);
 `
 function TourRow({ tour }) {
-const {updateTour,isUpdating}=useUpdateTour()
+
 const {deleteTour,isDeleting}=useDeleteTour()
 const {createTour,isCreating}=useCreateTour()
 const {id,name,slug,maxGroupSize,price,priceDiscount,imageCover,guides,description,summary}=tour
