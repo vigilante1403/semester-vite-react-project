@@ -16,18 +16,26 @@ export const getTourByIdOrSlug = async (id, slug) => {
   return data;
 };
 export const addNewTour = async (tour) => {
-  const { data, error } = await axios.post('/tours', tour);
+  const { data, error } = await axios.post('/tours', tour,{
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   if (error) throw new Error(error.message);
   return data;
 };
 export const updateTour = async (tour) => {
-  const { data, error } = await axios.put('/tours', tour);
+  const { data, error } = await axios.post('/tours', tour,{
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   if (error) throw new Error(error.message);
   return data;
 };
 export const deleteTour = async (id) => {
-  const { error } = await axios.delete('/tours', id);
-  if (error) throw new Error(error.message);
+  await axios.delete(`/tours?id=${id}`);
+  // if (error) throw new Error(error.message);
   return id;
 };
 export const getTourNearMe = async (locationForm) => {

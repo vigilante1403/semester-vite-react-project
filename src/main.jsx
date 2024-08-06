@@ -11,13 +11,13 @@ axios.defaults.baseURL='http://localhost:8080/api/v1';
 axios.interceptors.request.use(request=>{
   return request;
 },error=>{
-  toast.error(error.data.message);
+  toast.error(error.message);
   return Promise.reject(error);
 })
 axios.interceptors.response.use(response=>{
   return response
 },error=>{
-  toast.error(error.data.message);
+  toast.error(error.message);
   return Promise.reject(error)
 })
 ReactDOM.createRoot(document.getElementById('root')).render(

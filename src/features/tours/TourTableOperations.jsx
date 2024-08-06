@@ -15,12 +15,25 @@ function TourTableOperations() {
           { value: 'with-discount', label: 'With discount' },
         ]}
       />
-      <SortBy options={[{ value: 'name-asc', label: 'Sort by name (A-Z)' },{
-        value:'name-desc',label:'Sort by name (Z-A)'
-      },{value:'regularPrice-asc',label:'Sort by price (low first)'},
-      {value:'regularPrice-desc',label:'Sort by price (high first)'},
-        {value:'maxCapacity-asc',label:'Sort by max group size (low first)'},
-        {value:'maxCapacity-desc',label:'Sort by max group size (high first)'}]} />
+      <SortBy
+        options={[
+          { value: 'name-asc', label: 'Sort by name (A-Z)' },
+          {
+            value: 'name-desc',
+            label: 'Sort by name (Z-A)',
+          },
+          { value: 'price-asc', label: 'Sort by price (low first)' },
+          { value: 'price-desc', label: 'Sort by price (high first)' },
+          {
+            value: 'maxGroupSize-asc',
+            label: 'Sort by max group size (low first)',
+          },
+          {
+            value: 'maxGroupSize-desc',
+            label: 'Sort by max group size (high first)',
+          },
+        ]}
+      />
     </TableOperations>
   );
 }
