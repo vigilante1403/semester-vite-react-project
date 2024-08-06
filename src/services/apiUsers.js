@@ -22,7 +22,7 @@ export const updateUser = async (updateUserForm) => {
   return data;
 };
 export const deleteUser = async (id) => {
-  const { error } = await axios.delete('/users', id);
+  const { error } = await axios.delete(`/users?id=${id}`);
   if (error) throw new Error(error.message);
   return id;
 };
