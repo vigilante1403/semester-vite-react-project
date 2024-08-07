@@ -12,6 +12,7 @@ import Tours from "./pages/Tours"
 import Users from "./pages/Users"
 import Bookings from "./pages/Bookings"
 import Accounts from "./pages/Accounts"
+import GeocodeComponent from "./pages/GeocodeComponent"
 import { DarkModeProvider } from "./context/DarkModeContext"
 import HomePage from './pages/userpages/HomePage';
 import TourPage from './pages/userpages/TourPage';
@@ -49,6 +50,7 @@ function App() {
             <Route index element={<Navigate replace to="dashboard" />} />
             <Route path="dashboard" element={<Dashboard/>}  />
             <Route path="tours" element={<Tours/>} />
+            <Route path="geo" element={<GeocodeComponent/>} />
             <Route path="accounts" element={<Accounts/>} />
             <Route path="users" element={<Users/>} />
             <Route path="bookings" element={<Bookings/>} />

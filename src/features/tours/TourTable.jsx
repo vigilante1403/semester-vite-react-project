@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import Spinner from '../../ui/Spinner';
-
+import Pagination from '../../ui/Pagination';
 import Table from '../../ui/Table';
 
 import Menus from '../../ui/Menus';
@@ -8,6 +8,8 @@ import { useSearchParams } from 'react-router-dom';
 import Empty from '../../ui/Empty';
 import { useTours } from './useTours';
 import TourRow from './TourRow';
+import { PAGE_SIZE } from '../../utils/constants';
+import { useOpencage } from './useOpenCage';
 // const Table = styled.div`
 //   border: 1px solid var(--color-grey-200);
 
@@ -33,9 +35,14 @@ const TableHeader = styled.header`
 `;
 function TourTable() {
   const [searchParams] = useSearchParams();
+
+  
+
   const searchDiscountValue = searchParams.get('discount') || 'all';
   const { tours, isLoading } = useTours();
   if (isLoading) return <Spinner />;
+
+  if (!tours) return <Empty resourceName="tours" />;
   /// filter
   let filteredTours;
   if (searchDiscountValue !== 'all') {
@@ -49,19 +56,25 @@ function TourTable() {
   }
   const sortBy = searchParams.get('sortBy') || 'name-asc';
   const [field, direction] = sortBy.split('-');
-  console.log(field,direction)
+  console.log(field, direction);
   const modifier = direction === 'asc' ? 1 : -1;
-  
- let sortedTours = filteredTours.sort(
+
+  let sortedTours = filteredTours.sort(
     (a, b) => (a[field] - b[field]) * modifier
   );
-  if(field==='name'){
-    
+  if (field === 'name') {
     sortedTours = filteredTours.sort(
       (a, b) => modifier * a[field].localeCompare(b[field])
     );
   }
-  if (!sortedTours.length) return <Empty resourceName="tours" />;
+  //pagination
+  const currentPage = !searchParams.get('page')?1:Number(searchParams.get('page'))
+  var startIndex = (currentPage-1)*PAGE_SIZE;
+  var endIndex = (currentPage)*PAGE_SIZE
+  let paginatedTours ;
+  paginatedTours=[...sortedTours].slice(startIndex,endIndex)
+  
+  if (!paginatedTours.length) return <Empty resourceName="tours" />;
   return (
     <Menus>
       <Table columns="0.6fr 1.8fr 2.2fr 1fr 1fr 1fr">
@@ -74,9 +87,12 @@ function TourTable() {
           <div></div>
         </Table.Header>
         <Table.Body
-          data={sortedTours}
+          data={paginatedTours}
           render={(tour) => <TourRow tour={tour} key={tour.id} />}
         />
+        <Table.Footer>
+          <Pagination  count={sortedTours.length} />
+        </Table.Footer>
       </Table>
     </Menus>
   );

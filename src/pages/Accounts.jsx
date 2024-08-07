@@ -1,8 +1,8 @@
 import Row from '../ui/Row';
 import Heading from '../ui/Heading'
 import AccountTable from '../features/authentication/AccountTable';
-import AddTour from '../features/tours/AddTour';
 import AccountTableOperations from '../features/authentication/AccountTableOperations'
+import AddUser from '../features/authentication/AddUser';
 function Accounts() {
     return (
         <>
@@ -12,7 +12,7 @@ function Accounts() {
       </Row>
       <Row>
        <AccountTable/>
-        
+        <AddUser/>
       </Row>
     </>
     )

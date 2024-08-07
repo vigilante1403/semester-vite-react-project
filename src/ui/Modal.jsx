@@ -1,6 +1,6 @@
 /*eslint-disable*/
-import { formatRFC3339 } from 'date-fns'
-import { cloneElement, createContext, useContext, useEffect, useRef, useState } from 'react'
+
+import { cloneElement, createContext, useContext, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { HiXMark } from 'react-icons/hi2'
 import styled from 'styled-components'
@@ -16,6 +16,8 @@ const StyledModal = styled.div`
   box-shadow: var(--shadow-lg);
   padding: 3.2rem 4rem;
   transition: all 0.5s;
+  max-height: 90vh; /* Ensure the modal does not exceed the viewport height */
+  overflow-y: auto; /* Enable vertical scrolling if content overflows */
 `
 
 const Overlay = styled.div`
@@ -23,11 +25,16 @@ const Overlay = styled.div`
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-color: var(--backdrop-color);
   backdrop-filter: blur(4px);
   z-index: 1000;
   transition: all 0.5s;
+  scrollbar-width: none;
+  &::-webkit-scrollbar{
+    display: none;
+  }
+  /* scrollbar-width: 0; */
 `
 
 const Button = styled.button`

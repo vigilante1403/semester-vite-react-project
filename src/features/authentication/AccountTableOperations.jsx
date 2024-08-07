@@ -9,11 +9,12 @@ function TourTableOperations() {
         options={[
           { value: 'all', label: 'All' },
           {
-            value: 'user',
+            value: 'USER',
             label: 'User Role',
           },
-          { value: 'guide', label: 'Guide Role' },
-          { value: 'admin', label: 'Admin Role' },
+          { value: 'GUIDE', label: 'Guide Role' },
+          { value: 'LEADGUIDE', label: 'LeadGuide Role' },
+          { value: 'ADMIN', label: 'Admin Role' },
         ]}
       />
       <SortBy options={[{ value: 'name-asc', label: 'Sort by name (A-Z)' },{
