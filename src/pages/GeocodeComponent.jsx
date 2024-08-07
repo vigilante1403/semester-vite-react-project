@@ -12,11 +12,12 @@ const GeocodeComponent = () => {
       if (data.results.length > 0) {
         const place = data.results[0];
         console.log(place)
-        setPlaceDetails({
+        return {
           formatted: place.formatted,
           geometry: place.geometry,
           timezone: place.annotations.timezone.name,
-        });
+        }
+       
       } else {
         setError(`Status: ${data.status.message}, total_results: ${data.total_results}`);
       }
