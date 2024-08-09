@@ -1,4 +1,4 @@
-import { formatDistance, parseISO } from 'date-fns';
+import { formatDistance, parse, parseISO,format } from 'date-fns';
 import { differenceInDays } from 'date-fns';
 import opencage from 'opencage-api-client';
 import toast from 'react-hot-toast';
@@ -7,12 +7,18 @@ import toast from 'react-hot-toast';
 export const subtractDates = (dateStr1, dateStr2) =>
   differenceInDays(parseISO(String(dateStr1)), parseISO(String(dateStr2)));
 
-export const formatDistanceFromNow = (dateStr) =>
-  formatDistance(parseISO(dateStr), new Date(), {
-    addSuffix: true,
-  })
-    .replace('about ', '')
-    .replace('in', 'In');
+export const formatDistanceFromNow = (dateStr) =>{
+  const cleanedDateString = dateStr.replace(/ ICT/, '');
+  const parsedDate = parse(cleanedDateString, 'EEE MMM dd HH:mm:ss yyyy', new Date());
+  const formattedDate = format(parsedDate, 'yyyy-MM-dd');
+  return formatDistance(formattedDate,new Date(),{
+    addSuffix:true
+  }).replace('about ', '')
+  .replace('in', 'In');
+}
+  
+    
+  
 
 // Supabase needs an ISO date string. However, that string will be different on every render because the MS or SEC have changed, which isn't good. So we use this trick to remove any time
 export const getToday = function (options = {}) {
