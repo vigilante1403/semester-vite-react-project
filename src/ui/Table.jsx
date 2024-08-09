@@ -38,6 +38,7 @@ const StyledRow = styled(CommonRow)`
 
 const StyledBody = styled.section`
   margin: 0.4rem 0;
+  min-height: 53vh;
 `
 
 const Footer = styled.footer`

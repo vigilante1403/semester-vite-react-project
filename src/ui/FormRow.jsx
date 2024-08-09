@@ -1,12 +1,11 @@
 /*eslint-disable*/
-import styled from 'styled-components'
-import Input from './Input'
+import styled, { css }  from 'styled-components'
 const StyledFormRow = styled.div`
   display: grid;
   align-items: center;
   grid-template-columns: 24rem 1fr 1.2fr;
   gap: 2.4rem;
-
+  position: relative;
   padding: 1.2rem 0;
 
   &:first-child {
@@ -23,13 +22,25 @@ const StyledFormRow = styled.div`
 
   &:has(button) {
     display: flex;
+    
     justify-content: flex-end;
+    /* ${(props) => props.flex==='flex-start' &&
+    css` 
+    justify-content: space-between;
+    `
+  } */
     gap: 1.2rem;
   }
 `
 
 const Label = styled.label`
   font-weight: 500;
+  ${(props) => props.flex==='flex-start' &&
+    css` 
+    position: absolute;
+    left:0;
+    `
+  }
 `
 
 const Error = styled.span`
@@ -38,11 +49,11 @@ const Error = styled.span`
 `
 
 // eslint-disable-next-line react/prop-types
-function FormRow({ label,error,children }) {
+function FormRow({ label,error,children,flex }) {
   return (
-    <StyledFormRow>
+    <StyledFormRow flex={flex}>
 
-      {label&&<Label htmlFor={children.props.id}>{label}</Label>}
+      {label&&<Label flex={flex} htmlFor={children.props.id}>{label}</Label>}
       {children}
       {error && <Error>{error}</Error>}
     </StyledFormRow>

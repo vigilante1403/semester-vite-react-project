@@ -1,16 +1,16 @@
 /* eslint-disable react/prop-types */
-import styled from 'styled-components'
-import { formatCurrency } from '../../utils/helpers'
-import toast from 'react-hot-toast'
-import Table from '../../ui/Table'
-import { HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2'
-import Modal from '../../ui/Modal'
-import ConfirmDelete from '../../ui/ConfirmDelete'
-import Menus from '../../ui/Menus'
-import CreateTourForm from './CreateTourForm'
-import { useUpdateTour } from './useUpdateTour'
-import { useDeleteTour } from './useDeleteTour'
-import { useCreateTour } from './userCreateTour'
+import styled from 'styled-components';
+import { formatCurrency } from '../../utils/helpers';
+import toast from 'react-hot-toast';
+import Table from '../../ui/Table';
+import { HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
+import Modal from '../../ui/Modal';
+import ConfirmDelete from '../../ui/ConfirmDelete';
+import Menus from '../../ui/Menus';
+import CreateTourForm from './CreateTourForm';
+import { useUpdateTour } from './useUpdateTour';
+import { useDeleteTour } from './useDeleteTour';
+import { useCreateTour } from './userCreateTour';
 
 // const TableRow = styled.div`
 //   display: grid;
@@ -31,46 +31,60 @@ const Img = styled.img`
   object-fit: cover;
   object-position: center;
   transform: scale(1.5) translateX(-7px);
-`
+`;
 
 const Tour = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--color-grey-600);
   font-family: 'Sono';
-`
+`;
 
 const Price = styled.div`
   font-family: 'Sono';
   font-weight: 600;
-`
+`;
 
 const Discount = styled.div`
   font-family: 'Sono';
   font-weight: 500;
   color: var(--color-green-700);
-`
+`;
 function TourRow({ tour }) {
-
-const {deleteTour,isDeleting}=useDeleteTour()
-const {createTour,isCreating}=useCreateTour()
-const {id,name,slug,maxGroupSize,price,priceDiscount,imageCover,guides,description,summary}=tour
+  const { deleteTour, isDeleting } = useDeleteTour();
+  const { createTour, isCreating } = useCreateTour();
+  const {
+    id,
+    name,
+    slug,
+    maxGroupSize,
+    price,
+    priceDiscount,
+    imageCover,
+    guides,
+    description,
+    summary,
+  } = tour;
   function handleDuplicate() {
-   const formData = new FormData()
-   formData.append("name","Copy of "+name+" "+Math.floor(Math.random() * 100));
-    formData.append("maxGroupSize",maxGroupSize);
-    formData.append("imageCoverCopy",imageCover)
-    formData.append("description",description);
-    formData.append("summary",summary);
-    formData.append("price",price)
-    formData.append("priceDiscount",priceDiscount)
-    formData.append("guides",guides[0].id)
-    createTour(formData)
+    const formData = new FormData();
+    formData.append(
+      'name',
+      'Copy of ' + name + ' ' + Math.floor(Math.random() * 100)
+    );
+    formData.append('maxGroupSize', maxGroupSize);
+    formData.append('imageCoverCopy', imageCover);
+    formData.append('description', description);
+    formData.append('summary', summary);
+    formData.append('price', price);
+    formData.append('priceDiscount', priceDiscount);
+    formData.append('guides', guides[0].id);
+    createTour(formData);
   }
   return (
     <Table.Row>
-    
-      <Img src={'http://localhost:8080/api/v1/file/image/'+imageCover||''}  />
+      <Img
+        src={'http://localhost:8080/api/v1/file/image/tour/' + imageCover || ''}
+      />
       <Tour>{name}</Tour>
       <div>Fits up {maxGroupSize} guests</div>
       <Price>{formatCurrency(price)}</Price>
@@ -81,40 +95,38 @@ const {id,name,slug,maxGroupSize,price,priceDiscount,imageCover,guides,descripti
       )}
       <div>
         <Modal>
-        <Menus.Menu>
-          <Menus.Toggle id={id} />
-          <Menus.List id={id}>
-            <Menus.Button icon={<HiSquare2Stack />} onClick={() => handleDuplicate()}>
-              Duplicate
-            </Menus.Button>
-          <Modal.Open opens={`edit-${id}`}>
-          <Menus.Button icon={<HiPencil/>}>
-              Edit
-            </Menus.Button>
-          </Modal.Open>
-          <Modal.Open opens={`delete-${id}`}>
-            <Menus.Button icon={<HiTrash />}>
-              Delete
-            </Menus.Button>
-          </Modal.Open>
-          </Menus.List>
-          <Modal.Window name={`edit-${id}`}>
-           <CreateTourForm editTour={tour} />
-          </Modal.Window>
-          <Modal.Window name={`delete-${id}`}>
-            <ConfirmDelete
-              resourceName={name}
-              onConfirm={() => deleteTour(id)}
-              disabled={isDeleting}
-           
-            />
-          </Modal.Window>
+          <Menus.Menu>
+            <Menus.Toggle id={id} />
+            <Menus.List id={id}>
+              <Menus.Button
+                icon={<HiSquare2Stack />}
+                onClick={() => handleDuplicate()}
+              >
+                Duplicate
+              </Menus.Button>
+              <Modal.Open opens={`edit-${id}`}>
+                <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+              </Modal.Open>
+              <Modal.Open opens={`delete-${id}`}>
+                <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+              </Modal.Open>
+            </Menus.List>
+            
           </Menus.Menu>
+          <Modal.Window name={`edit-${id}`}>
+              <CreateTourForm editTour={tour} />
+            </Modal.Window>
+            <Modal.Window name={`delete-${id}`}>
+              <ConfirmDelete
+                resourceName={name}
+                onConfirm={() => deleteTour(id)}
+                disabled={isDeleting}
+              />
+            </Modal.Window>
         </Modal>
-        
       </div>
     </Table.Row>
-  )
+  );
 }
 
-export default TourRow
+export default TourRow;

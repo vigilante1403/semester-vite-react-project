@@ -25,7 +25,7 @@ export const updateBooking = async (bookingUpdateForm) => {
   return data;
 };
 export const deleteBooking = async (id) => {
-  const { error } = await axios.delete('/bookings', id);
+  const { error } = await axios.delete(`/bookings?id=${id}`);
   if (error) throw new Error(error.message);
   return id;
 };

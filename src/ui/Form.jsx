@@ -19,10 +19,11 @@ const Form = styled.form`
       
     `}
     
-  overflow-y: scroll!important;
+  overflow: hidden;
   font-size: 1.4rem;
+  
 `;
-Form.defaultProps={
-  type:'modal'
-}
+// Form.defaultProps={
+//   type:'modal'
+// }
 export default Form;

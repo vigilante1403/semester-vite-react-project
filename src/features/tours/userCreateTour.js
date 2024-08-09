@@ -10,7 +10,8 @@ export function useCreateTour(){
         onError:(err)=>toast.error(err.message),
         onSuccess:()=>{toast.success('New tour created');
             queryClient.invalidateQueries({
-                queryKey:['tours']
+                predicate: query =>
+                    query.queryKey[0].startsWith("tours")
             })
         }
     })
