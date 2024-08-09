@@ -58,7 +58,7 @@ function BookingRow({
     priceOrigin,
     priceDiscount,
     priceFinal,
-    // status,
+    paid,
     user: { name: guestName, email },
     tour: { name: tourName },
   },
@@ -72,15 +72,15 @@ function BookingRow({
     user: { name: guestName, email },
     tour: { name: tourName },
   }
+  const paidValue = paid?'paid':'unpaid'
   const statusToTagName = {
-    unconfirmed: 'blue',
-    'checked-in': 'green',
-    'checked-out': 'silver',
+    unpaid: 'blue',
+    paid: 'green',
+    // 'checked-out': 'silver',
   };
   const navigate = useNavigate();
   // const { checkout, isCheckingOut } = useCheckout();
   const { deleteBooking, isDeleting } = useDeleteBooking();
-  const status = 'unconfirmed'
   return (
     <Table.Row>
       <Tour>{tourName}</Tour>
@@ -104,7 +104,7 @@ function BookingRow({
         </span>
       </Stacked>
 
-      <Tag type={statusToTagName[status]}>{status.replace('-', ' ')}</Tag>
+      <Tag type={statusToTagName[paidValue]}>{paidValue}</Tag>
 
       <Amount>{formatCurrency(priceFinal)}</Amount>
       <Modal>
@@ -117,15 +117,15 @@ function BookingRow({
             >
               See details
             </Menus.Button>
-            {status === 'unconfirmed' && (
+            {paidValue === 'unpaid' && (
               <Menus.Button
                 icon={<HiArrowDownOnSquare />}
                 onClick={() => navigate(`/checkins/${bookingId}`)}
               >
-                Check in
+                Paid bill
               </Menus.Button>
             )}
-            {status === 'checked-in' && (
+            {paidValue === 'paid' && (
               <Menus.Button
                 icon={<HiArrowUpOnSquare />}
                 // disable={isCheckingOut}
@@ -133,7 +133,7 @@ function BookingRow({
                 //   checkout(bookingId);
                 // }}
               >
-                Check out
+                Get ticket
               </Menus.Button>
             )}
             <Modal.Open opens={`edit-${bookingId}`}>
