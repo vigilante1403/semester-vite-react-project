@@ -125,7 +125,7 @@ function CreateTourForm({ onClose, editTour }) {
     if (inputs && inputs.length > 0) {
       Array.from(inputs).forEach((addr, index) => {
         formData.append('addresses', addr);
-        formData.append('days', index+1);
+        formData.append('days', index + 1);
       });
     } else {
       toast.error('Please set valid addresses ');

@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router-dom";
 export function useBookingsTotal(){
     const {data:bookings,isLoading}=useQuery({
         queryKey:['bookings'],
+        retry:false,
         queryFn:getAllBookings
     })
     return {bookings,isLoading}
