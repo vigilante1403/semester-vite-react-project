@@ -29,3 +29,8 @@ export const deleteBooking = async (id) => {
   if (error) throw new Error(error.message);
   return id;
 };
+export const getBookingById = async (id) => {
+  const { data, error } = await axios.get(`/bookings/${id}`);
+  if (error) throw new Error(error.message);
+  return data;
+};
