@@ -26,6 +26,7 @@ export function useRecentBookings(){
             date: new Date(booking.createdAt),
             priceOrigin: booking.priceOrigin,
             priceFinal: booking.priceFinal,
+            paid:booking.paid
           }))
     }
     return {bookings,isLoading}

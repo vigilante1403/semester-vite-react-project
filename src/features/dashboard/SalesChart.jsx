@@ -22,6 +22,7 @@ import { useState, useEffect } from 'react';
 
 const StyledSalesChart = styled(DashboardBox)`
   grid-column: 1 / -1;
+  min-height: 40rem;
 
   /* Hack to change grid line colors */
   & .recharts-cartesian-grid-horizontal line,

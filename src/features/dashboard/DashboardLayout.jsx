@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import Spinner from '../../ui/Spinner';
 import Empty from '../../ui/Empty';
-
+import Stats from '../../ui/Stats';
 import SalesChart from './SalesChart';
 import DurationChart from './DurationChart';
 import { useTours } from '../tours/useTours';
@@ -27,7 +27,7 @@ function DashboardLayout() {
   if (!tours || !bookings) return <Empty resourceName="tours" />;
   return (
     <StyledDashboardLayout>
-      {/* <Stats bookings={tours} numDays={10} numCabins={tours.length} confirmStays={confirmedStays} /> */}
+      <Stats bookings={bookings} confirmStays={[...bookings].filter(booking=>booking.paid)} />
       {/* <TodayActivity /> */}
       <DurationChart confirmedStays={tours} />
       <SalesChart
