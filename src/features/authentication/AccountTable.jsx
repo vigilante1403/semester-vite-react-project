@@ -6,6 +6,8 @@ import { useSearchParams } from 'react-router-dom';
 import Empty from '../../ui/Empty';
 import { useUsers } from './useUsers'; // Ensure this hook is implemented correctly
 import AccountRow from './AccountRow';
+import Pagination from '../../ui/Pagination';
+import { PAGE_SIZE } from '../../utils/constants';
 
 const TableHeader = styled.header`
   display: grid;
@@ -25,9 +27,10 @@ const TableHeader = styled.header`
 function AccountTable() {
   const [searchParams] = useSearchParams();
   const searchRoleValue = searchParams.get('role') || 'all';
-  const { users, isLoading } = useUsers(); // Implement useUsers to fetch user data
+  const { users, isLoading } = useUsers();
 
   if (isLoading) return <Spinner />;
+  if(!users) return <Empty resourceName="users"/>;
 
   // Filter by role
   let filteredUsers = users;
@@ -58,8 +61,14 @@ function AccountTable() {
     return (a[field] - b[field]) * modifier;
   });
 
-  if (!sortedUsers.length) return <Empty resourceName="users" />;
 
+  const currentPage = !searchParams.get('page') ? 1 : Number(searchParams.get('page'));
+  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const endIndex = currentPage * PAGE_SIZE;
+  let paginatedUsers;
+  paginatedUsers = [...sortedUsers].slice(startIndex, endIndex);
+console.log(sortedUsers.length);
+  if (!paginatedUsers.length) return <Empty resourceName="users" />;
   return (
     <Menus>
       <Table columns="0.6fr 2.5fr 1.5fr 1fr 1fr 1fr">
@@ -72,9 +81,12 @@ function AccountTable() {
           <div></div>
         </Table.Header>
         <Table.Body
-          data={sortedUsers}
+          data={paginatedUsers}
           render={(user) => <AccountRow user={user} key={user.id} />}
         />
+        <Table.Footer>
+          <Pagination count={sortedUsers.length} />
+        </Table.Footer>
       </Table>
     </Menus>
   );

@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { HiArrowUpOnSquare } from "react-icons/hi2";
 
-// import BookingDataBox from "./BookingDataBox";
+import TourDataBox from "./TourDataBox";
 import Row from "../../ui/Row";
 import Heading from "../../ui/Heading";
 import Tag from "../../ui/Tag";
@@ -11,15 +11,13 @@ import ButtonText from "../../ui/ButtonText";
 import Spinner from '../../ui/Spinner'
 
 import { useMoveBack } from "../../hooks/useMoveBack";
-// import { useBooking } from "./useBooking";
+import { useTour } from "./useTour";
+import {useDeleteTour} from './useDeleteTour'
 import { useNavigate } from "react-router-dom";
-// import { useCheckout } from "../check-in-out/useCheckout";
-import { useDeleteBooking } from "./useDeleteBooking";
+
 import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Empty from "../../ui/Empty";
-import { useBookingById } from "./useBookings";
-import BookingDataBox from "./BookingDataBox";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -27,32 +25,32 @@ const HeadingGroup = styled.div`
   align-items: center;
 `;
 
-function BookingDetail() {
+function TourDetail() {
   const navigate=useNavigate()
-  const {booking,isLoading} = useBookingById();
-  const {deleteBooking,isDeleting}=useDeleteBooking()
+  const {tour,isLoading} = useTour();
+  const {deleteTour,isDeleting}=useDeleteTour()
+ 
   const moveBack = useMoveBack();
 
   const statusToTagName = {
-   
-    "unpaid": "blue",
-    "paid": "green",
+    pending: "blue",
+    active: "green",
+    inactive: "silver",
   };
-  if(isLoading||isDeleting) return <Spinner />
-  if(!booking) return <Empty resourceName="booking"/>
-  const {paid,id}=booking;
-  const paidValue = paid?'paid':'unpaid';
+  if(isLoading) return <Spinner />
+  if(!tour) return <Empty resourceName="tour"/>
+  const {status,id,name}=tour;
   return (
     <>
       <Row type="horizontal">
         <HeadingGroup>
-          <Heading as="h1">Booking #{id}</Heading>
-          <Tag type={statusToTagName[paid]}>{paid}</Tag>
+          <Heading as="h1">Tour {name}</Heading>
+          <Tag type={statusToTagName[status]}>{status}</Tag>
         </HeadingGroup>
         <ButtonText onClick={moveBack}>&larr; Back</ButtonText>
       </Row>
 
-      <BookingDataBox booking={booking} />
+      <TourDataBox tour={tour} />
 
       <ButtonGroup>
       <Modal>
@@ -60,12 +58,12 @@ function BookingDetail() {
       <Button variation='danger'>Delete</Button>
       </Modal.Open>
       <Modal.Window name='delete'>
-        <ConfirmDelete onConfirm={()=>deleteBooking(id,{onSettled:navigate('/admin/bookings')})} disabled={isDeleting} resourceName={id}/>
+        <ConfirmDelete onConfirm={()=>deleteTour(id,{onSettled:navigate('/admin/tours')})} resourceName={id}/>
       </Modal.Window>
       
       </Modal>
-      {paidValue==='unpaid'&&<Button onClick={()=>navigate(`/admin/checkins/${id}`)}>Check in</Button>}
-      {paidValue==='paid'&&<Button icon ={<HiArrowUpOnSquare/>} disable={true} onClick={()=>{}}>Check out</Button>}
+      {status==='unconfirmed'&&<Button>Check in</Button>}
+      {status==='checked-in'&&<Button icon ={<HiArrowUpOnSquare/>} >Check out</Button>}
         <Button variation="secondary" onClick={moveBack}>
           Back
         </Button>
@@ -74,4 +72,4 @@ function BookingDetail() {
   );
 }
 
-export default BookingDetail;
+export default TourDetail;

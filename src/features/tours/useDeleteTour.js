@@ -9,7 +9,8 @@ export function useDeleteTour(){
         onError:(err)=>toast.error(err.message),
         onSuccess:(id)=>{toast.success('Tour deleted');
             queryClient.invalidateQueries({
-                queryKey:['tours']
+                predicate:query =>
+                    query.queryKey[0].startsWith("tours")
             })
            
         }

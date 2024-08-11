@@ -81,6 +81,7 @@ function BookingRow({
   const navigate = useNavigate();
   // const { checkout, isCheckingOut } = useCheckout();
   const { deleteBooking, isDeleting } = useDeleteBooking();
+  console.log(booking.startDate)
   return (
     <Table.Row>
       <Tour>{tourName}</Tour>
@@ -99,8 +100,8 @@ function BookingRow({
         </span>
         <span>
             
-          {format(new Date(startDate.replace(/ICT/,'')), 'MMM dd yyyy')} &mdash;{' '}
-          {format(new Date(startDate.replace(/ICT/,'')), 'MMM dd yyyy')}
+          {format(new Date(startDate.replace('ICT', '+0700')), 'MMM dd yyyy')} &mdash;{' '}
+          {format(new Date(startDate.replace('ICT', '+0700')), 'MMM dd yyyy')}
         </span>
       </Stacked>
 
@@ -113,14 +114,14 @@ function BookingRow({
           <Menus.List id={bookingId}>
             <Menus.Button
               icon={<HiEye />}
-              onClick={() => navigate(`/bookings/${bookingId}`)}
+              onClick={() => navigate(`/admin/bookings/${bookingId}`)}
             >
               See details
             </Menus.Button>
             {paidValue === 'unpaid' && (
               <Menus.Button
                 icon={<HiArrowDownOnSquare />}
-                onClick={() => navigate(`/checkins/${bookingId}`)}
+                onClick={() => navigate(`/admin/checkins/${bookingId}`)}
               >
                 Paid bill
               </Menus.Button>

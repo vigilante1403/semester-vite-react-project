@@ -5,12 +5,14 @@ import toast from "react-hot-toast";
 export function useCreateBooking(){
     const queryClient = useQueryClient();
     const {mutate:createBooking,isLoading:isCreating}=useMutation({
-        mutationFn:addBooking,
+        mutationFn:(bookingForm) => addBooking(bookingForm),
+        retry:false,
         onError:(err)=>toast.error(err),
         onSuccess:()=>{
             toast.success('Create booking successfully');
             queryClient.invalidateQueries({
-                queryKey:['bookings']
+                predicate: query => 
+                query.queryKey[0].startsWith('bookings')
             })
         }
     })

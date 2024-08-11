@@ -10,12 +10,9 @@ export function useUpdate() {
     onSuccess: (data) => {
       toast.success('User updated');
       queryClient.invalidateQueries({
-        queryKey: (queries) =>
-          queries.filter(
-            (query) =>
-              query.startsWith(`user-email-${data.email}`) ||
-              query.startsWith(`user-id-${data.id}`)
-          ),
+        predicate:
+        (queries) =>queries.queryKey[0].startsWith(`user-email-${data.email}`)||queries.queryKey[0].startsWith(`user-id-${data.id}`)
+          
       });
     },
   });

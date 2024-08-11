@@ -61,7 +61,7 @@ function AccountRow({ user }) {
 
   return (
     <Table.Row>
-      <Img src={'http://localhost:8080/api/v1/file/image/' + photo || ''} />
+      <Img src={'http://localhost:8080/api/v1/file/image/user/' + photo || ''} />
       <Email>{email}</Email>
       <UserName>{name}</UserName>
       <Role>{role}</Role>

@@ -12,6 +12,8 @@ import Tours from "./pages/Tours"
 import Users from "./pages/Users"
 import Bookings from "./pages/Bookings"
 import Accounts from "./pages/Accounts"
+import Checkin from "./pages/Checkin"
+import BookingDetail from "./features/bookings/BookingDetail"
 import GeocodeComponent from "./pages/GeocodeComponent"
 import { DarkModeProvider } from "./context/DarkModeContext"
 import HomePage from './pages/userpages/HomePage';
@@ -54,6 +56,11 @@ function App() {
             <Route path="accounts" element={<Accounts/>} />
             <Route path="users" element={<Users/>} />
             <Route path="bookings" element={<Bookings/>} />
+            <Route
+                    path="bookings/:bookingId"
+                    element={<BookingDetail />}
+                  />
+                  <Route path="checkins/:bookingId" element={<Checkin />} />
             </Route>
             <Route path="*" element={<PageNotFound />} />
           </Route>

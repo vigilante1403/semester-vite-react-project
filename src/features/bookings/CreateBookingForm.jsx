@@ -16,7 +16,6 @@ import { useUpdateBooking } from './useUpdateBooking';
 import Spinner from '../../ui/Spinner';
 import { useState } from 'react';
 
-
 function CreateBookingForm({ onClose, editBooking }) {
   const { createBooking, isCreating } = useCreateBooking();
   const{tours,isLoading}=useTours();
@@ -41,9 +40,11 @@ function CreateBookingForm({ onClose, editBooking }) {
 
   const [datesSelected,setDatesSelected]=useState([])
 
-
-  const onSubmit = (data) => {
+ const onSubmit = (data) => {
     const formData = new FormData()
+    if (editBooking !== undefined) {
+      formData.append("id", editBooking.id)
+    }
     formData.append('tour',data.tour)
     formData.append('user',data.user)
     formData.append('date',data.date.toString())
