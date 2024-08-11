@@ -13,9 +13,10 @@ const StyledSelect = styled.select`
   font-weight: 500;
   box-shadow: var(--shadow-sm);
 `;
-function Select({options,value,onChange,...props}) { // currently active value can use ...props to get the remaining props
+function Select({options,value,onChange,text,...props}) { // currently active value can use ...props to get the remaining props
   return (
-    <StyledSelect onChange={onChange} value={value} {...props}>
+    <StyledSelect onChange={onChange} value={value} {...props} text={text}>
+    <option value='#' key='#'>{text}</option>
       {options.map(option=><option value={option.value} key={option.value}>{option.label}</option>)}
     </StyledSelect>
   )

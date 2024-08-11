@@ -59,8 +59,8 @@ function BookingRow({
     priceDiscount,
     priceFinal,
     paid,
-    user: { name: guestName, email },
-    tour: { name: tourName },
+    user: { name: guestName, email, id:userId },
+    tour: { name: tourName,id },
   },
 }) {
   const booking = {
@@ -69,8 +69,8 @@ function BookingRow({
     priceOrigin,
     priceDiscount,
     priceFinal,
-    user: { name: guestName, email },
-    tour: { name: tourName },
+    user: { name: guestName, email, userId },
+    tour: { name: tourName,id },
   }
   const paidValue = paid?'paid':'unpaid'
   const statusToTagName = {
@@ -99,7 +99,6 @@ function BookingRow({
           &rarr;  1 day travel
         </span>
         <span>
-            
           {format(new Date(startDate.replace('ICT', '+0700')), 'MMM dd yyyy')} &mdash;{' '}
           {format(new Date(startDate.replace('ICT', '+0700')), 'MMM dd yyyy')}
         </span>
