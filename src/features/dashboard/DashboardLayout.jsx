@@ -1,13 +1,13 @@
-import styled from "styled-components";
+import styled from 'styled-components';
+import { useState } from 'react';
+import Spinner from '../../ui/Spinner';
+import Empty from '../../ui/Empty';
 
-import Spinner from "../../ui/Spinner";
-
-
-
-import SalesChart from "./SalesChart";
-import DurationChart from "./DurationChart";
-import { useTours } from "../tours/useTours";
-// import TodayActivity from "../check-in-out/TodayActivity";
+import SalesChart from './SalesChart';
+import DurationChart from './DurationChart';
+import { useTours } from '../tours/useTours';
+import { useSearchParams } from 'react-router-dom';
+import { useRecentBookings } from './useRecentBookings';
 
 const StyledDashboardLayout = styled.div`
   display: grid;
@@ -16,19 +16,26 @@ const StyledDashboardLayout = styled.div`
   gap: 2.4rem;
 `;
 function DashboardLayout() {
-//   const {bookings,isLoading}=useRecentBookings()
-//   const {numDays,stays,confirmedStays,isLoading:isLoadingStays}=useRecentStays()
-  const {tours,isLoading:isLoadingTour}=useTours()
-//   if(isLoading||isLoadingStays||isLoadingCabin) return <Spinner />
-if(isLoadingTour) return <Spinner />
+  const [dataSale, setDataSale] = useState([]);
+  const { tours, isLoading: isLoadingTour } = useTours();
+  const [searchParams] = useSearchParams();
+  const numDays = Number(searchParams.get('last')) || 7;
+  const { bookings, isLoading } = useRecentBookings();
+
+ 
+  if (isLoadingTour || isLoading) return <Spinner />;
+  if (!tours || !bookings) return <Empty resourceName="tours" />;
   return (
     <StyledDashboardLayout>
       {/* <Stats bookings={tours} numDays={10} numCabins={tours.length} confirmStays={confirmedStays} /> */}
       {/* <TodayActivity /> */}
       <DurationChart confirmedStays={tours} />
-      <SalesChart bookings={tours} numDays={7} />
+      <SalesChart
+        bookings={bookings}
+        numDays={numDays}
+      />
     </StyledDashboardLayout>
-  )
+  );
 }
 
-export default DashboardLayout
+export default DashboardLayout;
