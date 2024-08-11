@@ -1,40 +1,74 @@
-import { Box, Card, CardContent, CardMedia, Typography, Button, Container, Grid, Rating } from '@mui/material';
-function Tour({tour}) {
-    return (
-        <Grid item xs={12} sm={6} md={4} key={tour.id}>
-            <Card>
-              <CardMedia
-                component="img"
-                height="200"
-                image={tour.image}
-                alt={tour.title}
-              />
-              <CardContent>
-                <Typography variant="h5" gutterBottom sx={{ fontSize: '1.5rem' }}>
-                  {tour.title}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" gutterBottom sx={{ fontSize: '1rem' }}>
-                  {tour.description}
-                </Typography>
-                <Typography variant="body1" color="textPrimary" gutterBottom sx={{ fontSize: '1.25rem' }}>
-                  Price: {tour.price}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" gutterBottom sx={{ fontSize: '1rem' }}>
-                  Start Date: {tour.startDate}
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Rating name="read-only" value={tour.rating} readOnly />
-                  <Typography variant="body2" color="textSecondary" sx={{ ml: 1, fontSize: '1rem' }}>
-                    ({tour.rating})
-                  </Typography>
-                </Box>
-                <Button variant="contained" color="primary" sx={{ marginTop: '10px', fontSize: '1rem' }}>
-                  Book Now
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-    )
-}
+import React from 'react';
+import { Box, Card, CardContent, CardMedia, Typography, Button, Grid, Rating } from '@mui/material';
+import { HiOutlineCurrencyDollar, HiCalendar, HiUserGroup } from 'react-icons/hi2';
 
-export default Tour
+const Tour = ({ tour, bookings }) => {
+  const participantCount = bookings.filter(booking => booking.tour.id === tour.id).length;
+
+  return (
+    <Grid item xs={12} sm={6} md={4} lg={3}>
+      <Card sx={{
+          transition: 'transform 0.3s ease-in-out', // Thay đổi khi hover
+          '&:hover': {
+            transform: 'scale(1.05)', // Phóng to khi hover
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', // Thêm bóng khi hover
+          },
+        }}>
+        <CardMedia
+          component="img"
+          height="200"
+          image={'http://localhost:8080/api/v1/file/image/tour/' + tour.imageCover}
+          alt={tour.name}
+          sx={{ objectFit: 'cover' }}
+        />
+        <CardContent>
+          <Typography variant="h5" gutterBottom sx={{ fontSize: '1.6rem' }}>
+            {tour.name}
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+            <img 
+              src={tour.countryFlag} 
+              alt={tour.countryNameCommon} 
+              style={{ width: 24, height: 24, marginRight: 8 }} 
+            />
+            <Typography variant="body2" color="textPrimary" sx={{ fontSize: '1.4rem' }}>
+              {tour.countryNameCommon}
+            </Typography>
+          </Box>
+          <Typography variant="body2" color="textSecondary" gutterBottom sx={{ fontSize: '1.2rem' }}>
+            {tour.description}
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <HiOutlineCurrencyDollar size={24} style={{ marginRight: 8 }} />
+            <Typography variant="body1" color="textSecondary" sx={{ fontSize: '1.2rem' }}>
+             {tour.price} USD
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <HiCalendar size={24} style={{ marginRight: 8 }} />
+            <Typography variant="body1" color="textSecondary" sx={{ fontSize: '1.2rem' }}>
+             {tour.startDates}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <HiUserGroup size={24} style={{ marginRight: 8 }} />
+            <Typography variant="body1" color="textSecondary" sx={{ fontSize: '1.2rem' }}>
+               {participantCount}/{tour.maxGroupSize}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Rating name="read-only" value={tour.rating} readOnly />
+            <Typography variant="body2" color="textSecondary" sx={{ ml: 1, fontSize: '1.2rem' }}>
+              ({tour.rating ? tour.rating: 0})
+            </Typography>
+          </Box>
+          <Button variant="contained" color="primary" sx={{ marginTop: '1rem', fontSize: '1.2rem' }}>
+            Show Detail
+          </Button>
+        </CardContent>
+      </Card>
+    </Grid>
+  );
+};
+
+export default Tour;

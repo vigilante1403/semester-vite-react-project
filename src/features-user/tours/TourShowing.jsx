@@ -1,7 +1,9 @@
 import React from 'react';
 import { Typography, Container, Grid } from '@mui/material';
 import Tour from './Tour';
-const TourShowing = ({tours}) => {
+
+const TourShowing = ({ tours,bookings }) => {
+ 
 
   return (
     <Container>
@@ -10,7 +12,7 @@ const TourShowing = ({tours}) => {
       </Typography>
       <Grid container spacing={4}>
         {tours.map((tour) => (
-          <Tour tour={tour} />
+          <Tour key={tour.id} tour={tour} bookings={bookings}/>
         ))}
       </Grid>
     </Container>

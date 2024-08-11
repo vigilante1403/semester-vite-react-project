@@ -1,7 +1,8 @@
+import React from 'react';
 import { HiChevronLeft, HiChevronRight } from 'react-icons/hi2';
 import { useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
-import {PAGE_SIZE} from '../utils/constants'
+
 const StyledPagination = styled.div`
   width: 100%;
   display: flex;
@@ -11,7 +12,9 @@ const StyledPagination = styled.div`
 
 const P = styled.p`
   font-size: 1.4rem;
-  margin-left: 0.8rem;
+  margin: 0;
+  flex: 1;
+  text-align: center;
 
   & span {
     font-weight: 600;
@@ -58,36 +61,42 @@ const PaginationButton = styled.button`
   }
 `;
 
-function  Pagination({ count }) {
+function PaginationCustom({ count, pageSize }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = !searchParams.get('page')
     ? 1
     : Number(searchParams.get('page'));
-  const pageCount = Math.ceil(count / PAGE_SIZE);
+  const pageCount = Math.ceil(count / pageSize);
+
   function nextPage() {
     const next = currentPage === pageCount ? currentPage : currentPage + 1;
     searchParams.set('page', next);
     setSearchParams(searchParams);
   }
+
   function prevPage() {
     const prev = currentPage <= 1 ? 1 : currentPage - 1;
     searchParams.set('page', prev);
     setSearchParams(searchParams);
   }
+
   if (pageCount <= 1) return null;
+
   return (
     <StyledPagination>
-      <P>
-        Showing <span>{(currentPage - 1) * PAGE_SIZE + 1}</span> to <span>
-          {currentPage !== pageCount ? currentPage * PAGE_SIZE : count}
-        </span>{' '}
-        of <span>{count}</span> results
-      </P>
       <Buttons>
         <PaginationButton onClick={prevPage} disabled={currentPage === 1}>
           <HiChevronLeft />
           <span>Previous</span>
         </PaginationButton>
+      </Buttons>
+      <P>
+        Showing <span>{(currentPage - 1) * pageSize + 1}</span> to <span>
+          {currentPage !== pageCount ? currentPage * pageSize : count}
+        </span>{' '}
+        of <span>{count}</span> results
+      </P>
+      <Buttons>
         <PaginationButton
           onClick={nextPage}
           disabled={currentPage === pageCount}
@@ -100,4 +109,4 @@ function  Pagination({ count }) {
   );
 }
 
-export default Pagination;
+export default PaginationCustom;
