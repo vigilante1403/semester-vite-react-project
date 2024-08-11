@@ -7,7 +7,7 @@ export function useCreateBooking(){
     const {mutate:createBooking,isLoading:isCreating}=useMutation({
         mutationFn:(bookingForm) => addBooking(bookingForm),
         retry:false,
-        onError:(err)=>toast.error(err),
+        onError:(err)=>{toast.error(err.response.data.message);console.log(err.response.data.message)},
         onSuccess:()=>{
             toast.success('Create booking successfully');
             queryClient.invalidateQueries({

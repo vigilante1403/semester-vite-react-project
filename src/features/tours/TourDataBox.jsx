@@ -1,6 +1,5 @@
 import styled from "styled-components";
-import { format, isToday, parse } from "date-fns";
-// import { utcToZonedTime } from 'date-fns-tz';
+import { format, isToday } from "date-fns";
 import {
   HiOutlineChatBubbleBottomCenterText,
   HiOutlineCheckCircle,
@@ -9,12 +8,9 @@ import {
 } from "react-icons/hi2";
 
 import DataItem from "../../ui/DataItem";
-// import { Flag } from "../../ui/Flag";
+import { Flag } from "../../ui/Flag";
 
 import { formatDistanceFromNow, formatCurrency } from "../../utils/helpers";
-import Modal from "../../ui/Modal";
-import BookingQRCode from "../../utils/qrCode";
-import Button from "../../ui/Button";
 
 const StyledBookingDataBox = styled.section`
   /* Box */
@@ -81,9 +77,9 @@ const Price = styled.div`
   margin-top: 2.4rem;
 
   background-color: ${(props) =>
-    props.paid ? "var(--color-green-100)" : "var(--color-yellow-100)"};
+    props.isPaid ? "var(--color-green-100)" : "var(--color-yellow-100)"};
   color: ${(props) =>
-    props.paid ? "var(--color-green-700)" : "var(--color-yellow-700)"};
+    props.isPaid ? "var(--color-green-700)" : "var(--color-yellow-700)"};
 
   & p:last-child {
     text-transform: uppercase;
@@ -106,93 +102,88 @@ const Footer = styled.footer`
 `;
 
 // A purely presentational component
-function BookingDataBox({ booking }) {
+function TourDataBox({ tour }) {
   const {
-    id: bookingId,
-    startDate,
-    priceOrigin,
+    id,
+    name,
+    slug,
+    maxGroupSize,
+    price,
     priceDiscount,
-    priceFinal,
-    user: { name: guestName, email },
-    tour: { name: tourName },
-    paid
-  } = booking;
+    imageCover,
+    guides,
+    description,
+    startDates,
+    summary,
+    countryFlag,
+    countryNameCommon,
+    countryNameOfficial
+  } = tour;
 
-
-const outputFormat = 'yyyy-MM-dd HH:mm:ss';
-const formattedDate = format(new Date(startDate.replace('ICT', '+0700')), outputFormat);
-
-console.log(formattedDate);
-console.log(startDate)
   return (
     <StyledBookingDataBox>
       <Header>
         <div>
           <HiOutlineHomeModern />
           <p>
-            {tourName} 
+            {startDates.length} day trip <span>{name}</span>
           </p>
         </div>
 
         <p>
-          {format(new Date(startDate.replace('ICT', '+0700')), "yyyy-MM-dd HH:mm")} (
-          {isToday(new Date(startDate))
+          {format(new Date(startDates[0]), "EEE, MMM dd yyyy")} (
+          {isToday(new Date(startDates[0]))
             ? "Today"
-            : formatDistanceFromNow(startDate)}
+            : formatDistanceFromNow(startDates[0])}
           )
+          {/* ) &mdash; {format(new Date(endDate), "EEE, MMM dd yyyy")} */}
         </p>
       </Header>
 
       <Section>
         <Guest>
-        
+          {countryFlag && <Flag src={countryFlag} alt={`Flag of ${countryNameCommon}`} />}
           <p>
-            {guestName}
+            {/* {guestName} {numGuests > 1 ? `+ ${numGuests - 1} guests` : ""} */}
           </p>
           <span>&bull;</span>
-          <p>{email}</p>
+          <p>{startDates.length}-day trip</p>
           <span>&bull;</span>
-         
+          <p>Country Name: {countryNameOfficial}</p>
         </Guest>
 
-
-      
-
-      
-        <Price paid={paid}>
-        <DataItem icon={<HiOutlineCurrencyDollar />} label={`Origin price`}>
-            {formatCurrency(priceOrigin)}
-
-           
+        {/* {observations && (
+          <DataItem
+            icon={<HiOutlineChatBubbleBottomCenterText />}
+            label="Observations"
+          >
+            {observations}
           </DataItem>
-          <DataItem icon={<HiOutlineCurrencyDollar />} label={`Discount price`}>
-            {formatCurrency(priceDiscount)}
+        )} */}
 
-           
-          </DataItem>
-         
+        {/* <DataItem icon={<HiOutlineCheckCircle />} label="Breakfast included?">
+          {hasBreakfast ? "Yes" : "No"}
+        </DataItem> */}
+
+        {/* <Price isPaid={isPaid}>
           <DataItem icon={<HiOutlineCurrencyDollar />} label={`Total price`}>
-            {formatCurrency(priceFinal)}
+            {formatCurrency(totalPrice)}
 
-           
+            {hasBreakfast &&
+              ` (${formatCurrency(cabinPrice)} cabin + ${formatCurrency(
+                extrasPrice
+              )} breakfast)`}
           </DataItem>
-          <p>{paid ? "Paid" : "Will pay at property"}</p>
-        </Price>
-        
+
+          <p>{isPaid ? "Paid" : "Will pay at property"}</p>
+        </Price> */}
       </Section>
 
       <Footer>
-      <Modal>
-      <Modal.Open opens="qr-code">
-        <Button disabled={!paid}>Get QR code</Button>
-      </Modal.Open>
-      <Modal.Window name="qr-code">
-      <BookingQRCode booking={booking} />
-      </Modal.Window>
-      </Modal>
+        <p>Started at {format(new Date(startDates[0]), "EEE, MMM dd yyyy, p")}</p>
       </Footer>
     </StyledBookingDataBox>
   );
 }
 
-export default BookingDataBox;
+export default TourDataBox;
