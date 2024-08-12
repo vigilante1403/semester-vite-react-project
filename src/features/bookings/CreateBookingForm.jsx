@@ -1,13 +1,13 @@
 /*eslint-disable*/
 import styled from 'styled-components';
-import { formatDistance, parse, parseISO,format } from 'date-fns';
+import { formatDistance, parse, parseISO, format } from 'date-fns';
 import Input from '../../ui/Input';
 import Form from '../../ui/Form';
 import Select from '../../ui/Select';
 import FormRow from '../../ui/FormRow';
 import Button from '../../ui/Button';
 
-import { useForm,Controller } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useCreateBooking } from './useCreateBooking';
 import { useTours } from '../tours/useTours';
@@ -17,17 +17,41 @@ import Spinner from '../../ui/Spinner';
 import { useState } from 'react';
 
 function CreateBookingForm({ onClose, editBooking }) {
-  if(editBooking) console.log(editBooking)
+  if (editBooking) console.log(editBooking);
   const { createBooking, isCreating } = useCreateBooking();
-  const{tours,isLoading}=useTours();
-  const {users,isLoading:isLoading2}=useUsers();
+  const { tours, isLoading } = useTours();
+  const { users, isLoading: isLoading2 } = useUsers();
   const { updateBooking, isUpdating } = useUpdateBooking();
-  const formatDate = (dateInput)=>{
+  const formatDate = (dateInput) => {
     const cleanedDateString = dateInput.replace(/ ICT/, '');
-    const parsedDate = parse(cleanedDateString, 'EEE MMM dd HH:mm:ss yyyy', new Date());
+    const parsedDate = parse(
+      cleanedDateString,
+      'EEE MMM dd HH:mm:ss yyyy',
+      new Date()
+    );
     const formattedDate = format(parsedDate, 'yyyy-MM-dd');
     return formattedDate;
-  }
+  };
+  const validatePrice = (data) => {
+    if(priceDiscount==='') {setPriceDiscount(0)}
+    if(price==='') {setPrice(0)}
+
+    if (parseFloat(price) <= 0 || price =='') {
+      toast.error('Price must be greater than 0');
+      return false;
+    }
+    if (parseFloat(price) > 10000) {
+      toast.error('Price must not be greater than 10000');
+      return false;
+    }
+    if (parseFloat(priceDiscount) > parseFloat(price)) {
+      toast.error('Discount price cannot be greater than the original price');
+      return false;
+    }
+    return true;
+  };
+
+
   const {
     handleSubmit,
     reset,
@@ -37,32 +61,49 @@ function CreateBookingForm({ onClose, editBooking }) {
   } = useForm({
     defaultValues: editBooking !== undefined ? editBooking : {},
   });
-  if(editBooking!==undefined)console.log(formatDate(editBooking.startDate))
-  const [dateChose,setDateChose]=useState(editBooking!==undefined?formatDate(editBooking.startDate).toString():'');
-  const [tourChose,setTourChose]=useState(editBooking!==undefined?editBooking.tour.id:'');
-  const [userChose,setUserChose]=useState(editBooking!==undefined?editBooking.user.userId:'');
-  const [change,setChange]=useState(false);
-  
-
+  if (editBooking !== undefined) console.log(formatDate(editBooking.startDate));
+  const [dateChose, setDateChose] = useState(
+    editBooking !== undefined
+      ? formatDate(editBooking.startDate).toString()
+      : ''
+  );
+  const [tourChose, setTourChose] = useState(
+    editBooking !== undefined ? editBooking.tour.id : ''
+  );
+  const [userChose, setUserChose] = useState(
+    editBooking !== undefined ? editBooking.user.userId : ''
+  );
+  const [change, setChange] = useState(false);
+  const [price, setPrice] = useState(editBooking ? editBooking.priceOrigin : 0);
+  const [priceDiscount, setPriceDiscount] = useState(editBooking ? editBooking.priceDiscount : 0);
   const onError = (errors) => {
     toast.error('Form submit fail');
     // console.log(errors);
   };
 
-  
-  
- const onSubmit = (data) => {
-    const formData = new FormData()
-    if(tourChose===''||tourChose==='#'){toast.error('Please choose tour');return}
-    if(userChose===''||userChose==='#'){toast.error('Please choose user');return}
-    if(dateChose===''||dateChose==='#'){toast.error('Please choose date');return}
-    if (editBooking !== undefined) {
-      formData.append("id", editBooking.id)
+  const onSubmit = (data) => {
+    const formData = new FormData();
+    if (tourChose === '' || tourChose === '#') {
+      toast.error('Please choose tour');
+      return;
     }
-    formData.append('tour',tourChose)
-    formData.append('user',userChose)
-    formData.append('date',dateChose)
-    formData.append('paid',true);
+    if (userChose === '' || userChose === '#') {
+      toast.error('Please choose user');
+      return;
+    }
+    if (dateChose === '' || dateChose === '#') {
+      toast.error('Please choose date');
+      return;
+    }
+    if (editBooking !== undefined) {
+      formData.append('id', editBooking.id);
+    }
+    formData.append('tour', tourChose);
+    formData.append('user', userChose);
+    formData.append('date', dateChose);
+    formData.append('paid', true);
+    formData.append('priceOrigin', price);
+    formData.append('priceDiscount', priceDiscount);
     if (editBooking !== undefined) {
       updateBooking(formData, {
         onSettled: () => {
@@ -79,17 +120,22 @@ function CreateBookingForm({ onClose, editBooking }) {
       });
     }
   };
-  const [datesSelected,setDatesSelected]=useState([])
+  const handleReset = () => {
+   
+    setPrice(0);
+    setPriceDiscount(0);
+  };
+  const [datesSelected, setDatesSelected] = useState([]);
   // if validation fail, handleSubmit will call the second method we pass in not the first one
-  if ( isCreating || isUpdating||isLoading||isLoading2) return <Spinner />; 
- 
+  if (isCreating || isUpdating || isLoading || isLoading2) return <Spinner />;
+
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
       type={editBooking ? 'regular' : 'modal'}
     >
       <FormRow label="Booking name">
-      <Controller
+        <Controller
           name="tour"
           control={control}
           rules={{
@@ -100,60 +146,74 @@ function CreateBookingForm({ onClose, editBooking }) {
             <Select
               {...field}
               value={tourChose}
-              options={Array.from(tours).map(tour=>({label:tour.name,value:tour.id}))}
+              options={Array.from(tours).map((tour) => ({
+                label: tour.name,
+                value: tour.id,
+              }))}
               text="Choose tour"
               onChange={(e) => {
                 const selectedTour = e.target.value;
                 field.onChange(selectedTour);
                 const filteredDates = [...tours]
-                  .filter(tour => tour.id === selectedTour)[0]
-                  .startDates.map(date => ({ label: date, value: date }));
-                
+                  .filter((tour) => tour.id === selectedTour)[0]
+                  .startDates.map((date) => ({ label: date, value: date }));
+
                 setDatesSelected(filteredDates);
-                setTourChose(prev=>e.target.value)
+                setTourChose((prev) => e.target.value);
                 setDateChose(filteredDates[0].value);
                 setValue('date', filteredDates[0].value);
-                setChange(prev=>true);
+                setChange((prev) => true);
               }}
             />
           )}
         />
       </FormRow>
 
-      <FormRow label="User info" >
-      <Controller
-    name="user"
-    control={control}
-    rules={{
-      validate: (value) => String(value).length > 0 || 'This field is required',
-    }}
-    render={({ field }) => (
-      <Select
-        {...field}
-        text="Choose user"
-        value={userChose}
-        options={Array.from([...users].filter(u=>u.role==='USER')).map(user=>({label:user.email,value:user.id}))}
-        onChange={(e) => {field.onChange(e.target.value);setUserChose(prev=>e.target.value)}}
-      />
-    )}
-  />
-      
-      </FormRow>
-
-      <FormRow label="Start date" >
-      <Controller
-          name="date"
-          
+      <FormRow label="User info">
+        <Controller
+          name="user"
           control={control}
           rules={{
-            validate: (value) => String(value).length > 0 || 'This field is required',
+            validate: (value) =>
+              String(value).length > 0 || 'This field is required',
           }}
           render={({ field }) => (
             <Select
-            text="Choose date"
               {...field}
-              options={editBooking!==undefined&&!change?[...tours].filter(tour=>tour.id===tourChose)[0].startDates.map(date=>({label:date,value:date})):datesSelected}
-              value={(dateChose!==''?dateChose:datesSelected[0])}
+              text="Choose user"
+              value={userChose}
+              options={Array.from(
+                [...users].filter((u) => u.role === 'USER')
+              ).map((user) => ({ label: user.email, value: user.id }))}
+              onChange={(e) => {
+                field.onChange(e.target.value);
+                setUserChose((prev) => e.target.value);
+              }}
+            />
+          )}
+        />
+      </FormRow>
+
+      <FormRow label="Start date">
+        <Controller
+          name="date"
+          control={control}
+          rules={{
+            validate: (value) =>
+              String(value).length > 0 || 'This field is required',
+          }}
+          render={({ field }) => (
+            <Select
+              text="Choose date"
+              {...field}
+              options={
+                editBooking !== undefined && !change
+                  ? [...tours]
+                      .filter((tour) => tour.id === tourChose)[0]
+                      .startDates.map((date) => ({ label: date, value: date }))
+                  : datesSelected
+              }
+              value={dateChose !== '' ? dateChose : datesSelected[0]}
               onChange={(e) => {
                 const selectedDate = e.target.value;
                 field.onChange(selectedDate);
@@ -163,9 +223,28 @@ function CreateBookingForm({ onClose, editBooking }) {
           )}
         />
       </FormRow>
+      <FormRow label="Price">
+        <Input
+          type="number"
+          value={price}
+          step="0.01"
+          readOnly={editBooking === undefined}
+          onChange={(e) => setPrice(e.target.value)}
+        />
+      </FormRow>
+
+      <FormRow label="Discount Price">
+        <Input
+          type="number"
+          value={priceDiscount}
+          step="0.01"
+          readOnly={editBooking === undefined}
+          onChange={(e) => setPriceDiscount(e.target.value)}
+        />
+      </FormRow>
       <FormRow>
         {/* type is an HTML attribute! */}
-        <Button variation="secondary" type="reset">
+        <Button variation="secondary" type="reset" onClick={handleReset}>
           Cancel
         </Button>
         <Button type="submit">

@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import Spinner from '../../ui/Spinner';
 import Empty from '../../ui/Empty';
-import Stats from '../../ui/Stats';
+import Stats from './Stats';
 import SalesChart from './SalesChart';
 import DurationChart from './DurationChart';
 import { useTours } from '../tours/useTours';

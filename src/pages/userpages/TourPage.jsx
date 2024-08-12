@@ -1,59 +1,48 @@
 import React from 'react';
-import { Box, Card, CardContent, CardMedia, Typography, Button, Container, Grid, Rating } from '@mui/material';
+import { Box, Container, Grid, useMediaQuery, useTheme } from '@mui/material';
 import TourShowing from '../../features-user/tours/TourShowing';
-
-const tours = [
-  {
-    id: 1,
-    title: 'Tour to the Mountains',
-    description: 'Enjoy a beautiful tour to the mountains.',
-    image: 'https://picsum.photos/id/237/600/400',
-    price: '$200',
-    startDate: '2023-08-10',
-    rating: 4.5
-  },
-  {
-    id: 2,
-    title: 'Beach Getaway',
-    description: 'Relax on the sandy beaches.',
-    image: 'https://picsum.photos/id/238/600/400',
-    price: '$150',
-    startDate: '2023-09-01',
-    rating: 4.0
-  },
-  {
-    id: 3,
-    title: 'City Exploration',
-    description: 'Discover the wonders of the city.',
-    image: 'https://picsum.photos/id/239/600/400',
-    price: '$100',
-    startDate: '2023-10-05',
-    rating: 4.2
-  },
-  {
-    id: 4,
-    title: 'Forest Adventure',
-    description: 'Explore the deep forests.',
-    image: 'https://picsum.photos/id/240/600/400',
-    price: '$180',
-    startDate: '2023-11-15',
-    rating: 4.8
-  },
-  {
-    id: 5,
-    title: 'Desert Safari',
-    description: 'Experience the thrill of the desert.',
-    image: 'https://picsum.photos/id/241/600/400',
-    price: '$220',
-    startDate: '2023-12-20',
-    rating: 4.7
-  }
-];
+import { useTours } from '../../features/tours/useTours';
+import Spinner from '../../ui/Spinner';
+import Empty from '../../ui/Empty';
+import { useBookingsTotal } from '../../features/bookings/useBookings';
+import { useSearchParams } from 'react-router-dom';
+import PaginationCustom from '../../ui/userLayout/PaginationCustom';
+import { PAGE_SIZES } from '../../utils/constants';
 
 const TourPage = () => {
+  const theme = useTheme();
+  const isExtraSmall = useMediaQuery(theme.breakpoints.down('xs'));
+  const isLarge = useMediaQuery(theme.breakpoints.up('lg'));
+  const isMedium = useMediaQuery(theme.breakpoints.up('md'));
+  const isSmall = useMediaQuery(theme.breakpoints.up('sm'));
+
+  const PAGE_SIZE = isLarge ? PAGE_SIZES.lg :
+                     isMedium ? PAGE_SIZES.md :
+                     isSmall ? PAGE_SIZES.sm :
+                     isExtraSmall ? PAGE_SIZES.xs :
+                     PAGE_SIZES.xs; 
+
+  const [searchParams] = useSearchParams();
+  const { tours, isLoading } = useTours();
+  const { bookings, isLoading: isBookingLoading } = useBookingsTotal();
+
+  if (isLoading || isBookingLoading) return <Spinner />;
+  if (!tours) return <Empty resourceName="tours" />;
+
+  const currentPage = !searchParams.get('page') ? 1 : Number(searchParams.get('page'));
+  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const endIndex = currentPage * PAGE_SIZE;
+  const paginatedTours = tours.slice(startIndex, endIndex);
+
+  if (!paginatedTours.length) return <Empty resourceName="tours" />;
 
   return (
-    <TourShowing tours={tours}/>
+    <Container>
+      <TourShowing tours={paginatedTours} bookings={bookings} />
+      <Box sx={{ marginTop: '4rem', marginBottom: '4rem', display: 'flex', justifyContent: 'center' }}>
+        <PaginationCustom count={tours.length} pageSize={PAGE_SIZE} />
+      </Box>
+    </Container>
   );
 };
 
