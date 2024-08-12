@@ -25,9 +25,9 @@ const HeadingGroup = styled.div`
   align-items: center;
 `;
 
-function TourDetail() {
+function TourDetail({tourId}) {
   const navigate=useNavigate()
-  const {tour,isLoading} = useTour();
+  const {tour,isLoading} = useTour(tourId);
   const {deleteTour,isDeleting}=useDeleteTour()
  
   const moveBack = useMoveBack();

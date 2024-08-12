@@ -4,7 +4,8 @@ export const getAllTours = async () => {
   if (error) throw new Error(error.message);
   return data;
 };
-export const getTourByIdOrSlug = async (id, slug) => {
+export const getTourByIdOrSlug = async ({id, slug}) => {
+  console.log(id)
   var url = '/tours/';
   if (slug != null) {
     url += `slug/${slug}`;

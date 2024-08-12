@@ -131,11 +131,11 @@ function TourDataBox({ tour }) {
         </div>
 
         <p>
-          {format(new Date(startDates[0]), "EEE, MMM dd yyyy")} (
+        {/* {format(new Date(startDates[0].replace('ICT', '+0700')), "yyyy-MM-dd HH:mm")} (
           {isToday(new Date(startDates[0]))
             ? "Today"
             : formatDistanceFromNow(startDates[0])}
-          )
+          ) */}
           {/* ) &mdash; {format(new Date(endDate), "EEE, MMM dd yyyy")} */}
         </p>
       </Header>

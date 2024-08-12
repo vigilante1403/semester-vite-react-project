@@ -119,11 +119,11 @@ function BookingDataBox({ booking }) {
   } = booking;
 
 
-const outputFormat = 'yyyy-MM-dd HH:mm:ss';
-const formattedDate = format(new Date(startDate.replace('ICT', '+0700')), outputFormat);
+// const outputFormat = 'yyyy-MM-dd HH:mm:ss';
+// const formattedDate = format(new Date(startDate.replace('ICT', '+0700')), outputFormat);
 
-console.log(formattedDate);
-console.log(startDate)
+// console.log(formattedDate);
+// console.log(startDate)
   return (
     <StyledBookingDataBox>
       <Header>
