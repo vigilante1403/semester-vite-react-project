@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { formatCurrency } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 import Table from '../../ui/Table';
-import { HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
+import { HiEye, HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
 import Modal from '../../ui/Modal';
 import ConfirmDelete from '../../ui/ConfirmDelete';
 import Menus from '../../ui/Menus';
@@ -11,6 +11,7 @@ import CreateTourForm from './CreateTourForm';
 import { useUpdateTour } from './useUpdateTour';
 import { useDeleteTour } from './useDeleteTour';
 import { useCreateTour } from './userCreateTour';
+import TourDetail from './TourDetails';
 
 // const TableRow = styled.div`
 //   display: grid;
@@ -104,6 +105,9 @@ function TourRow({ tour }) {
               >
                 Duplicate
               </Menus.Button>
+              <Modal.Open opens={`detail-${id}`}>
+                <Menus.Button icon={<HiEye />}>See details</Menus.Button>
+              </Modal.Open>
               <Modal.Open opens={`edit-${id}`}>
                 <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
               </Modal.Open>
@@ -111,18 +115,20 @@ function TourRow({ tour }) {
                 <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
               </Modal.Open>
             </Menus.List>
-            
           </Menus.Menu>
+          <Modal.Window name={`detail-${id}`}>
+            <TourDetail tourId={id} />
+          </Modal.Window>
           <Modal.Window name={`edit-${id}`}>
-              <CreateTourForm editTour={tour} />
-            </Modal.Window>
-            <Modal.Window name={`delete-${id}`}>
-              <ConfirmDelete
-                resourceName={name}
-                onConfirm={() => deleteTour(id)}
-                disabled={isDeleting}
-              />
-            </Modal.Window>
+            <CreateTourForm editTour={tour} />
+          </Modal.Window>
+          <Modal.Window name={`delete-${id}`}>
+            <ConfirmDelete
+              resourceName={name}
+              onConfirm={() => deleteTour(id)}
+              disabled={isDeleting}
+            />
+          </Modal.Window>
         </Modal>
       </div>
     </Table.Row>

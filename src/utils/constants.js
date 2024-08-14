@@ -1,5 +1,4 @@
 export const PAGE_SIZE = 5;
-
 export const PAGE_SIZES = {
     xl: 8,
     lg: 8, // Large screens

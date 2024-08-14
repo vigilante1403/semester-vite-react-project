@@ -34,3 +34,8 @@ export const getBookingById = async (id) => {
   if (error) throw new Error(error.message);
   return data;
 };
+export const getBookingsByDate = async(bookingForm)=>{
+  const {data,error}=await axios.post('/bookings/from-to-dates',bookingForm)
+  if(error) throw new Error(error.message)
+  return data;
+}

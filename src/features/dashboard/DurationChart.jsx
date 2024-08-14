@@ -140,7 +140,7 @@ function DurationChart({confirmedStays}) {
   const data = prepareData(startData,confirmedStays)
   return (
     <ChartBox>
-      <Heading as='h2'>Stay duration summary</Heading>
+      <Heading as='h2'>Total tours summary</Heading>
       <ResponsiveContainer width="100%" height={240}>
         <PieChart>
           <Pie data={data} innerRadius={70} outerRadius={90} nameKey='duration' dataKey='value'
