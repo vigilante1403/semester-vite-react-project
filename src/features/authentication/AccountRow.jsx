@@ -2,7 +2,7 @@
 import styled from 'styled-components'
 import toast from 'react-hot-toast'
 import Table from '../../ui/Table'
-import { HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2'
+import { HiEye, HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2'
 import Modal from '../../ui/Modal'
 import ConfirmDelete from '../../ui/ConfirmDelete'
 import Menus from '../../ui/Menus'
@@ -10,6 +10,7 @@ import CreateUserForm from './CreateUserForm'
 import { useUpdate } from './useUpdateUser'
 import { useDeleteUser } from './useDeleteUser'
 import { useCreateUser } from './useCreateUser'
+import { useNavigate } from 'react-router-dom'
 
 const Img = styled.img`
   display: block;
@@ -48,6 +49,7 @@ function AccountRow({ user }) {
   const { deleteUser, isDeleting } = useDeleteUser()
   const { createUser } = useCreateUser()
   const { id,email, name, role, enabled, photo } = user
+  const navigate = useNavigate()
 
   function handleDuplicate() {
     const formData = new FormData()
@@ -79,6 +81,7 @@ function AccountRow({ user }) {
                   Edit
                 </Menus.Button>
               </Modal.Open>
+              <Menus.Button icon={<HiEye/>} onClick={()=>navigate(`/admin/accounts/${id}`)}>See details</Menus.Button>
               <Modal.Open opens={`delete-${id}`}>
                 <Menus.Button icon={<HiTrash />}>
                   Delete

@@ -25,7 +25,7 @@ const HeadingGroup = styled.div`
   align-items: center;
 `;
 
-function TourDetail() {
+function TourReview() {
   const navigate=useNavigate()
   const {tour,isLoading} = useTour();
   const {deleteTour,isDeleting}=useDeleteTour()
@@ -72,4 +72,4 @@ function TourDetail() {
   );
 }
 
-export default TourDetail;
+export default TourReview;

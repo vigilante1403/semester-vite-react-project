@@ -12,6 +12,7 @@ import { useUpdateTour } from './useUpdateTour';
 import { useDeleteTour } from './useDeleteTour';
 import { useCreateTour } from './userCreateTour';
 import TourDetail from './TourDetails';
+import { useNavigate } from 'react-router-dom';
 
 // const TableRow = styled.div`
 //   display: grid;
@@ -54,6 +55,7 @@ const Discount = styled.div`
 function TourRow({ tour }) {
   const { deleteTour, isDeleting } = useDeleteTour();
   const { createTour, isCreating } = useCreateTour();
+  const navigate = useNavigate()
   const {
     id,
     name,
@@ -105,9 +107,7 @@ function TourRow({ tour }) {
               >
                 Duplicate
               </Menus.Button>
-              <Modal.Open opens={`detail-${id}`}>
-                <Menus.Button icon={<HiEye />}>See details</Menus.Button>
-              </Modal.Open>
+                <Menus.Button onClick={()=>navigate(`/admin/tours/${id}`)} icon={<HiEye />}>See details</Menus.Button>  
               <Modal.Open opens={`edit-${id}`}>
                 <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
               </Modal.Open>
@@ -116,9 +116,7 @@ function TourRow({ tour }) {
               </Modal.Open>
             </Menus.List>
           </Menus.Menu>
-          <Modal.Window name={`detail-${id}`}>
-            <TourDetail tourId={id} />
-          </Modal.Window>
+          
           <Modal.Window name={`edit-${id}`}>
             <CreateTourForm editTour={tour} />
           </Modal.Window>
