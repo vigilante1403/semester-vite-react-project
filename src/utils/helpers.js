@@ -16,7 +16,12 @@ export const formatDistanceFromNow = (dateStr) =>{
   }).replace('about ', '')
   .replace('in', 'In');
 }
-  
+export const formatDateToCalendar= (dateStr)=>{
+  const cleanedDateString = dateStr.replace(/ ICT/, '');
+  const parsedDate = parse(cleanedDateString, 'EEE MMM dd HH:mm:ss yyyy', new Date());
+  const formattedDate = format(parsedDate, 'yyyy-MM-dd');
+  return formattedDate;
+}
     
   
 

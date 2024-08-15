@@ -1,7 +1,5 @@
 import styled from "styled-components";
 import { HiArrowUpOnSquare } from "react-icons/hi2";
-
-import TourDataBox from "./TourDataBox";
 import Row from "../../ui/Row";
 import Heading from "../../ui/Heading";
 import Tag from "../../ui/Tag";
@@ -12,13 +10,13 @@ import Spinner from '../../ui/Spinner'
 
 import { useMoveBack } from "../../hooks/useMoveBack";
 import {useUser} from './useUser'
-import {useDeleteTour} from './useDeleteTour'
 import { useNavigate } from "react-router-dom";
 
 import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Empty from "../../ui/Empty";
 import { useDeleteUser } from "./useDeleteUser";
+import AccountDataBox from "./AccountDataBox";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -51,7 +49,7 @@ function AccountDetail() {
         </HeadingGroup>
         <ButtonText onClick={moveBack}>&larr; Back</ButtonText>
       </Row>
-
+      <AccountDataBox user={user} />
       
 
       <ButtonGroup>

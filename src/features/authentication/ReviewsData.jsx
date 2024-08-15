@@ -49,7 +49,8 @@ padding:0.7rem;
 justify-content: space-between;
 color: var(--color-grey-500);
 align-items: center;
-max-width: 40rem;
+max-width: 40vw;
+min-width: 20vw;
 flex-direction: column;
 `;
 

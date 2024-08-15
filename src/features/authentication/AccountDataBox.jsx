@@ -26,7 +26,7 @@ import {
 import DataItem from '../../ui/DataItem';
 import { Flag } from '../../ui/Flag';
 
-import { formatDistanceFromNow, formatCurrency } from '../../utils/helpers';
+import { formatDistanceFromNow, formatCurrency, formatDateToCalendar } from '../../utils/helpers';
 import Menus from '../../ui/Menus';
 import Button from '../../ui/Button';
 import Modal from '../../ui/Modal';
@@ -165,14 +165,14 @@ function AccountDataBox({ user }) {
     reviews,
     bookings,
   } = user;
-
+console.log(createdAt)
   return (
     <StyledBookingDataBox>
       <Header>
         <div>
           <HiOutlineHomeModern />
           <p>
-            Created at date: {format(createdAt.split("T")[0],"dd/MM/yyyy")} <span> Display Name: {displayName}</span>
+            Created at date: {formatDateToCalendar(createdAt)} <span> Display Name: {displayName}</span>
           </p>
         </div>
 
@@ -233,7 +233,7 @@ function AccountDataBox({ user }) {
               <Modal.Open opens="reviews">
                 <Button>Click view reviews</Button>
               </Modal.Open>
-              <Modal.Window><ReviewsData reviews={reviews} /></Modal.Window>
+              <Modal.Window name="reviews"><ReviewsData reviews={reviews} /></Modal.Window>
             </Modal>
           )}
           {(!reviews || reviews.length === 0) && <p>No review to show</p>}
@@ -244,7 +244,7 @@ function AccountDataBox({ user }) {
               <Modal.Open opens="joinedTours">
                 <Button>Click view joined Tours</Button>
               </Modal.Open>
-              <Modal.Window><ToursData tours={joinedTours} /></Modal.Window>
+              <Modal.Window name="joinedTours"><ToursData tours={joinedTours} /></Modal.Window>
             </Modal>
           )}
           {(!joinedTours || joinedTours.length === 0) && <p>This user hasn't joined any tour</p>}
@@ -255,7 +255,7 @@ function AccountDataBox({ user }) {
               <Modal.Open opens="bookings">
                 <Button>Click view bookings</Button>
               </Modal.Open>
-              <Modal.Window><BookingsData bookings={bookings} /></Modal.Window>
+              <Modal.Window name="bookings"><BookingsData bookings={bookings} /></Modal.Window>
             </Modal>
           )}
           {(!bookings || bookings.length === 0) && <p>This user hasn't made any booking</p>}

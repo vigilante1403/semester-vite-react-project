@@ -25,8 +25,8 @@ function UserAvatar() {
   const {currentUser}=useAuthenticate()
   return (
     <StyledUserAvatar>
-      <Avatar src={'http://localhost:8080/api/v1/file/image/user/'+currentUser.photo} alt={`Avatar of user`} />
-      <span>Hi {currentUser.name}</span>
+      <Avatar src={'/default-user.jpg'} alt={`Avatar of user`} />
+      <span>Hi {currentUser}</span>
     </StyledUserAvatar>
   )
 }

@@ -1,9 +1,10 @@
-import styled from "styled-components";
-import { format, isToday } from "date-fns";
+import styled from 'styled-components';
+import { format, isToday } from 'date-fns';
 import {
   HiBookOpen,
   HiBriefcase,
   HiCurrencyDollar,
+  HiMapPin,
   HiOutlineChatBubbleBottomCenterText,
   HiOutlineCheckCircle,
   HiOutlineCurrencyDollar,
@@ -15,16 +16,19 @@ import {
   HiRectangleStack,
   HiUserGroup,
   HiUsers,
-} from "react-icons/hi2";
+} from 'react-icons/hi2';
 
-import DataItem from "../../ui/DataItem";
-import { Flag } from "../../ui/Flag";
+import DataItem from '../../ui/DataItem';
+import { Flag } from '../../ui/Flag';
 
-import { formatDistanceFromNow, formatCurrency } from "../../utils/helpers";
-import Menus from "../../ui/Menus";
-import Button from "../../ui/Button";
-import Modal from "../../ui/Modal";
-import ReviewsData from "./ReviewsData";
+import { formatDistanceFromNow, formatCurrency } from '../../utils/helpers';
+import Menus from '../../ui/Menus';
+import Button from '../../ui/Button';
+import Modal from '../../ui/Modal';
+import ReviewsData from './ReviewsData';
+
+import toast from 'react-hot-toast';
+import MapComponent from './Map';
 
 const StyledBookingDataBox = styled.section`
   /* Box */
@@ -59,7 +63,7 @@ const Header = styled.header`
   }
 
   & span {
-    font-family: "Sono";
+    font-family: 'Sono';
     font-size: 2rem;
     margin-left: 4px;
   }
@@ -67,8 +71,8 @@ const Header = styled.header`
 
 const Section = styled.section`
   padding: 3.2rem 4rem 1.2rem;
-  display:grid;
-  grid-template-columns: repeat(2,1fr);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
 `;
 
 const Guest = styled.div`
@@ -93,9 +97,9 @@ const Price = styled.div`
   margin-top: 2.4rem;
 
   background-color: ${(props) =>
-    props.isPaid ? "var(--color-green-100)" : "var(--color-yellow-100)"};
+    props.isPaid ? 'var(--color-green-100)' : 'var(--color-yellow-100)'};
   color: ${(props) =>
-    props.isPaid ? "var(--color-green-700)" : "var(--color-yellow-700)"};
+    props.isPaid ? 'var(--color-green-700)' : 'var(--color-yellow-700)'};
 
   & p:last-child {
     text-transform: uppercase;
@@ -117,26 +121,25 @@ const Footer = styled.footer`
   text-align: right;
 `;
 const Guides = styled.div`
-display: flex;
-align-items: center;
-justify-content: space-between;
-gap: 2rem;
-`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+`;
 const Guide = styled.div`
   padding: 1rem;
   font-size: 1.6rem;
   display: flex;
   align-items: center;
-  
-`
+`;
 const Img = styled.img`
-  display:${(props)=>props.circle?"inline-block":"block"};
+  display: ${(props) => (props.circle ? 'inline-block' : 'block')};
   width: 6.4rem;
-  aspect-ratio: ${(props)=>props.circle?"1/1":"3/2"};
-  border-radius: ${(props)=>props.circle?"50%":"0"};
-  object-fit: ${(props)=>props.circle?"fill":"cover"};
-  object-position: ${(props)=>props.circle?"unset":"center"};
-  transform: scale(0.6) ;
+  aspect-ratio: ${(props) => (props.circle ? '1/1' : '3/2')};
+  border-radius: ${(props) => (props.circle ? '50%' : '0')};
+  object-fit: ${(props) => (props.circle ? 'fill' : 'cover')};
+  object-position: ${(props) => (props.circle ? 'unset' : 'center')};
+  transform: scale(0.6);
 `;
 // A purely presentational component
 function TourDataBox({ tour }) {
@@ -156,7 +159,8 @@ function TourDataBox({ tour }) {
     countryFlag,
     countryNameCommon,
     countryNameOfficial,
-    reviews
+    reviews,
+    locations,
   } = tour;
 
   return (
@@ -170,7 +174,7 @@ function TourDataBox({ tour }) {
         </div>
 
         <p>
-        {/* {format(new Date(startDates[0].replace('ICT', '+0700')), "yyyy-MM-dd HH:mm")} (
+          {/* {format(new Date(startDates[0].replace('ICT', '+0700')), "yyyy-MM-dd HH:mm")} (
           {isToday(new Date(startDates[0]))
             ? "Today"
             : formatDistanceFromNow(startDates[0])}
@@ -181,7 +185,9 @@ function TourDataBox({ tour }) {
 
       <Section>
         <Guest>
-          {countryFlag && <Flag src={countryFlag} alt={`Flag of ${countryNameCommon}`} />}
+          {countryFlag && (
+            <Flag src={countryFlag} alt={`Flag of ${countryNameCommon}`} />
+          )}
           <p>
             {/* {guestName} {numGuests > 1 ? `+ ${numGuests - 1} guests` : ""} */}
           </p>
@@ -190,35 +196,95 @@ function TourDataBox({ tour }) {
           <span>&bull;</span>
           <p>Country Name: {countryNameCommon}</p>
         </Guest>
-          <DataItem icon={<HiBriefcase />} label="Tour name"><p>{name}</p></DataItem>
-          <DataItem icon={<HiUsers />} label="Max Group Size"><p>{maxGroupSize} persons</p></DataItem>
-          <DataItem icon={<HiCurrencyDollar />} label="Initial price"><p>{formatCurrency(price)}</p></DataItem>
-          <DataItem icon={<HiCurrencyDollar />} label="Now discount price"><p>{formatCurrency(priceDiscount)}</p></DataItem>
-          {imageCover&&<DataItem icon={<HiPhoto />} label="Image Cover"><Img
-        src={'http://localhost:8080/api/v1/file/image/tour/' + imageCover || ''}
-      /></DataItem>}
-      {!imageCover&&<DataItem icon={<HiBriefcase />} label="Image Cover"><p>Currently no image cover to show</p></DataItem>}
-         {images && <DataItem icon={<HiBriefcase />} label="Images">{ images.map((image)=><Img
-        src={'http://localhost:8080/api/v1/file/image/tour/' + image || ''}
-      />)}</DataItem>}
-      {!images&&<DataItem icon={<HiBriefcase />} label="Images"><p>Currently no images to show</p></DataItem>}
-        <DataItem icon={<HiPencil/>} label="Description"><p>{description}</p></DataItem>
-        <DataItem icon={<HiPaintBrush/>} label="Summary"><p>{summary}</p></DataItem>
-        <DataItem icon={<HiRectangleStack/>} label="Start dates">{startDates && startDates.length>0&& startDates.map((start)=>(<div>{start}</div>))}</DataItem>
-        <DataItem label="Guides" icon={<HiUserGroup/>}>
-          <Guides>{guides && guides.length>0 && guides.map(guide=>(<Guide><Img
-        src={'/default-user.jpg'} circle={true}
-      /><span>{guide.fullName}</span></Guide>))}</Guides>
+        <DataItem icon={<HiBriefcase />} label="Tour name">
+          <p>{name}</p>
         </DataItem>
-        <DataItem icon={<HiBookOpen/>} label="Reviews">{reviews&&reviews.length>0&&<Modal><Modal.Open opens="reviews">
-        <Button>Click view reviews</Button>
-        </Modal.Open>
-        <Modal.Window><ReviewsData reviews={reviews} /></Modal.Window>
-        </Modal>}{(!reviews||reviews.length===0) && <p>No review to show</p>}</DataItem>
+        <DataItem icon={<HiUsers />} label="Max Group Size">
+          <p>{maxGroupSize} persons</p>
+        </DataItem>
+        <DataItem icon={<HiCurrencyDollar />} label="Initial price">
+          <p>{formatCurrency(price)}</p>
+        </DataItem>
+        <DataItem icon={<HiCurrencyDollar />} label="Now discount price">
+          <p>{formatCurrency(priceDiscount)}</p>
+        </DataItem>
+        {imageCover && (
+          <DataItem icon={<HiPhoto />} label="Image Cover">
+            <Img
+              src={
+                'http://localhost:8080/api/v1/file/image/tour/' + imageCover ||
+                ''
+              }
+            />
+          </DataItem>
+        )}
+        {!imageCover && (
+          <DataItem icon={<HiBriefcase />} label="Image Cover">
+            <p>Currently no image cover to show</p>
+          </DataItem>
+        )}
+        {images && (
+          <DataItem icon={<HiBriefcase />} label="Images">
+            {images.map((image) => (
+              <Img
+                src={
+                  'http://localhost:8080/api/v1/file/image/tour/' + image || ''
+                }
+              />
+            ))}
+          </DataItem>
+        )}
+        {!images && (
+          <DataItem icon={<HiBriefcase />} label="Images">
+            <p>Currently no images to show</p>
+          </DataItem>
+        )}
+        <DataItem icon={<HiPencil />} label="Description">
+          <p>{description}</p>
+        </DataItem>
+        <DataItem icon={<HiPaintBrush />} label="Summary">
+          <p>{summary}</p>
+        </DataItem>
+        <DataItem icon={<HiRectangleStack />} label="Start dates">
+          {startDates &&
+            startDates.length > 0 &&
+            startDates.map((start) => <div>{start}</div>)}
+        </DataItem>
+        <DataItem label="Guides" icon={<HiUserGroup />}>
+          <Guides>
+            {guides &&
+              guides.length > 0 &&
+              guides.map((guide) => (
+                <Guide>
+                  <Img src={'/default-user.jpg'} circle={true} />
+                  <span>{guide.fullName}</span>
+                </Guide>
+              ))}
+          </Guides>
+        </DataItem>
+        {locations.length > 0 && <MapComponent locations={locations} />}
+        <DataItem icon={<HiMapPin />} label="Locations">
+          No location to show
+        </DataItem>
+        <DataItem icon={<HiBookOpen />} label="Reviews">
+          {reviews && reviews.length > 0 && (
+            <Modal>
+              <Modal.Open opens="reviews">
+                <Button>Click view reviews</Button>
+              </Modal.Open>
+              <Modal.Window name="reviews">
+                <ReviewsData reviews={reviews} />
+              </Modal.Window>
+            </Modal>
+          )}
+          {(!reviews || reviews.length === 0) && <p>No review to show</p>}
+        </DataItem>
       </Section>
 
       <Footer>
-        <p>Started at {format(new Date(startDates[0]), "EEE, MMM dd yyyy, p")}</p>
+        <p>
+          Started at {format(new Date(startDates[0]), 'EEE, MMM dd yyyy, p')}
+        </p>
       </Footer>
     </StyledBookingDataBox>
   );
