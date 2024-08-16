@@ -1,10 +1,20 @@
 import React from 'react';
 import { Box, Card, CardContent, CardMedia, Typography, Button, Grid, Rating } from '@mui/material';
 import { HiOutlineCurrencyDollar, HiCalendar, HiUserGroup } from 'react-icons/hi2';
+import CheckoutButton from './CheckoutButton';
 
 const Tour = ({ tour, bookings }) => {
   const participantCount = bookings.filter(booking => booking.tour.id === tour.id).length;
-
+  const tour1 = {
+    name: 'Amazing Tour',
+    summary: 'An amazing tour you won’t forget!',
+    price: 5000, // price in cents
+    imageCover: 'cover-image.jpg',
+    slug: 'amazing-tour',
+    tourID: '12345',
+    email: 'vytruong1999@mailsac.com',
+    userID: '123456789',
+  };
   return (
     <Grid item xs={12} sm={6} md={4} lg={3}>
       <Card sx={{
@@ -62,9 +72,7 @@ const Tour = ({ tour, bookings }) => {
               ({tour.rating ? tour.rating: 0})
             </Typography>
           </Box>
-          <Button variant="contained" color="primary" sx={{ marginTop: '1rem', fontSize: '1.2rem' }}>
-            Show Detail
-          </Button>
+          <CheckoutButton tour={tour1} />
         </CardContent>
       </Card>
     </Grid>
