@@ -10,7 +10,7 @@ display: flex;
 align-items: center;
 justify-content: center;
 `
-function ProtectedRoute({children}) {
+function ProtectedRouteAdmin({children}) {
     const navigate=useNavigate()
     /// 1 load the authentcated user
     const {isAuthenticated,isLoading}=useAuthenticate();
@@ -24,4 +24,4 @@ function ProtectedRoute({children}) {
     if(isAuthenticated) return children
 }
 
-export default ProtectedRoute
+export default ProtectedRouteAdmin

@@ -22,8 +22,17 @@ import ContactPage from './pages/userpages/ContactPage';
 import UserLayout from './ui/userLayout/UserLayout';
 import TourDetail from './features/tours/TourDetails';
 import AccountDetail from './features/authentication/AccountDetail'
-import ProtectedRoute from './ui/ProtectedRoute';
-
+import ProtectedRouteAdmin from './ui/ProtectedRouteAdmin';
+import AuthenticatedUserLayout from './ui/userLayout/AuthenticatedUserLayout';
+import ProtectedRouteUser from './ui/userLayout/ProtectedRouteUser'
+import MyDashboard from './pages/userpages/MyDashboard';
+import MyReviews from './pages/userpages/MyReviews'
+import MyBookings from './pages/userpages/MyBookings'
+import MyStatistics from './pages/userpages/MyStatistics'
+import MySettings from './pages/userpages/MySettings'
+import AboutMe from './pages/userpages/AboutMe'
+import Verification from './pages/userpages/Verification'
+import VerifySuccess from './pages/userpages/VerifySuccess';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -44,14 +53,29 @@ function App() {
               <Route element={<AppLayout />}>
                 <Route index element={<Navigate replace to="home" />} />
                 <Route path="" element={<UserLayout />}>
+                {/* for all */}
                   <Route index element={<Navigate replace to="home" />} />
                   <Route path="home" element={<HomePage />} />
-                  {/* <Route path="login" element={<Login />} /> */}
                   <Route path="tours" element={<TourPage />} />
                   <Route path="contact" element={<ContactPage />} />
+                  <Route path="signup/signUpVerificationRequired" element={<Verification/>} />
+                  <Route path="/verifyAccount/:email/:token" element={<VerifySuccess/>} />
+                  {/* user part */}
+                  
+                  <Route path="*" element={<PageNotFound />} />
                 </Route>
-                {/* phan cho admin se co filter role va authentication sau */}
-                <Route path="admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+                <Route path="user" element={<ProtectedRouteUser><AuthenticatedUserLayout/></ProtectedRouteUser>}>
+                    <Route index element={<Navigate replace to="dashboard"/>} />
+                    <Route path="dashboard" element={<MyDashboard/>} />
+                    <Route path="me" element={<AboutMe/>} />
+                    <Route path="bookings" element={<MyBookings/>} />
+                    <Route path="reviews" element={<MyReviews/>} />
+                    <Route path="statistics" element={<MyStatistics/>} />
+                    <Route path="settings" element={<MySettings/>} />
+                    <Route path="*" element={<PageNotFound />} />
+                  </Route>
+              {/* for admin */}
+                <Route path="admin" element={<ProtectedRouteAdmin><AdminLayout /></ProtectedRouteAdmin>}>
                   <Route index element={<Navigate replace to="dashboard" />} />
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="tours" element={<Tours />} />
@@ -66,6 +90,7 @@ function App() {
                     element={<BookingDetail />}
                   />
                   <Route path="checkins/:bookingId" element={<Checkin />} />
+                  <Route path="*" element={<PageNotFound />} />
                 </Route>
                 <Route path="*" element={<PageNotFound />} />
               </Route>

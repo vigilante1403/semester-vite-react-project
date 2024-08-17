@@ -7,5 +7,5 @@ export function useAuthenticate() {
     queryFn: confirmLogin,
   });
 
-  return { user: currentUser, isAuthenticated: currentUser !== undefined ,isLoading };
+  return { user: currentUser, isAuthenticated: (currentUser !== null&&currentUser!==undefined) && currentUser.role !=='USER' ,isLoading };
 }

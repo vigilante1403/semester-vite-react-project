@@ -22,11 +22,11 @@ const Avatar = styled.img`
   outline: 2px solid var(--color-grey-100);
 `;
 function UserAvatar() {
-  const {currentUser}=useAuthenticate()
+  const {user}=useAuthenticate()
   return (
     <StyledUserAvatar>
       <Avatar src={'/default-user.jpg'} alt={`Avatar of user`} />
-      <span>Hi {currentUser}</span>
+      <span>Hi {user.name}</span>
     </StyledUserAvatar>
   )
 }

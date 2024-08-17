@@ -1,8 +1,9 @@
 import styled from "styled-components";
 
-import { useMoveBack } from "../hooks/useMoveBack";
-import Heading from "../ui/Heading";
-import Button from "../ui/Button";
+import { useMoveBack } from "../../hooks/useMoveBack";
+import Heading from "../../ui/Heading";
+import Button from "../../ui/Button";
+import { useLocation } from "react-router-dom";
 
 const StyledPageNotFound = styled.main`
   height: 100vh;
@@ -28,14 +29,16 @@ const Box = styled.div`
   }
 `;
 
-function PageNotFound() {
+function Verification() {
   const moveBack = useMoveBack();
+  const location = useLocation()
+
 
   return (
     <StyledPageNotFound>
       <Box>
         <Heading as="h1">
-          The page you are looking for could not be found 😢
+          Please check your mail to confirm the email 😀
         </Heading>
         <Button size="large" onClick={moveBack}>
           &larr; Go back
@@ -45,4 +48,4 @@ function PageNotFound() {
   );
 }
 
-export default PageNotFound;
+export default Verification;
