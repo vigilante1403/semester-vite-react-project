@@ -33,28 +33,26 @@ function CreateTourForm({ onClose, editTour }) {
 
   useEffect(() => {
     if (editTour && editTour.imageCover) {
-      fetchFileFromUrl("tour",editTour.imageCover).then(file => setCurrentPhoto(file));
+      fetchFileFromUrl('tour', editTour.imageCover).then((file) =>
+        setCurrentPhoto(file),
+      );
     }
     if (editTour?.images && editTour.images.length > 0) {
       const fetchAllPhotos = async () => {
-        const photoPromises = editTour.images.map(url =>
-          fetchFileFromUrl('tour', url)
+        const photoPromises = editTour.images.map((url) =>
+          fetchFileFromUrl('tour', url),
         );
         const photos = await Promise.all(photoPromises);
         setCurrentImages(photos);
       };
-   
 
-      fetchAllPhotos(); 
+      fetchAllPhotos();
     }
     if (editTour) {
       setSelectedCountry(editTour.countryNameCommon || null);
-     
     }
   }, [editTour]);
 
-  console.log(editTour);
-  console.log(currentImages)
   const {
     register,
     handleSubmit,
@@ -71,17 +69,15 @@ function CreateTourForm({ onClose, editTour }) {
       priceDiscount: editTour?.priceDiscount || '',
       summary: editTour?.summary || '',
       description: editTour?.description || '',
-      guide: editTour?.guide || '',
+      guide: editTour?.guides[0].id || '',
       imageCover: null,
       images: [], // No default file input, handled separately
       countryNameCommon: editTour?.countryNameCommon || '',
     },
   });
   const { errors } = formState;
-  console.log(editTour.imageCover)
 
   const onError = (errors) => {
-    // console.log(errors)
     toast.error('Form submit fail');
     console.log(errors);
   };
@@ -90,7 +86,6 @@ function CreateTourForm({ onClose, editTour }) {
   const [dates, setDates] = useState(['']);
   const [descriptions, setDescriptions] = useState(['']);
   const [coordinates, setCoordinates] = useState([]);
-
 
   const handleInputDateChange = (index, event) => {
     const newInputs = dates.slice();
@@ -116,7 +111,7 @@ function CreateTourForm({ onClose, editTour }) {
   const handleAddDates = () => {
     setDates([...dates, '']);
   };
-console.log(currentPhoto)
+
   const onSubmit = (data) => {
     const imagesElement = document.getElementById('images');
     const formData = new FormData();
@@ -136,18 +131,18 @@ console.log(currentPhoto)
         toast.error('Image cover is empty');
         return;
       }
-      if (data.images === undefined || data.images.length === 0) {
-        toast.error('Images is empty');
-        return;
-      }
-      formData.append('imageCover',imageCoverFile);
+      // if (data.images === undefined || data.images.length === 0) {
+      //   toast.error('Images is empty');
+      //   return;
+      // }
+      formData.append('imageCover', imageCoverFile);
     }
     if (imagesElement.files.length > 0) {
       Array.from(imagesElement.files).forEach((file) => {
         formData.append('images', file);
       });
-    } else if (currentPhotos.length > 0) {
-      currentPhotos.forEach((file) => {
+    } else if (currentImages.length > 0) {
+      currentImages.forEach((file) => {
         formData.append('images', file);
       });
     } else {
@@ -197,13 +192,18 @@ console.log(currentPhoto)
     formData.append('priceDiscount', data.priceDiscount);
     data.guide = data.guide !== undefined ? data.guide : guides[0].value;
     formData.append('guides', data.guide);
-    
-    if (!selectedCountry || selectedCountry ==='' || selectedCountry==null || selectedCountry === undefined) {
+
+    if (
+      !selectedCountry ||
+      selectedCountry === '' ||
+      selectedCountry == null ||
+      selectedCountry === undefined
+    ) {
       toast.error('Country is empty');
       return;
     }
     if (selectedCountry) {
-      const country = countries.find(c => c.name.common === selectedCountry);
+      const country = countries.find((c) => c.name.common === selectedCountry);
       if (country) {
         formData.append('countryNameOfficial', country.name.official);
         formData.append('countryNameCommon', country.name.common);
@@ -211,7 +211,7 @@ console.log(currentPhoto)
         formData.append('countryFlag', country.flags.svg);
       }
     }
-    formData.append('status','active');
+    formData.append('status', 'active');
     if (editTour !== undefined) {
       updateTour(formData, {
         onSettled: () => {
@@ -251,7 +251,7 @@ console.log(currentPhoto)
     }
   };
 
-  // if validation fail, handleSubmit will call the second method we pass in not the first one
+
   if (isLoading || isCreating || isUpdating || isCountriesLoading)
     return <Spinner />;
   return (
@@ -329,7 +329,7 @@ console.log(currentPhoto)
           defaultValue=""
         />
       </FormRow>
-      <FormRow label="Guide" error={errors?.guide?.message}>
+      {/* <FormRow label="Guide" error={errors?.guide?.message}>
         <Select
           options={guides}
           {...register('guide', {
@@ -338,6 +338,29 @@ console.log(currentPhoto)
           })}
           value={guides[0].value}
           onChange={(e) => setValue('guide', e.target.value)}
+        />
+      </FormRow> */}
+      <FormRow label="Guide" error={errors?.guide?.message}>
+        <Controller
+          name="guide"
+          control={control}
+          rules={{
+            validate: (value) =>
+              String(value).length > 0 || 'This field is required',
+          }}
+          defaultValue={editTour?.guides[0]?.id || ''} 
+          render={({ field }) => (
+            <Select
+              {...field}
+              options={guides}
+              value={field.value || guides[0]?.value} 
+              onChange={(e) => {
+                const selectedValue = e.target.value;
+                field.onChange(selectedValue);
+                setValue('guide', selectedValue);
+              }}
+            />
+          )}
         />
       </FormRow>
       <FormRow label="Tour Photo">
@@ -351,8 +374,12 @@ console.log(currentPhoto)
         />
       </FormRow>
       {editTour && currentPhoto && (
-          <img src={URL.createObjectURL(currentPhoto)} alt="current user image" width={100} />
-        )}
+        <img
+          src={URL.createObjectURL(currentPhoto)}
+          alt="current user image"
+          width={100}
+        />
+      )}
       <FormRow label="Tour Images">
         <FileInput
           id="images"
@@ -367,7 +394,13 @@ console.log(currentPhoto)
       {currentImages.length > 0 && (
         <div>
           {currentImages.map((file, index) => (
-            <img key={index} src={URL.createObjectURL(file)} alt={`Current Photo ${index}`} width={100}  style={{margin: "0.5rem"}}/>
+            <img
+              key={index}
+              src={URL.createObjectURL(file)}
+              alt={`Current Photo ${index}`}
+              width={100}
+              style={{ margin: '0.5rem' }}
+            />
           ))}
         </div>
       )}
