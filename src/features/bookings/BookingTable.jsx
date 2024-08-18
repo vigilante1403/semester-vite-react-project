@@ -32,7 +32,7 @@ function BookingTable() {
   const currentPage = !searchParams.get('page') ? 1 : Number(searchParams.get('page'));
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const endIndex = currentPage * PAGE_SIZE;
-  const paginatedBookings = filteredBookings.slice(startIndex, endIndex);
+  const  paginatedBookings = filteredBookings.slice(startIndex, endIndex);
 
   if (!paginatedBookings.length) return <Empty resourceName='bookings' />;
 

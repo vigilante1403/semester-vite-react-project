@@ -45,3 +45,12 @@ export const getTourNearMe = async (locationForm) => {
   return data;
 };
 
+const API_URL = 'https://restcountries.com/v3.1/all?fields=name,flags,region,ccn3';
+
+export const getAllCountries = async () => {
+  const response = await axios.get(API_URL);
+  const sortedCountries = response.data.sort((a, b) => a.name.common.localeCompare(b.name.common));
+       
+  return sortedCountries;
+};
+

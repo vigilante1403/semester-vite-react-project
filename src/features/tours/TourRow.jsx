@@ -62,9 +62,15 @@ function TourRow({ tour }) {
     price,
     priceDiscount,
     imageCover,
+    images,
     guides,
     description,
     summary,
+    countryFlag,
+    countryNameCommon,
+    countryNameOfficial,
+    region,
+    status
   } = tour;
   function handleDuplicate() {
     const formData = new FormData();
@@ -79,6 +85,13 @@ function TourRow({ tour }) {
     formData.append('price', price);
     formData.append('priceDiscount', priceDiscount);
     formData.append('guides', guides[0].id);
+    formData.append('images',images);
+    formData.append('countryNameCommon',countryNameCommon);
+    formData.append('countryNameOfficial',countryNameOfficial);
+    formData.append('countryFlag',countryFlag);
+    formData.append('region',region);
+    formData.append('status', status);
+
     createTour(formData);
   }
   return (

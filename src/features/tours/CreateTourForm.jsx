@@ -8,32 +8,77 @@ import Button from '../../ui/Button';
 import FileInput from '../../ui/FileInput';
 import Select from '../../ui/Select';
 import Textarea from '../../ui/Textarea';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useCreateTour } from './userCreateTour';
 import { useTourGuides } from './useTourGuides';
 import { useUpdateTour } from './useUpdateTour';
 import Spinner from '../../ui/Spinner';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FormRowVertical from '../../ui/FormRowVertical';
 import { geocodeAddress } from '../../utils/helpers';
+import useCountries from './useCountries';
+import { Typography } from '@mui/material';
+import fetchFileFromUrl from '../../services/useFetchFileFromUrl';
 
 function CreateTourForm({ onClose, editTour }) {
   const { createTour, isCreating } = useCreateTour();
   const { updateTour, isUpdating } = useUpdateTour();
   const { guides, isLoading } = useTourGuides();
+  const { countries, isLoading: isCountriesLoading } = useCountries();
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
+  const [currentPhoto, setCurrentPhoto] = useState(null);
+  const [currentImages, setCurrentImages] = useState([]);
+
+  useEffect(() => {
+    if (editTour && editTour.imageCover) {
+      fetchFileFromUrl("tour",editTour.imageCover).then(file => setCurrentPhoto(file));
+    }
+    if (editTour?.images && editTour.images.length > 0) {
+      const fetchAllPhotos = async () => {
+        const photoPromises = editTour.images.map(url =>
+          fetchFileFromUrl('tour', url)
+        );
+        const photos = await Promise.all(photoPromises);
+        setCurrentImages(photos);
+      };
+   
+
+      fetchAllPhotos(); 
+    }
+    if (editTour) {
+      setSelectedCountry(editTour.countryNameCommon || null);
+     
+    }
+  }, [editTour]);
+
+  console.log(editTour);
+  console.log(currentImages)
   const {
     register,
     handleSubmit,
     reset,
     getValues,
     formState,
+    control,
     setValue,
   } = useForm({
-    defaultValues: editTour !== undefined ? editTour : {},
+    defaultValues: {
+      name: editTour?.name || '',
+      maxGroupSize: editTour?.maxGroupSize || '',
+      price: editTour?.price || '',
+      priceDiscount: editTour?.priceDiscount || '',
+      summary: editTour?.summary || '',
+      description: editTour?.description || '',
+      guide: editTour?.guide || '',
+      imageCover: null,
+      images: [], // No default file input, handled separately
+      countryNameCommon: editTour?.countryNameCommon || '',
+    },
   });
   const { errors } = formState;
+  console.log(editTour.imageCover)
 
   const onError = (errors) => {
     // console.log(errors)
@@ -45,6 +90,8 @@ function CreateTourForm({ onClose, editTour }) {
   const [dates, setDates] = useState(['']);
   const [descriptions, setDescriptions] = useState(['']);
   const [coordinates, setCoordinates] = useState([]);
+
+
   const handleInputDateChange = (index, event) => {
     const newInputs = dates.slice();
     newInputs[index] = event.target.value;
@@ -69,7 +116,7 @@ function CreateTourForm({ onClose, editTour }) {
   const handleAddDates = () => {
     setDates([...dates, '']);
   };
-
+console.log(currentPhoto)
   const onSubmit = (data) => {
     const imagesElement = document.getElementById('images');
     const formData = new FormData();
@@ -84,7 +131,8 @@ function CreateTourForm({ onClose, editTour }) {
     if (typeof data.imageCover === String) {
       formData.append('imageCoverCopy', data.imageCover);
     } else {
-      if (data.imageCover === undefined) {
+      const imageCoverFile = data.imageCover?.[0] || currentPhoto;
+      if (!imageCoverFile) {
         toast.error('Image cover is empty');
         return;
       }
@@ -92,16 +140,20 @@ function CreateTourForm({ onClose, editTour }) {
         toast.error('Images is empty');
         return;
       }
-      formData.append('imageCover', data.imageCover[0]);
+      formData.append('imageCover',imageCoverFile);
     }
-    if (imagesElement.files.length === 0) {
-      toast.error('Images is empty');
+    if (imagesElement.files.length > 0) {
+      Array.from(imagesElement.files).forEach((file) => {
+        formData.append('images', file);
+      });
+    } else if (currentPhotos.length > 0) {
+      currentPhotos.forEach((file) => {
+        formData.append('images', file);
+      });
+    } else {
+      toast.error('Images are empty');
       return;
     }
-    // Append each image file to the FormData object
-    Array.from(imagesElement.files).forEach((file) => {
-      formData.append('images', file);
-    });
     // append each coor
     if (coordinates && coordinates.length > 0) {
       Array.from(coordinates).forEach((coor) => {
@@ -145,7 +197,21 @@ function CreateTourForm({ onClose, editTour }) {
     formData.append('priceDiscount', data.priceDiscount);
     data.guide = data.guide !== undefined ? data.guide : guides[0].value;
     formData.append('guides', data.guide);
-
+    
+    if (!selectedCountry || selectedCountry ==='' || selectedCountry==null || selectedCountry === undefined) {
+      toast.error('Country is empty');
+      return;
+    }
+    if (selectedCountry) {
+      const country = countries.find(c => c.name.common === selectedCountry);
+      if (country) {
+        formData.append('countryNameOfficial', country.name.official);
+        formData.append('countryNameCommon', country.name.common);
+        formData.append('region', country.region);
+        formData.append('countryFlag', country.flags.svg);
+      }
+    }
+    formData.append('status','active');
     if (editTour !== undefined) {
       updateTour(formData, {
         onSettled: () => {
@@ -186,7 +252,8 @@ function CreateTourForm({ onClose, editTour }) {
   };
 
   // if validation fail, handleSubmit will call the second method we pass in not the first one
-  if (isLoading || isCreating || isUpdating) return <Spinner />;
+  if (isLoading || isCreating || isUpdating || isCountriesLoading)
+    return <Spinner />;
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
@@ -280,8 +347,12 @@ function CreateTourForm({ onClose, editTour }) {
           {...register('imageCover', {
             required: editTour !== undefined ? false : 'This field is required',
           })}
+          onChange={(e) => setCurrentPhoto(e.target.files[0])}
         />
       </FormRow>
+      {editTour && currentPhoto && (
+          <img src={URL.createObjectURL(currentPhoto)} alt="current user image" width={100} />
+        )}
       <FormRow label="Tour Images">
         <FileInput
           id="images"
@@ -290,8 +361,16 @@ function CreateTourForm({ onClose, editTour }) {
           {...register('images', {
             required: editTour !== undefined ? false : 'This field is required',
           })}
+          onChange={(e) => setCurrentImages(Array.from(e.target.files))}
         />
       </FormRow>
+      {currentImages.length > 0 && (
+        <div>
+          {currentImages.map((file, index) => (
+            <img key={index} src={URL.createObjectURL(file)} alt={`Current Photo ${index}`} width={100}  style={{margin: "0.5rem"}}/>
+          ))}
+        </div>
+      )}
       {dates.map((input, index) => (
         <FormRow label={`Date ${index + 1}`}>
           <>
@@ -351,6 +430,57 @@ function CreateTourForm({ onClose, editTour }) {
           + Add Input
         </Button>
       </FormRow>
+
+      <FormRow label="Country">
+        <Controller
+          name="countryNameCommon"
+          control={control}
+          rules={{
+            validate: (value) =>
+              String(value).length > 0 || 'This field is required',
+          }}
+          render={({ field }) => (
+            <Select
+              {...field}
+              value={selectedCountry}
+              options={Array.from(countries).map((c) => ({
+                label: c.name.common,
+                value: c.name.common,
+              }))}
+              text="Choose country"
+              onChange={(e) => {
+                const selected = e.target.value;
+                field.onChange(selected);
+                // const country = countries.find(c => c.name.common === selectedCountry);
+
+                setSelectedCountry((prev) => selected);
+                // setValue('countryNameCommon'), selected.name.common;
+
+                // setValue('region', selected.region);
+                // setValue('countryFlag', selected.flags.svg);
+                // setValue('countryNameOfficial'), selected.name.official;
+                // setChange((prev) => true);
+              }}
+            />
+          )}
+        />
+      </FormRow>
+
+      {selectedCountry && countries && (
+        <FormRow>
+          <img
+            src={
+              countries.find((c) => c.name.common === selectedCountry)?.flags
+                .svg
+            }
+            alt="Country flag"
+            width={50}
+          />
+          <Typography variant="body1">
+            {countries.find((c) => c.name.common === selectedCountry)?.region}
+          </Typography>
+        </FormRow>
+      )}
 
       <FormRow>
         {/* type is an HTML attribute! */}

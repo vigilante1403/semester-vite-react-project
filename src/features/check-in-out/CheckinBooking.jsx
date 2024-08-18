@@ -15,6 +15,8 @@ import Spinner from "../../ui/Spinner";
 import { useEffect, useState } from "react";
 import { useBookingById,  } from "../bookings/useBookings";
 import BookingDataBox from "../bookings/BookingDataBox";
+import Modal from "../../ui/Modal";
+import CreateBookingForm from "../bookings/CreateBookingForm";
 
 const Box = styled.div`
   /* Box */
@@ -36,16 +38,9 @@ function CheckinBooking() {
  
  
   if(isLoading) return <Spinner />
-  const {id,tour,user,date}=booking
+  const {id,tour,user,date,paid}=booking
+ console.log(booking)
  
-  function handleCheckin() {
-    if(!confirmPaid) return;
-      checkin(
-        //formData
-      )
-    
-   
-  }
   return (
     <>
       <Row type="horizontal">
@@ -60,7 +55,16 @@ function CheckinBooking() {
       </Box>
 
       <ButtonGroup>
-        <Button disabled={!confirmPaid||isCheckingIn} onClick={handleCheckin}>Check in booking #{id}</Button>
+      <Modal>
+      <Modal.Open opens={`edit-${booking.id}`}>
+      <Button disabled={!confirmPaid||isCheckingIn} >Check in booking #{id}</Button>
+            </Modal.Open>
+      <Modal.Window name={`edit-${booking.id}`}>
+          <CreateBookingForm editBooking={booking} />
+        </Modal.Window>
+      
+      </Modal>
+     
         <Button variation="secondary" onClick={moveBack}>
           Back
         </Button>

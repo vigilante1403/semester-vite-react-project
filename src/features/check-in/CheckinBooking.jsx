@@ -15,6 +15,7 @@ import Spinner from "../../ui/Spinner";
 import { useEffect, useState } from "react";
 import { useBookingById,  } from "../bookings/useBookings";
 import BookingDataBox from "../bookings/BookingDataBox";
+import Modal from "../../ui/Modal";
 
 const Box = styled.div`
   /* Box */
@@ -61,7 +62,16 @@ function CheckinBooking() {
       </Box>
 
       <ButtonGroup>
-        <Button disabled={!confirmPaid||isCheckingIn} onClick={handleCheckin}>Check in booking #{id}</Button>
+      <Modal>
+      <Modal.Open opens={`edit-${booking.id}`}>
+      <Button disabled={!confirmPaid||isCheckingIn}>Check in booking #{id}</Button>
+            </Modal.Open>
+      <Modal.Window name={`edit-${bookingId}`}>
+          <CreateBookingForm editBooking={booking} />
+        </Modal.Window>
+      
+      </Modal>
+        {/* <Button disabled={!confirmPaid||isCheckingIn} onClick={handleCheckin}>Check in booking #{id}</Button> */}
         <Button variation="secondary" onClick={moveBack}>
           Back
         </Button>

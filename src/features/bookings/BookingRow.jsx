@@ -8,7 +8,7 @@ import ConfirmDelete from '../../ui/ConfirmDelete';
 
 import { formatCurrency } from '../../utils/helpers';
 import { formatDistanceFromNow } from '../../utils/helpers';
-import CreateBookingForm from '../bookings/CreateBookingForm'
+import CreateBookingForm from '../bookings/CreateBookingForm';
 import Menus from '../../ui/Menus';
 import {
   HiArrowDownOnSquare,
@@ -17,7 +17,7 @@ import {
   HiPencil,
   HiTrash,
 } from 'react-icons/hi2';
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDeleteBooking } from './useDeleteBooking';
 
 const Tour = styled.div`
@@ -59,8 +59,8 @@ function BookingRow({
     priceDiscount,
     priceFinal,
     paid,
-    user: { name: guestName, email, id:userId },
-    tour: { name: tourName,id },
+    user: { name: guestName, email, id:userid},
+    tour: { name: tourName, id:id },
   },
 }) {
   const booking = {
@@ -69,10 +69,11 @@ function BookingRow({
     priceOrigin,
     priceDiscount,
     priceFinal,
-    user: { name: guestName, email, userId },
-    tour: { name: tourName,id },
-  }
-  const paidValue = paid?'paid':'unpaid'
+    paid,
+    user: { name: guestName, email, id:userid },
+    tour: { name: tourName, id:id },
+  };
+  const paidValue = paid ? 'paid' : 'unpaid';
   const statusToTagName = {
     unpaid: 'blue',
     paid: 'green',
@@ -81,7 +82,7 @@ function BookingRow({
   const navigate = useNavigate();
   // const { checkout, isCheckingOut } = useCheckout();
   const { deleteBooking, isDeleting } = useDeleteBooking();
-  console.log(booking.startDate)
+  console.log(booking.startDate);
   return (
     <Table.Row>
       <Tour>{tourName}</Tour>
@@ -96,10 +97,11 @@ function BookingRow({
           {isToday(new Date(startDate))
             ? 'Today'
             : formatDistanceFromNow(startDate)}{' '}
-          &rarr;  1 day travel
+          &rarr; 1 day travel
         </span>
         <span>
-          {format(new Date(startDate.replace('ICT', '+0700')), 'MMM dd yyyy')} &mdash;{' '}
+          {format(new Date(startDate.replace('ICT', '+0700')), 'MMM dd yyyy')}{' '}
+          &mdash;{' '}
           {format(new Date(startDate.replace('ICT', '+0700')), 'MMM dd yyyy')}
         </span>
       </Stacked>
@@ -142,20 +144,20 @@ function BookingRow({
             <Modal.Open opens={`delete-${bookingId}`}>
               <Menus.Button icon={<HiTrash />}>Delete booking</Menus.Button>
             </Modal.Open>
-            
-            
           </Menus.List>
         </Menus.Menu>
         <Modal.Window name={`delete-${bookingId}`}>
-              <ConfirmDelete
-                onConfirm={() => {deleteBooking(bookingId)}}
-                disabled={isDeleting}
-                resourceName={bookingId}
-              />
-            </Modal.Window>
-            <Modal.Window name={`edit-${bookingId}`}>
-              <CreateBookingForm editBooking={booking} />
-            </Modal.Window>
+          <ConfirmDelete
+            onConfirm={() => {
+              deleteBooking(bookingId);
+            }}
+            disabled={isDeleting}
+            resourceName={bookingId}
+          />
+        </Modal.Window>
+        <Modal.Window name={`edit-${bookingId}`}>
+          <CreateBookingForm editBooking={booking} />
+        </Modal.Window>
       </Modal>
     </Table.Row>
   );
