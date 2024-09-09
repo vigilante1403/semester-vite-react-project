@@ -5,14 +5,14 @@ import toast from 'react-hot-toast';
 export function useUpdate() {
   const queryClient = useQueryClient();
   const { mutate: updateUser, isLoading: isUpdating } = useMutation({
-    mutationFn: updateUserApi,
+    mutationFn: (userForm) => updateUserApi(userForm),
     onError: (err) => toast.error(err.message),
     onSuccess: (data) => {
       toast.success('User updated');
       queryClient.invalidateQueries({
-        predicate:
-        (queries) =>queries.queryKey[0].startsWith(`user-email-${data.email}`)||queries.queryKey[0].startsWith(`user-id-${data.id}`)
-          
+        predicate: (queries) =>
+          queries.queryKey[0].startsWith(`user-email-${data.email}`) ||
+          queries.queryKey[0].startsWith(`user-id-${data.id}`),
       });
     },
   });

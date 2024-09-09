@@ -6,3 +6,8 @@ export const PAGE_SIZES = {
     sm: 6,  // Small screens
     xs: 4
   };
+  export const roles = [
+    { label: 'GUIDE', value: 'GUIDE' },
+    { label: 'LEADGUIDE', value: 'LEADGUIDE' },
+    { label: 'USER', value: 'USER' },
+  ];

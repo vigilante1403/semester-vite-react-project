@@ -71,13 +71,14 @@ console.log(sortedUsers.length);
   if (!paginatedUsers.length) return <Empty resourceName="users" />;
   return (
     <Menus>
-      <Table columns="0.6fr 2.5fr 1.5fr 1fr 1fr 1fr">
+      <Table columns="0.6fr 2fr 1fr 0.5fr 0.7fr 1fr 0.5fr">
         <Table.Header role="row">
           <div></div>
           <div>User Email</div>
           <div>Name</div>
           <div>Role</div>
           <div>Activate</div>
+          <div>Country</div>
           <div></div>
         </Table.Header>
         <Table.Body

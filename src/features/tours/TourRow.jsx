@@ -12,7 +12,6 @@ import { useUpdateTour } from './useUpdateTour';
 import { useDeleteTour } from './useDeleteTour';
 import { useCreateTour } from './userCreateTour';
 import TourDetail from './TourDetails';
-import { useNavigate } from 'react-router-dom';
 
 // const TableRow = styled.div`
 //   display: grid;
@@ -55,7 +54,6 @@ const Discount = styled.div`
 function TourRow({ tour }) {
   const { deleteTour, isDeleting } = useDeleteTour();
   const { createTour, isCreating } = useCreateTour();
-  const navigate = useNavigate()
   const {
     id,
     name,
@@ -64,9 +62,15 @@ function TourRow({ tour }) {
     price,
     priceDiscount,
     imageCover,
+    images,
     guides,
     description,
     summary,
+    countryFlag,
+    countryNameCommon,
+    countryNameOfficial,
+    region,
+    status
   } = tour;
   function handleDuplicate() {
     const formData = new FormData();
@@ -81,6 +85,13 @@ function TourRow({ tour }) {
     formData.append('price', price);
     formData.append('priceDiscount', priceDiscount);
     formData.append('guides', guides[0].id);
+    formData.append('images',images);
+    formData.append('countryNameCommon',countryNameCommon);
+    formData.append('countryNameOfficial',countryNameOfficial);
+    formData.append('countryFlag',countryFlag);
+    formData.append('region',region);
+    formData.append('status', status);
+
     createTour(formData);
   }
   return (
@@ -107,7 +118,9 @@ function TourRow({ tour }) {
               >
                 Duplicate
               </Menus.Button>
-                <Menus.Button onClick={()=>navigate(`/admin/tours/${id}`)} icon={<HiEye />}>See details</Menus.Button>  
+              <Modal.Open opens={`detail-${id}`}>
+                <Menus.Button icon={<HiEye />}>See details</Menus.Button>
+              </Modal.Open>
               <Modal.Open opens={`edit-${id}`}>
                 <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
               </Modal.Open>
@@ -116,7 +129,9 @@ function TourRow({ tour }) {
               </Modal.Open>
             </Menus.List>
           </Menus.Menu>
-          
+          <Modal.Window name={`detail-${id}`}>
+            <TourDetail tourId={id} />
+          </Modal.Window>
           <Modal.Window name={`edit-${id}`}>
             <CreateTourForm editTour={tour} />
           </Modal.Window>

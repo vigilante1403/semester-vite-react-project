@@ -44,11 +44,19 @@ const Enable = styled.div`
   font-weight: 500;
   color: var(--color-green-700);
 `
-
+const Country = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+`;
+const Flag = styled.img`
+  width: 3rem;
+  height: auto;
+`;
 function AccountRow({ user }) {
   const { deleteUser, isDeleting } = useDeleteUser()
   const { createUser } = useCreateUser()
-  const { id,email, name, role, enabled, photo } = user
+  const { id,email, name, role, enabled, photo, countryFlag,nationality } = user
   const navigate = useNavigate()
 
   function handleDuplicate() {
@@ -68,6 +76,10 @@ function AccountRow({ user }) {
       <UserName>{name}</UserName>
       <Role>{role}</Role>
       <Enable>{enabled ? 'Enabled' : 'Disabled'}</Enable>
+      <Country>
+        {countryFlag && <Flag src={countryFlag} alt={`${nationality} flag`} />}
+        <div>{nationality}</div>
+      </Country>
       <div>
         <Modal>
           <Menus.Menu>

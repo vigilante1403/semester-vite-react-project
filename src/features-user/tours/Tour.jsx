@@ -45,33 +45,35 @@ const Tour = ({ tour, bookings }) => {
               {tour.countryNameCommon}
             </Typography>
           </Box>
-          <Typography variant="body2" color="textSecondary" gutterBottom sx={{ fontSize: '1.2rem' }}>
-            {tour.description}
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <HiOutlineCurrencyDollar size={24} style={{ marginRight: 8 }} />
-            <Typography variant="body1" color="textSecondary" sx={{ fontSize: '1.2rem' }}>
-             {tour.price} USD
-            </Typography>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <HiOutlineCurrencyDollar size={24} style={{ marginRight: 8 }} />
+              <Typography variant="body1" color="textSecondary" sx={{ fontSize: '1.2rem' }}>
+                {tour.price} USD
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <HiCalendar size={24} style={{ marginRight: 8 }} />
+              <Typography variant="body1" color="textSecondary" sx={{ fontSize: '1.2rem' }}>
+                {tour.startDates}
+              </Typography>
+            </Box>
           </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <HiCalendar size={24} style={{ marginRight: 8 }} />
-            <Typography variant="body1" color="textSecondary" sx={{ fontSize: '1.2rem' }}>
-             {tour.startDates}
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <HiUserGroup size={24} style={{ marginRight: 8 }} />
-            <Typography variant="body1" color="textSecondary" sx={{ fontSize: '1.2rem' }}>
-               {participantCount}/{tour.maxGroupSize}
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Rating name="read-only" value={tour.rating} readOnly />
-            <Typography variant="body2" color="textSecondary" sx={{ ml: 1, fontSize: '1.2rem' }}>
-              ({tour.rating ? tour.rating: 0})
-            </Typography>
-          </Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <HiUserGroup size={24} style={{ marginRight: 8 }} />
+              <Typography variant="body1" color="textSecondary" sx={{ fontSize: '1.2rem' }}>
+                {participantCount}/{tour.maxGroupSize}
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Rating name="read-only" value={tour.rating} readOnly />
+              <Typography variant="body2" color="textSecondary" sx={{ ml: 1, fontSize: '1.2rem' }}>
+                ({tour.rating ? tour.rating : 0})
+              </Typography>
+            </Box>
+            </Box>
           <CheckoutButton tour={tour1} />
         </CardContent>
       </Card>

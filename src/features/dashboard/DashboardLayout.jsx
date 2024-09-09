@@ -8,6 +8,7 @@ import DurationChart from './DurationChart';
 import { useTours } from '../tours/useTours';
 import { useSearchParams } from 'react-router-dom';
 import { useRecentBookings } from './useRecentBookings';
+import BillDataBox from './BillDataBox';
 
 const StyledDashboardLayout = styled.div`
   display: grid;
@@ -28,7 +29,7 @@ function DashboardLayout() {
   return (
     <StyledDashboardLayout>
       <Stats bookings={bookings} confirmStays={[...bookings].filter(booking=>booking.paid)} />
-      {/* <TodayActivity /> */}
+      <BillDataBox />
       <DurationChart confirmedStays={tours} />
       <SalesChart
         bookings={bookings}
