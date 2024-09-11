@@ -2,9 +2,16 @@ import React from 'react';
 import { Box, Card, CardContent, CardMedia, Typography, Button, Grid, Rating } from '@mui/material';
 import { HiOutlineCurrencyDollar, HiCalendar, HiUserGroup } from 'react-icons/hi2';
 import CheckoutButton from './CheckoutButton';
+import toast from 'react-hot-toast';
 
 const Tour = ({ tour, bookings }) => {
-  const participantCount = bookings.filter(booking => booking.tour.id === tour.id).length;
+
+  const bookingsCount = bookings.filter(booking => booking.tour.id === tour.id);
+  var participantCount=0;
+  Array.from(bookingsCount).forEach(booking=>{
+    participantCount=participantCount+booking.numJoin
+    
+  })
   const tour1 = {
     name: 'Amazing Tour',
     summary: 'An amazing tour you won’t forget!',
