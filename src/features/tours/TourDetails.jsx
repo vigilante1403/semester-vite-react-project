@@ -38,7 +38,7 @@ function TourDetail() {
     inactive: "silver",
   };
   if(isLoading) return <Spinner />
-  if(!tour||tour==null) return <Empty resourceName="tour"/>
+  // if(!tour||tour==null) return <Empty resourceName="tour"/>
   const {status,id,name}=tour;
   return (
     <>

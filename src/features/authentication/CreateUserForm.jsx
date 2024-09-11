@@ -169,6 +169,7 @@ function CreateUserForm({ onClose, editUser }) {
             id="role"
             value="USER"
             readOnly
+            disabled
           />
         ) : (
           <Select
