@@ -25,9 +25,9 @@ const HeadingGroup = styled.div`
   align-items: center;
 `;
 
-function TourDetail({tourId}) {
+function TourDetail() {
   const navigate=useNavigate()
-  const {tour,isLoading} = useTour(tourId);
+  const {tour,isLoading} = useTour();
   const {deleteTour,isDeleting}=useDeleteTour()
  
   const moveBack = useMoveBack();
@@ -38,7 +38,7 @@ function TourDetail({tourId}) {
     inactive: "silver",
   };
   if(isLoading) return <Spinner />
-  if(!tour) return <Empty resourceName="tour"/>
+  // if(!tour||tour==null) return <Empty resourceName="tour"/>
   const {status,id,name}=tour;
   return (
     <>

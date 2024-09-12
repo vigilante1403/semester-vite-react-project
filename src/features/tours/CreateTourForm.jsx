@@ -254,6 +254,7 @@ function CreateTourForm({ onClose, editTour }) {
 
   if (isLoading || isCreating || isUpdating || isCountriesLoading)
     return <Spinner />;
+  
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
@@ -340,7 +341,7 @@ function CreateTourForm({ onClose, editTour }) {
           onChange={(e) => setValue('guide', e.target.value)}
         />
       </FormRow> */}
-      <FormRow label="Guide" error={errors?.guide?.message}>
+      <FormRow label="Available Guide" error={errors?.guide?.message}>
         <Controller
           name="guide"
           control={control}

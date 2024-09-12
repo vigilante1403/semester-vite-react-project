@@ -9,7 +9,6 @@ import { useTours } from '../tours/useTours';
 import { useSearchParams } from 'react-router-dom';
 import { useRecentBookings } from './useRecentBookings';
 import BillDataBox from './BillDataBox';
-import { Box } from '@mui/material';
 
 const StyledDashboardLayout = styled.div`
   display: grid;
@@ -30,11 +29,8 @@ function DashboardLayout() {
   return (
     <StyledDashboardLayout>
       <Stats bookings={bookings} confirmStays={[...bookings].filter(booking=>booking.paid)} />
-    
-      <BillDataBox/>
+      <BillDataBox />
       <DurationChart confirmedStays={tours} />
-   
-     
       <SalesChart
         bookings={bookings}
         numDays={numDays}

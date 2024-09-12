@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useAuthenticate } from "./useAuthenticate";
 
 
 const StyledUserAvatar = styled.div`
@@ -21,12 +22,11 @@ const Avatar = styled.img`
   outline: 2px solid var(--color-grey-100);
 `;
 function UserAvatar() {
-
-
+  const {user}=useAuthenticate()
   return (
     <StyledUserAvatar>
-      <Avatar src='/default-user.jpg' alt={`Avatar of user`} />
-      <span>Hi user</span>
+      <Avatar src={'/default-user.jpg'} alt={`Avatar of user`} />
+      <span>Hi {user.name}</span>
     </StyledUserAvatar>
   )
 }

@@ -21,10 +21,14 @@ function CreateBookingForm({ onClose, editBooking }) {
   const { tours, isLoading } = useTours();
   const { users, isLoading: isLoading2 } = useUsers();
   const { updateBooking, isUpdating } = useUpdateBooking();
-  
+
   const formatDate = (dateInput) => {
     const cleanedDateString = dateInput.replace(/ ICT/, '');
-    const parsedDate = parse(cleanedDateString, 'EEE MMM dd HH:mm:ss yyyy', new Date());
+    const parsedDate = parse(
+      cleanedDateString,
+      'EEE MMM dd HH:mm:ss yyyy',
+      new Date()
+    );
     const formattedDate = format(parsedDate, 'yyyy-MM-dd');
     return formattedDate;
   };
@@ -51,16 +55,23 @@ function CreateBookingForm({ onClose, editBooking }) {
   const { handleSubmit, reset, control, setValue } = useForm({
     defaultValues: editBooking !== undefined ? editBooking : {},
   });
-console.log(editBooking);
-  const [dateChose, setDateChose] = useState(editBooking ? formatDate(editBooking.startDate) : '');
-  const [tourChose, setTourChose] = useState(editBooking ? editBooking.tour.id : '');
-  const [userChose, setUserChose] = useState(editBooking ? editBooking.user.id : '');
+  const [dateChose, setDateChose] = useState(
+    editBooking ? formatDate(editBooking.startDate) : ''
+  );
+  const [tourChose, setTourChose] = useState(
+    editBooking ? editBooking.tour.id : ''
+  );
+  const [userChose, setUserChose] = useState(
+    editBooking ? editBooking.user.id : ''
+  );
   const [change, setChange] = useState(false);
   const [price, setPrice] = useState(editBooking ? editBooking.priceOrigin : 0);
-  const [priceDiscount, setPriceDiscount] = useState(editBooking ? editBooking.priceDiscount : 0);
-  const [isPaid, setIsPaid] = useState( editBooking ? editBooking.paid : true); // Added state for "paid"
+  const [priceDiscount, setPriceDiscount] = useState(
+    editBooking ? editBooking.priceDiscount : 0
+  );
+  const [isPaid, setIsPaid] = useState(editBooking ? editBooking.paid : true); // Added state for "paid"
   const [datesSelected, setDatesSelected] = useState([]);
-
+  const [numJoin, setNumJoin] = useState(editBooking?editBooking.numJoin:1);
   const onError = (errors) => {
     toast.error('Form submit fail');
   };
@@ -89,13 +100,14 @@ console.log(editBooking);
     formData.append('paid', isPaid);
     formData.append('priceOrigin', price);
     formData.append('priceDiscount', priceDiscount);
-    console.log(formData.get('paid'));
-    console.log(formData.get('user'));
-    console.log(formData.get('tour'));
-    console.log(formData.get('priceOrigin'));
-    console.log(formData.get('priceDiscount'));
-    console.log(formData.get('date'));
-   
+    formData.append('numJoin',numJoin)
+    // console.log(formData.get('paid'));
+    // console.log(formData.get('user'));
+    // console.log(formData.get('tour'));
+    // console.log(formData.get('priceOrigin'));
+    // console.log(formData.get('priceDiscount'));
+    // console.log(formData.get('date'));
+
     if (editBooking !== undefined) {
       updateBooking(formData, {
         onSettled: () => {
@@ -117,21 +129,48 @@ console.log(editBooking);
     setPrice(0);
     setPriceDiscount(0);
   };
-
+  const handleChangeNumJoin = (e) => {
+    var p;
+    if (e.target.value > 0) {
+      p = e.target.value;
+      setNumJoin(e.target.value);
+    } else {
+      p = 1;
+      setNumJoin(1);
+    }
+    if (tourChose !== '') {
+      const tour = tours.filter((el) => el.id === tourChose)[0] || null;
+      if (tour != null) {
+        setPrice(tour.price );
+        setPriceDiscount(tour.priceDiscount );
+      }
+    }
+    setPrice((price) => price * p);
+    setPriceDiscount((discount) => discount * p);
+  };
   if (isCreating || isUpdating || isLoading || isLoading2) return <Spinner />;
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)} type={editBooking ? 'regular' : 'modal'}>
+    <Form
+      onSubmit={handleSubmit(onSubmit, onError)}
+      type={editBooking ? 'regular' : 'modal'}
+    >
       <FormRow label="Booking name">
         <Controller
           name="tour"
           control={control}
-          rules={{ validate: (value) => String(value).length > 0 || 'This field is required' }}
+          rules={{
+            validate: (value) =>
+              String(value).length > 0 || 'This field is required',
+          }}
           render={({ field }) => (
             <Select
               {...field}
               value={tourChose}
-              options={tours.map((tour) => ({ label: tour.name, value: tour.id }))}
+              options={tours.map((tour) => ({
+                label: tour.name,
+                value: tour.id,
+              }))}
               text="Choose tour"
               onChange={(e) => {
                 const selectedTour = e.target.value;
@@ -142,6 +181,12 @@ console.log(editBooking);
 
                 setDatesSelected(filteredDates);
                 setTourChose(selectedTour);
+                const tour =
+                  tours.filter((el) => el.id === selectedTour)[0] || null;
+                if (tour != null) {
+                  setPrice(tour.price * numJoin);
+                  setPriceDiscount(tour.priceDiscount * numJoin);
+                }
                 setDateChose(filteredDates[0].value);
                 setValue('date', filteredDates[0].value);
                 setChange(true);
@@ -157,37 +202,59 @@ console.log(editBooking);
             value={users.find((user) => user.id === userChose)?.email || 'N/A'}
             readOnly
           />
-        ) : (<Controller
-          name="user"
-          control={control}
-          rules={{ validate: (value) => String(value).length > 0 || 'This field is required' }}
-          render={({ field }) => (
-            <Select
-              {...field}
-              text="Choose user"
-              value={userChose}
-              options={users.filter((u) => u.role === 'USER').map((user) => ({ label: user.email, value: user.id }))}
-              onChange={(e) => {
-                field.onChange(e.target.value);
-                setUserChose(prev => e.target.value);
-              }}
-            />
-          )}
-        />)}
+        ) : (
+          <Controller
+            name="user"
+            control={control}
+            rules={{
+              validate: (value) =>
+                String(value).length > 0 || 'This field is required',
+            }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                text="Choose user"
+                value={userChose}
+                options={users
+                  .filter((u) => u.role === 'USER')
+                  .map((user) => ({ label: user.email, value: user.id }))}
+                onChange={(e) => {
+                  field.onChange(e.target.value);
+                  setUserChose((prev) => e.target.value);
+                }}
+              />
+            )}
+          />
+        )}
       </FormRow>
-
+      <FormRow label="Total people joining">
+        <Input
+          type="number"
+          value={numJoin}
+          onChange={handleChangeNumJoin}
+          defaultValue={1}
+          min={1}
+        />
+      </FormRow>
       <FormRow label="Start date">
         <Controller
           name="date"
           control={control}
-          rules={{ validate: (value) => String(value).length > 0 || 'This field is required' }}
+          rules={{
+            validate: (value) =>
+              String(value).length > 0 || 'This field is required',
+          }}
           render={({ field }) => (
             <Select
               text="Choose date"
               {...field}
-              options={editBooking && !change
-                ? tours.filter((tour) => tour.id === tourChose)[0].startDates.map((date) => ({ label: date, value: date }))
-                : datesSelected}
+              options={
+                editBooking && !change
+                  ? tours
+                      .filter((tour) => tour.id === tourChose)[0]
+                      .startDates.map((date) => ({ label: date, value: date }))
+                  : datesSelected
+              }
               value={dateChose !== '' ? dateChose : datesSelected[0]?.value}
               onChange={(e) => {
                 const selectedDate = e.target.value;
@@ -223,20 +290,16 @@ console.log(editBooking);
         <Switch
           checked={isPaid}
           onChange={(e) => {
-            // toast.error(isPaid);
-           
             if (editBooking && editBooking.paid) return; // Prevent change if booking is already paid
             setIsPaid(e.target.checked);
-            toast.error(isPaid ? 'paid': 'unpaid');
-            console.log(isPaid);
+            // toast.error(isPaid ? 'paid' : 'unpaid');
           }}
           label={isPaid ? 'paid' : 'unPaid'}
           disabled={editBooking && editBooking.paid} // Disable switch if booking is already paid
         />
       </FormRow>
 
-
-{/* <FormRow label="Paid">
+      {/* <FormRow label="Paid">
   <Switch
     checked={isPaid}
     onChange={(e) => {

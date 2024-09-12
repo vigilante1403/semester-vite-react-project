@@ -3,7 +3,7 @@ import SignupForm from '../features/authentication/SignupForm'
 function Users() {
     return (
         <>
-      <Heading as="h1">Create a new user</Heading>
+      <Heading as="h1">Edit my info</Heading>
       <SignupForm />
     </>
     )

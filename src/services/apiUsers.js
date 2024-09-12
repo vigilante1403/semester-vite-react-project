@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
-// import jwt from 'jsonwebtoken';
+import {jwtDecode} from 'jwt-decode';
 export const getAllUsers = async () => {
   const { data, error } = await axios.get('/users');
   if (error) throw new Error(error.message);
@@ -36,24 +36,39 @@ export const findUserById = async (id) => {
   if (error) throw new Error(error.message);
   return data;
 };
-export const login = async (userLoginForm) => {
-  const { data, error } = await axios.post('/login');
+export const login = async (loginForm) => {
+  const { data, error } = await axios.post('/login',loginForm);
+  if (error) throw new Error(error.message);
+  localStorage.setItem('username',data.email)
+  return data;
+};
+
+export const confirmLogin = async () => {
+  
+  let user=localStorage.getItem('username')||null;
+  if(user==null) throw new Error('Unauthorized user')
+
+  const { data, error } = await axios.post(`/authenticate?username=${user}`);
+
   if (error) throw new Error(error.message);
   return data;
 };
-export const confirmLogin = async () => {
-  // const cookieFind = Cookies.get('token-vtravel-lib0-authw') || null;
-  // if (!cookieFind) return null;
-  // const user = jwt.decode(cookieFind.trim()).sub;
-  // const { data, error } = await axios.post('/authenticate', {
-  //   username: user,
-  //   token: cookieFind,
-  // });
-  // if (error) throw new Error(error.message);
-  // return user;
-};
+export const activateAccount = async({email,token})=>{
+  const {data,error}=await axios.get(`/unlockMe/${email}/${token}`)
+  if(error)throw new Error('Activate failed');
+  return data;
+}
+
+
 export const getAllGuides = async ()=>{
   const {data,error}=await axios.get('/users/guides')
   if(error) throw new Error(error.message)
     return data;
+}
+export const logout = ()=>{
+
+  if(localStorage.getItem('username'))localStorage.removeItem('username')
+  const cookieFind = Cookies.get('token-vtravel-lib0-authw') || null;
+  if(cookieFind==null||!cookieFind) return;
+  Cookies.remove('token-vtravel-lib0-authw')
 }

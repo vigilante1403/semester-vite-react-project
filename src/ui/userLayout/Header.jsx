@@ -21,6 +21,9 @@ import { AccountCircle, Menu as MenuIcon,DarkMode as DarkModeIcon, LightMode as 
 import styled from 'styled-components';
 import DarkModeToggle from '../DarkModeToggle';
 import LoginSignupPage from '../../pages/userpages/LoginSignupPage';
+import Modal from '../Modal';
+import LoginForm from '../../features-user/security/LoginForm';
+import SignupForm from '../../features-user/security/SignupForm';
 
 
 
@@ -75,6 +78,7 @@ export default function Header() {
                 flexGrow: 1,
               }}
             >
+            
               <Button color="inherit" sx={{ fontSize: '2rem', marginRight: 2 }}>
                 <Link to="/home" style={{ textDecoration: 'none', color: 'inherit' }}>
                   Home
@@ -95,16 +99,29 @@ export default function Header() {
                   About
                 </Link>
               </Button>
+              
             </Box>
             <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
+            <Modal>
               <DarkModeToggle/>
-              <Button onClick={() => handleLoginSignupOpen(true)} color="inherit" sx={{ fontSize: '2rem', marginRight: 2, display: 'flex', alignItems: 'center' }}>
+              <Modal.Open opens="login">
+              <Button color="inherit" sx={{ fontSize: '2rem', marginRight: 2, display: 'flex', alignItems: 'center' }}>
                 <AccountCircle sx={{ marginRight: 1 }} />
                 Login
               </Button>
+              </Modal.Open>
+              <Modal.Window name="login">
+                <LoginForm />
+              </Modal.Window>
+              <Modal.Open opens="signup">
               <Button onClick={() => handleLoginSignupOpen(false)}  sx={{ fontSize: '2rem', marginRight: 2 }}>
                 Sign Up
               </Button>
+              </Modal.Open>
+              <Modal.Window name="signup">
+                <SignupForm/>
+              </Modal.Window>
+              </Modal>
             </Box>
             <Box sx={{ display: { xs: 'block', md: 'none' } }}>
               <IconButton color="inherit" onClick={toggleDrawer(true)}>
@@ -138,7 +155,8 @@ export default function Header() {
             </List>
           </Box>
         </Drawer>
-        <LoginSignupPage open={openLoginSignup} onClose={handleLoginSignupClose} isLogin={isLogin} onSwitch={handleSwitch} />
+        
+        {/* <LoginSignupPage open={openLoginSignup} onClose={handleLoginSignupClose} isLogin={isLogin} onSwitch={handleSwitch} /> */}
       </StyledHeader>
     );
   }

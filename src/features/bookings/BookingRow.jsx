@@ -59,8 +59,9 @@ function BookingRow({
     priceDiscount,
     priceFinal,
     paid,
-    user: { name: guestName, email, id:userid},
-    tour: { name: tourName, id:id },
+    numJoin,
+    user: { name: guestName, email, id: userid },
+    tour: { name: tourName, id: id },
   },
 }) {
   const booking = {
@@ -70,8 +71,9 @@ function BookingRow({
     priceDiscount,
     priceFinal,
     paid,
-    user: { name: guestName, email, id:userid },
-    tour: { name: tourName, id:id },
+    user: { name: guestName, email, id: userid },
+    tour: { name: tourName, id: id },
+    numJoin,
   };
   const paidValue = paid ? 'paid' : 'unpaid';
   const statusToTagName = {

@@ -115,6 +115,7 @@ function BookingDataBox({ booking }) {
     priceFinal,
     user: { name: guestName, email },
     tour: { name: tourName },
+    numJoin,
     paid
   } = booking;
 
@@ -151,6 +152,7 @@ function BookingDataBox({ booking }) {
           </p>
           <span>&bull;</span>
           <p>{email}</p>
+          <p>Number people join: {numJoin}</p>
           <span>&bull;</span>
          
         </Guest>

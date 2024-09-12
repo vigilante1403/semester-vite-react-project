@@ -1,10 +1,27 @@
 import React from 'react';
 import { Box, Card, CardContent, CardMedia, Typography, Button, Grid, Rating } from '@mui/material';
 import { HiOutlineCurrencyDollar, HiCalendar, HiUserGroup } from 'react-icons/hi2';
+import CheckoutButton from './CheckoutButton';
+import toast from 'react-hot-toast';
 
 const Tour = ({ tour, bookings }) => {
-  const participantCount = bookings.filter(booking => booking.tour.id === tour.id).length;
 
+  const bookingsCount = bookings.filter(booking => booking.tour.id === tour.id);
+  var participantCount=0;
+  Array.from(bookingsCount).forEach(booking=>{
+    participantCount=participantCount+booking.numJoin
+    
+  })
+  const tour1 = {
+    name: 'Amazing Tour',
+    summary: 'An amazing tour you won’t forget!',
+    price: 5000, // price in cents
+    imageCover: 'cover-image.jpg',
+    slug: 'amazing-tour',
+    tourID: '12345',
+    email: 'vytruong1999@mailsac.com',
+    userID: '123456789',
+  };
   return (
     <Grid item xs={12} sm={6} md={4} lg={3}>
       <Card sx={{
@@ -35,9 +52,7 @@ const Tour = ({ tour, bookings }) => {
               {tour.countryNameCommon}
             </Typography>
           </Box>
-          <Typography variant="body2" color="textSecondary" gutterBottom sx={{ fontSize: '1.2rem' }}>
-            {tour.description}
-          </Typography>
+          
           <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <HiOutlineCurrencyDollar size={24} style={{ marginRight: 8 }} />
@@ -65,12 +80,8 @@ const Tour = ({ tour, bookings }) => {
                 ({tour.rating ? tour.rating : 0})
               </Typography>
             </Box>
-          </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
-            <Button variant="contained" color="primary" sx={{ fontSize: '1.2rem' }}>
-              Show Detail
-            </Button>
-          </Box>
+            </Box>
+          <CheckoutButton tour={tour1} />
         </CardContent>
       </Card>
     </Grid>
