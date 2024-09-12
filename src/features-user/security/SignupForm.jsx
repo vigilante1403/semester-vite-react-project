@@ -4,8 +4,8 @@ import Logo from '../../ui/Logo';
 import { useSignup } from './useSignup';
 
 
-function SignupForm({ onClose }) {
-  // Receive onClose as a prop
+function SignupForm({ onSwitch,onClose }) {
+  
   const [email, setEmail] = useState('');
   const [name,setName]=useState('')
   const [password, setPassword] = useState('');
@@ -14,14 +14,14 @@ function SignupForm({ onClose }) {
   const [validate, setValidate] = useState(false);
 
   function onSubmit(e) {
-    e.preventDefault(); // Prevent the default form submission
+    e.preventDefault();
     if (!email || !password||!name||!confirmPassword) return;
 
     const formData = new FormData();
     formData.append('email', email);
     formData.append('password', password);
     formData.append('name',name);
-  
+
 
     signUp(formData, {
       onSettled: () => {
@@ -29,7 +29,6 @@ function SignupForm({ onClose }) {
         setPassword('');
         setConfirmPassword('')
         setName('')
-        onClose(); // Close the modal after successful login
       },
     });
   }
@@ -53,11 +52,16 @@ function SignupForm({ onClose }) {
         InputLabelProps={{ style: { fontSize: '1.5rem' } }}
         InputProps={{ style: { fontSize: '1.5rem' } }}
         error={name.trim() === '' && validate}
+        helperText={(name.trim() === '' ) && validate ? "Display name is required" : ""}
+        FormHelperTextProps={{   
+          style: { fontSize: '1rem',color: 'red' }
+        }}
       />
       <TextField
         margin="normal"
         required
         fullWidth
+        typr="email"
         id="email"
         label="Email Address"
         name="email"
@@ -67,6 +71,10 @@ function SignupForm({ onClose }) {
         InputLabelProps={{ style: { fontSize: '1.5rem' } }}
         InputProps={{ style: { fontSize: '1.5rem' } }}
         error={email.trim() === '' && validate}
+        helperText={(email.trim() === '') && validate ? "Email is required" : ""}
+        FormHelperTextProps={{   
+          style: { fontSize: '1rem',color: 'red' }
+        }}
       />
 
       <TextField
@@ -83,6 +91,10 @@ function SignupForm({ onClose }) {
         InputLabelProps={{ style: { fontSize: '1.5rem' } }}
         InputProps={{ style: { fontSize: '1.5rem' } }}
         error={password.trim() === '' && validate}
+        helperText={(password.trim() === '' || password.length < 5) && validate ? "Password must be at least 5 characters long" : ""}
+        FormHelperTextProps={{   
+          style: { fontSize: '1rem',color: 'red' }
+        }}
       />
       <TextField
         margin="normal"
@@ -97,6 +109,10 @@ function SignupForm({ onClose }) {
         InputLabelProps={{ style: { fontSize: '1.5rem' } }}
         InputProps={{ style: { fontSize: '1.5rem' } }}
         error={(confirmPassword.trim()===''&&validate)||(confirmPassword!==password&&validate)}
+        helperText={password !== confirmPassword && validate ? "Password do not match" : ""}
+        FormHelperTextProps={{
+          style: { fontSize: '1rem' }
+        }}
       />
       
 
@@ -130,9 +146,18 @@ function SignupForm({ onClose }) {
           color: '#00CC33',
           fontSize: '1.5rem',
         }}
-        onClick={onClose} // Allow manual closing of the modal
+        onClick={onClose}
       >
         Cancel
+      </Button>
+      
+       <Button
+        fullWidth
+        variant="text"
+        sx={{ mt: 2, fontSize: '1.2rem' }}
+        onClick={onSwitch} 
+      >
+        Already have an account? Log in
       </Button>
     </Box>
   );

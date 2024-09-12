@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import Logo from "../Logo";
 import UserNav from "./UserNav";
+import { useNavigate } from "react-router-dom";
 
 const StyledSidebar = styled.aside`
   background-color: var(--color-grey-0);
@@ -12,11 +13,21 @@ const StyledSidebar = styled.aside`
   flex-direction: column;
   gap: 3.2rem;
 `;
+const LogoWrapper = styled.div`
+  cursor: pointer; 
+`;
 
 function UserSidebar() {
+  const navigate = useNavigate();
+
+  const handleLogoClick = () => {
+    navigate("/");
+  };
   return (
     <StyledSidebar>
-      <Logo />
+        <LogoWrapper onClick={handleLogoClick}>
+        <Logo />
+      </LogoWrapper>
       <UserNav />
     </StyledSidebar>
   );
