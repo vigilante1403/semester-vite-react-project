@@ -1,6 +1,7 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import {jwtDecode} from 'jwt-decode';
+import toast from 'react-hot-toast';
 export const getAllUsers = async () => {
   const { data, error } = await axios.get('/users');
   if (error) throw new Error(error.message);
@@ -72,3 +73,32 @@ export const logout = ()=>{
   if(cookieFind==null||!cookieFind) return;
   Cookies.remove('token-vtravel-lib0-authw')
 }
+export const forgotPass = async (forgotPassForm) => {
+  console.log(forgotPassForm.get('email'));
+  const { data, error } = await axios.get(`/users/reset/${forgotPassForm.get('email')}`);
+  if (error) throw new Error(error.message);
+  return data;
+};
+export const confirmForgotPass = async (confirmForgotPassForm) => {
+
+  const email = confirmForgotPassForm.get('email');
+  const token = confirmForgotPassForm.get('token');
+  const newPasswordReset = confirmForgotPassForm.get('newPasswordReset');
+  const url = `/users/reset-password/${email}/${token}`;
+  console.log(email);
+
+  try {
+
+    const { data } = await axios.post(url, null, {
+      params: {
+        newPasswordReset: newPasswordReset,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    console.error('Error resetting password:', error.response.data.message);
+    toast.error( error.response.data.message);
+    throw new Error(error.response ? error.response.data.message : error.message);
+  }
+};

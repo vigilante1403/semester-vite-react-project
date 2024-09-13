@@ -3,6 +3,7 @@ import { Box, Card, CardContent, CardMedia, Typography, Button, Grid, Rating } f
 import { HiOutlineCurrencyDollar, HiCalendar, HiUserGroup } from 'react-icons/hi2';
 import CheckoutButton from './CheckoutButton';
 import toast from 'react-hot-toast';
+import ShowDetailButton from './ShowDetailButton';
 
 const Tour = ({ tour, bookings }) => {
 
@@ -82,6 +83,7 @@ const Tour = ({ tour, bookings }) => {
             </Box>
             </Box>
           <CheckoutButton tour={tour1} />
+          <ShowDetailButton id={tour.id} />
         </CardContent>
       </Card>
     </Grid>

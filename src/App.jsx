@@ -33,6 +33,9 @@ import MySettings from './pages/userpages/MySettings'
 import AboutMe from './pages/userpages/AboutMe'
 import Verification from './pages/userpages/Verification'
 import VerifySuccess from './pages/userpages/VerifySuccess';
+import TourDetailPage from './pages/userpages/TourDetailPage';
+import ResetPasswordPage from './pages/userpages/ResetPasswordPage';
+import ResetPasswordSuccess from './pages/userpages/ResetPasswordSuccess';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -61,7 +64,7 @@ function App() {
                   <Route path="signup/signUpVerificationRequired" element={<Verification/>} />
                   <Route path="/verifyAccount/:email/:token" element={<VerifySuccess/>} />
                   {/* user part */}
-                  
+                  <Route path="/tours/tour-detail/:id" element={<TourDetailPage/>} />
                   <Route path="*" element={<PageNotFound />} />
                 </Route>
                 <Route path="user" element={<ProtectedRouteUser><AuthenticatedUserLayout/></ProtectedRouteUser>}>
@@ -95,6 +98,8 @@ function App() {
                 <Route path="*" element={<PageNotFound />} />
               </Route>
               <Route path="admin/login" element={<Login />} />
+              <Route path="/reset-password/:email/:token" element={<ResetPasswordPage/>} />
+              <Route path="/reset-password/success" element={<ResetPasswordSuccess/>} />
               <Route path="*" element={<PageNotFound />} />
             </Routes>
           </BrowserRouter>
