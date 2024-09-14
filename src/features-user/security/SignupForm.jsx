@@ -28,7 +28,8 @@ function SignupForm({ onSwitch,onClose }) {
         setEmail('');
         setPassword('');
         setConfirmPassword('')
-        setName('')
+        setName('');
+        onClose();
       },
     });
   }

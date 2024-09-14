@@ -35,7 +35,7 @@ import Verification from './pages/userpages/Verification'
 import VerifySuccess from './pages/userpages/VerifySuccess';
 import TourDetailPage from './pages/userpages/TourDetailPage';
 import ResetPasswordPage from './pages/userpages/ResetPasswordPage';
-import ResetPasswordSuccess from './pages/userpages/ResetpasswordSuccess';
+import ResetPasswordSuccess from './pages/userpages/ResetPasswordSuccess';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

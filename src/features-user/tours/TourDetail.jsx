@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Typography, Grid, Avatar, Card, CardContent, Rating, Dialog, IconButton } from "@mui/material";
-import { styled } from "@mui/system";
+// import { styled } from "@mui/system";
 import CloseIcon from '@mui/icons-material/Close';
 import MapComponent from "../../features/tours/Map";
 import { useAuthenticate } from "../security/useAuthenticate";

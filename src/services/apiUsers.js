@@ -86,7 +86,7 @@ export const confirmForgotPass = async (confirmForgotPassForm) => {
   const newPasswordReset = confirmForgotPassForm.get('newPasswordReset');
   const url = `/users/reset-password/${email}/${token}`;
   console.log(email);
-  
+
   try {
 
     const { data } = await axios.post(url, null, {
