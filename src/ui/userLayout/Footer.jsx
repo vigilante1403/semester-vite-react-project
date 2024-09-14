@@ -1,6 +1,5 @@
 import { Container, Typography } from "@mui/material";
 
-
 export default function Footer() {
     return (
       <footer

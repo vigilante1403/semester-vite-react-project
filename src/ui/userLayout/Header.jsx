@@ -35,6 +35,7 @@ export default function Header() {
 
   const { user, isAuthenticated, isLoading } = useAuthenticate();
   const navigate = useNavigate();
+  
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
   };
