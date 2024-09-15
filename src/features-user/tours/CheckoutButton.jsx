@@ -23,6 +23,7 @@ const CheckoutButton = ({ tour }) => {
       const { error } = await stripe.redirectToCheckout({
         sessionId: data.sessionId,
       });
+      
 
       if (error) {
         console.error('Error redirecting to checkout:', error);

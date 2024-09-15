@@ -26,7 +26,7 @@ function CreateUserForm({ onClose, editUser }) {
   const { countries, isLoading } = useCountries()
   const [selectedCountry, setSelectedCountry] = useState(editUser ? editUser.nationality : null)
   const [currentPhoto, setCurrentPhoto] = useState(null);
- console.log(editUser.photo)
+//  console.log(editUser.photo)
   useEffect(() => {
     if (editUser && editUser.photo) {
       fetchFileFromUrl("user",editUser.photo).then(file => setCurrentPhoto(file));

@@ -4,8 +4,9 @@ export const getAllBookings = async () => {
   if (error) throw new Error(error.message);
   return data;
 };
-export const getBookingsOfUser = async (userId) => {
-  const { data, error } = await axios.get(`/bookings/user/${userId}`);
+export const getBookingsOfUser = async ({userId}) => {
+  console.log('userId la:'+userId)
+  const { data, error } = await axios.get(`/bookings/user/${userId+""}`);
   if (error) throw new Error(error.message);
   return data;
 };
@@ -38,4 +39,8 @@ export const getBookingsByDate = async(bookingForm)=>{
   const {data,error}=await axios.post('/bookings/from-to-dates',bookingForm)
   if(error) throw new Error(error.message)
   return data;
+}
+export const cancelBooking = async({bookingId})=>{
+  const {  error } = await axios.put(`/bookings/cancel-booking?bookingId=${bookingId}`);
+  if (error) throw new Error(error.message);
 }

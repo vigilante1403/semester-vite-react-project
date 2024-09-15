@@ -9,15 +9,20 @@ import BookingRow from './BookingRow';
 import { PAGE_SIZE } from '../../utils/constants';
 import { useSearchParams } from 'react-router-dom';
 
-function BookingTable() {
+function BookingTable({require=null,select=null}) {
   const [searchParams] = useSearchParams();
-  const { bookings, isLoading } = useBookingsTotal();
+  var { bookings, isLoading } = useBookingsTotal();
 
   if (isLoading) return <Spinner />;
   if (!bookings) return <Empty resourceName='bookings' />;
-
+  
   // Xử lý lọc theo trạng thái
   const filterStatus = searchParams.get('status') || 'all';
+  if(require) bookings=require
+  
+  if(select&&select!=='all'){
+    bookings=bookings.filter(select)
+  }
   let filteredBookings = bookings;
 
   if (filterStatus !== 'all') {
@@ -43,13 +48,14 @@ function BookingTable() {
           <div>Tour</div>
           <div>Guest</div>
           <div>Dates</div>
-          <div>Status</div>
           <div>Amount</div>
+          <div>Status</div>
+          
           <div></div>
         </Table.Header>
         <Table.Body
           data={paginatedBookings}
-          render={(booking) => <BookingRow booking={booking} key={booking.id} />}
+          render={(booking) => <BookingRow booking={booking} key={booking.id} require={select} />}
         />
         <Table.Footer>
           <Pagination count={filteredBookings.length} />

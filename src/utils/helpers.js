@@ -22,7 +22,19 @@ export const formatDateToCalendar= (dateStr)=>{
   const formattedDate = format(parsedDate, 'yyyy-MM-dd');
   return formattedDate;
 }
-    
+export const isBeforeOrAfter = (dateStr)=>{
+ const date1 = new Date(dateStr).getTime();
+ const date2 = new Date().getTime()
+  if(date1>date2){
+    return "after"
+  }
+  else if(date1===date2){
+    return "equal"
+  } else{
+    return "before"
+  }
+  
+}
   
 
 // Supabase needs an ISO date string. However, that string will be different on every render because the MS or SEC have changed, which isn't good. So we use this trick to remove any time

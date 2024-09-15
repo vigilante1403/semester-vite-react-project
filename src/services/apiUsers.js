@@ -54,6 +54,8 @@ export const confirmLogin = async () => {
   if (error) throw new Error(error.message);
   return data;
 };
+// function phan quyen trong dashboard quan ly. role o trong authorities
+// useAuthorization
 export const activateAccount = async({email,token})=>{
   const {data,error}=await axios.get(`/unlockMe/${email}/${token}`)
   if(error)throw new Error('Activate failed');

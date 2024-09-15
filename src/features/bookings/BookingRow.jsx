@@ -6,7 +6,7 @@ import Table from '../../ui/Table';
 import Modal from '../../ui/Modal';
 import ConfirmDelete from '../../ui/ConfirmDelete';
 
-import { formatCurrency } from '../../utils/helpers';
+import { formatCurrency,isBeforeOrAfter } from '../../utils/helpers';
 import { formatDistanceFromNow } from '../../utils/helpers';
 import CreateBookingForm from '../bookings/CreateBookingForm';
 import Menus from '../../ui/Menus';
@@ -19,6 +19,7 @@ import {
 } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import { useDeleteBooking } from './useDeleteBooking';
+import { useCancelBookingById } from './useBookings';
 
 const Tour = styled.div`
   font-size: 1.6rem;
@@ -62,7 +63,9 @@ function BookingRow({
     numJoin,
     user: { name: guestName, email, id: userid },
     tour: { name: tourName, id: id },
+    status
   },
+  require=null
 }) {
   const booking = {
     id: bookingId,
@@ -74,6 +77,7 @@ function BookingRow({
     user: { name: guestName, email, id: userid },
     tour: { name: tourName, id: id },
     numJoin,
+    status
   };
   const paidValue = paid ? 'paid' : 'unpaid';
   const statusToTagName = {
@@ -81,10 +85,18 @@ function BookingRow({
     paid: 'green',
     // 'checked-out': 'silver',
   };
+  
+  const activeStatus = {
+    active:'yellow',
+    inactive:'grey'
+  }
+  const dateStr = format(new Date(startDate.replace('ICT', '+0700')), 'yyyy-MM-dd').toString()
+    const valid = isBeforeOrAfter(dateStr) === 'after'
   const navigate = useNavigate();
   // const { checkout, isCheckingOut } = useCheckout();
   const { deleteBooking, isDeleting } = useDeleteBooking();
-  console.log(booking.startDate);
+  const {cancelBooking,isCanceling}=useCancelBookingById();
+
   return (
     <Table.Row>
       <Tour>{tourName}</Tour>
@@ -107,10 +119,8 @@ function BookingRow({
           {format(new Date(startDate.replace('ICT', '+0700')), 'MMM dd yyyy')}
         </span>
       </Stacked>
-
-      <Tag type={statusToTagName[paidValue]}>{paidValue}</Tag>
-
-      <Amount>{formatCurrency(priceFinal)}</Amount>
+      <Amount>{formatCurrency(priceFinal)}&nbsp;&nbsp;<Tag type={statusToTagName[paidValue]}>{paidValue}</Tag></Amount>
+      <Tag type={activeStatus[status?'active':'inactive']}>{status?'Active':'Inactive'}</Tag>
       <Modal>
         <Menus.Menu>
           <Menus.Toggle id={bookingId}></Menus.Toggle>
@@ -140,12 +150,17 @@ function BookingRow({
                 Get ticket
               </Menus.Button>
             )}
-            <Modal.Open opens={`edit-${bookingId}`}>
+            {valid&&status===true&&<Modal.Open opens={`cancel-booking-${bookingId}`}><Menus.Button
+                icon={<HiArrowDownOnSquare />}
+              >
+                Cancel booking
+              </Menus.Button></Modal.Open>}
+           {require==null&&<><Modal.Open opens={`edit-${bookingId}`}>
               <Menus.Button icon={<HiPencil />}>Edit booking</Menus.Button>
             </Modal.Open>
             <Modal.Open opens={`delete-${bookingId}`}>
               <Menus.Button icon={<HiTrash />}>Delete booking</Menus.Button>
-            </Modal.Open>
+            </Modal.Open></> }
           </Menus.List>
         </Menus.Menu>
         <Modal.Window name={`delete-${bookingId}`}>
@@ -159,6 +174,16 @@ function BookingRow({
         </Modal.Window>
         <Modal.Window name={`edit-${bookingId}`}>
           <CreateBookingForm editBooking={booking} />
+        </Modal.Window>
+        <Modal.Window name={`cancel-booking-${bookingId}`}>
+        <ConfirmDelete
+            onConfirm={() => {
+              cancelBooking({bookingId:bookingId})
+            }}
+            disabled={isCanceling}
+            resourceName='booking'
+            action='cancel'
+          />
         </Modal.Window>
       </Modal>
     </Table.Row>

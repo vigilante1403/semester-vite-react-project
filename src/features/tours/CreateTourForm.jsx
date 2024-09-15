@@ -15,7 +15,6 @@ import { useTourGuides } from './useTourGuides';
 import { useUpdateTour } from './useUpdateTour';
 import Spinner from '../../ui/Spinner';
 import { useEffect, useState } from 'react';
-import FormRowVertical from '../../ui/FormRowVertical';
 import { geocodeAddress } from '../../utils/helpers';
 import useCountries from './useCountries';
 import { Typography } from '@mui/material';
@@ -30,7 +29,7 @@ function CreateTourForm({ onClose, editTour }) {
 
   const [currentPhoto, setCurrentPhoto] = useState(null);
   const [currentImages, setCurrentImages] = useState([]);
-
+  if(editTour) console.log(editTour)
   useEffect(() => {
     if (editTour && editTour.imageCover) {
       fetchFileFromUrl('tour', editTour.imageCover).then((file) =>

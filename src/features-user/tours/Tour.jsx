@@ -7,7 +7,7 @@ import ShowDetailButton from './ShowDetailButton';
 
 const Tour = ({ tour, bookings }) => {
 
-  const bookingsCount = bookings.filter(booking => booking.tour.id === tour.id);
+  const bookingsCount = bookings.filter(booking => booking.tour.id === tour.id&&booking.status===true);
   var participantCount=0;
   Array.from(bookingsCount).forEach(booking=>{
     participantCount=participantCount+booking.numJoin
