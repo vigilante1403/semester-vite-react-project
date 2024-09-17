@@ -14,6 +14,7 @@ const Tour = ({ tour, bookings }) => {
     
   })
   const tour1 = {
+    id:1,
     name: 'Amazing Tour',
     summary: 'An amazing tour you won’t forget!',
     price: 5000, // price in cents
@@ -82,7 +83,7 @@ const Tour = ({ tour, bookings }) => {
               </Typography>
             </Box>
             </Box>
-          <CheckoutButton tour={tour1} />
+          <CheckoutButton tour={tour} />
           <ShowDetailButton id={tour.id} />
         </CardContent>
       </Card>

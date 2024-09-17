@@ -1,15 +1,11 @@
 import React, { useContext, useState } from "react";
 import { Box, Tabs, Tab, Typography, TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { useBookingsByUser } from "../../features/bookings/useBookings";
 import { useBookingsOfUser } from "./useBookings";
 import Spinner from "../../ui/Spinner";
-import Table from '../../ui/Table';
-import Menus from '../../ui/Menus';
-import Empty from '../../ui/Empty';
 import BookingTable from '../../features/bookings/BookingTable'
 import { UserContext } from "../../ui/userLayout/ProtectedRouteUser";
-import {format, isBefore} from 'date-fns'
+import {format} from 'date-fns'
 import { isBeforeOrAfter } from "../../utils/helpers";
 
 function TabPanel(props) {

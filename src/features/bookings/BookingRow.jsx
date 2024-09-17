@@ -6,7 +6,7 @@ import Table from '../../ui/Table';
 import Modal from '../../ui/Modal';
 import ConfirmDelete from '../../ui/ConfirmDelete';
 
-import { formatCurrency,isBeforeOrAfter } from '../../utils/helpers';
+import { formatCurrency, isBeforeOrAfter } from '../../utils/helpers';
 import { formatDistanceFromNow } from '../../utils/helpers';
 import CreateBookingForm from '../bookings/CreateBookingForm';
 import Menus from '../../ui/Menus';
@@ -20,6 +20,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useDeleteBooking } from './useDeleteBooking';
 import { useCancelBookingById } from './useBookings';
+import toast from 'react-hot-toast';
+import CheckoutButton from '../../features-user/tours/CheckoutButton';
 
 const Tour = styled.div`
   font-size: 1.6rem;
@@ -62,10 +64,11 @@ function BookingRow({
     paid,
     numJoin,
     user: { name: guestName, email, id: userid },
-    tour: { name: tourName, id: id },
-    status
+    tour: { name: tourName, id: tourId,summary },
+    status,
+    sessionId,creationTime
   },
-  require=null
+  require = null,
 }) {
   const booking = {
     id: bookingId,
@@ -75,28 +78,42 @@ function BookingRow({
     priceFinal,
     paid,
     user: { name: guestName, email, id: userid },
-    tour: { name: tourName, id: id },
+    tour: { name: tourName, id: tourId,summary },
     numJoin,
-    status
+    status,
+    sessionId,creationTime
   };
+  const tour = {
+    id:tourId,
+    price:priceOrigin,
+    priceDiscount:priceDiscount,
+    name:tourName,
+    summary
+    
+  }
   const paidValue = paid ? 'paid' : 'unpaid';
   const statusToTagName = {
     unpaid: 'blue',
     paid: 'green',
     // 'checked-out': 'silver',
   };
-  
+
   const activeStatus = {
-    active:'yellow',
-    inactive:'grey'
-  }
-  const dateStr = format(new Date(startDate.replace('ICT', '+0700')), 'yyyy-MM-dd').toString()
-    const valid = isBeforeOrAfter(dateStr) === 'after'
+    active: 'yellow',
+    inactive: 'grey',
+  };
+  const dateStr = format(
+    new Date(startDate.replace('ICT', '+0700')),
+    'yyyy-MM-dd'
+  ).toString();
+  const valid =
+    isBeforeOrAfter(dateStr) === 'after' ||
+    isBeforeOrAfter(dateStr) === 'equal';
   const navigate = useNavigate();
   // const { checkout, isCheckingOut } = useCheckout();
   const { deleteBooking, isDeleting } = useDeleteBooking();
-  const {cancelBooking,isCanceling}=useCancelBookingById();
-
+  const { cancelBooking, isCanceling } = useCancelBookingById();
+  console.log(booking)
   return (
     <Table.Row>
       <Tour>{tourName}</Tour>
@@ -119,8 +136,13 @@ function BookingRow({
           {format(new Date(startDate.replace('ICT', '+0700')), 'MMM dd yyyy')}
         </span>
       </Stacked>
-      <Amount>{formatCurrency(priceFinal)}&nbsp;&nbsp;<Tag type={statusToTagName[paidValue]}>{paidValue}</Tag></Amount>
-      <Tag type={activeStatus[status?'active':'inactive']}>{status?'Active':'Inactive'}</Tag>
+      <Amount>
+        {formatCurrency(priceFinal)}&nbsp;&nbsp;
+        <Tag type={statusToTagName[paidValue]}>{paidValue}</Tag>
+      </Amount>
+      <Tag type={activeStatus[status ? 'active' : 'inactive']}>
+        {status ? 'Active' : 'Inactive'}
+      </Tag>
       <Modal>
         <Menus.Menu>
           <Menus.Toggle id={bookingId}></Menus.Toggle>
@@ -131,13 +153,16 @@ function BookingRow({
             >
               See details
             </Menus.Button>
-            {paidValue === 'unpaid' && (
+            {paidValue === 'unpaid' && !require && (
               <Menus.Button
                 icon={<HiArrowDownOnSquare />}
                 onClick={() => navigate(`/admin/checkins/${bookingId}`)}
               >
                 Paid bill
               </Menus.Button>
+            )}
+            {paidValue === 'unpaid' && require && (
+              <CheckoutButton tour={tour} bill={booking} payAfter={true} />
             )}
             {paidValue === 'paid' && (
               <Menus.Button
@@ -150,17 +175,23 @@ function BookingRow({
                 Get ticket
               </Menus.Button>
             )}
-            {valid&&status===true&&<Modal.Open opens={`cancel-booking-${bookingId}`}><Menus.Button
-                icon={<HiArrowDownOnSquare />}
-              >
-                Cancel booking
-              </Menus.Button></Modal.Open>}
-           {require==null&&<><Modal.Open opens={`edit-${bookingId}`}>
-              <Menus.Button icon={<HiPencil />}>Edit booking</Menus.Button>
-            </Modal.Open>
-            <Modal.Open opens={`delete-${bookingId}`}>
-              <Menus.Button icon={<HiTrash />}>Delete booking</Menus.Button>
-            </Modal.Open></> }
+            {valid && status === true && (
+              <Modal.Open opens={`cancel-booking-${bookingId}`}>
+                <Menus.Button icon={<HiArrowDownOnSquare />}>
+                  Cancel booking
+                </Menus.Button>
+              </Modal.Open>
+            )}
+            {require == null && (
+              <>
+                <Modal.Open opens={`edit-${bookingId}`}>
+                  <Menus.Button icon={<HiPencil />}>Edit booking</Menus.Button>
+                </Modal.Open>
+                <Modal.Open opens={`delete-${bookingId}`}>
+                  <Menus.Button icon={<HiTrash />}>Delete booking</Menus.Button>
+                </Modal.Open>
+              </>
+            )}
           </Menus.List>
         </Menus.Menu>
         <Modal.Window name={`delete-${bookingId}`}>
@@ -176,13 +207,13 @@ function BookingRow({
           <CreateBookingForm editBooking={booking} />
         </Modal.Window>
         <Modal.Window name={`cancel-booking-${bookingId}`}>
-        <ConfirmDelete
+          <ConfirmDelete
             onConfirm={() => {
-              cancelBooking({bookingId:bookingId})
+              cancelBooking({ bookingId: bookingId });
             }}
             disabled={isCanceling}
-            resourceName='booking'
-            action='cancel'
+            resourceName="booking"
+            action="cancel"
           />
         </Modal.Window>
       </Modal>

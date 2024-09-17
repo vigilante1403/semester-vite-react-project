@@ -24,7 +24,11 @@ export const formatDateToCalendar= (dateStr)=>{
 }
 export const isBeforeOrAfter = (dateStr)=>{
  const date1 = new Date(dateStr).getTime();
- const date2 = new Date().getTime()
+ const date = new Date()
+ const formattedDate = date.getFullYear() + '-' +
+  ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+  ('0' + date.getDate()).slice(-2);
+ const date2 = new Date(formattedDate).getTime()
   if(date1>date2){
     return "after"
   }
