@@ -40,16 +40,14 @@ export const findUserById = async (id) => {
 export const login = async (loginForm) => {
   const { data, error } = await axios.post('/login',loginForm);
   if (error) throw new Error(error.message);
-  localStorage.setItem('username',data.email)
+  
   return data;
 };
 
 export const confirmLogin = async () => {
-  
-  let user=localStorage.getItem('username')||null;
-  if(user==null) throw new Error('Unauthorized user')
 
-  const { data, error } = await axios.post(`/authenticate?username=${user}`);
+
+  const { data, error } = await axios.post(`/authenticate`);
 
   if (error) throw new Error(error.message);
   return data;
@@ -68,12 +66,13 @@ export const getAllGuides = async ()=>{
   if(error) throw new Error(error.message)
     return data;
 }
-export const logout = ()=>{
-
+export const logout = async ()=>{
+  const {data,error}=await axios.post('/logout');
   if(localStorage.getItem('username'))localStorage.removeItem('username')
   const cookieFind = Cookies.get('token-vtravel-lib0-authw') || null;
   if(cookieFind==null||!cookieFind) return;
-  Cookies.remove('token-vtravel-lib0-authw')
+  return data;
+  
 }
 export const forgotPass = async (forgotPassForm) => {
   console.log(forgotPassForm.get('email'));

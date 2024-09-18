@@ -5,7 +5,7 @@ export const getAllBookings = async () => {
   return data;
 };
 export const getBookingsOfUser = async ({userId}) => {
-  console.log('userId la:'+userId)
+  // console.log('userId la:'+userId)
   const { data, error } = await axios.get(`/bookings/user/${userId+""}`);
   if (error) throw new Error(error.message);
   return data;
