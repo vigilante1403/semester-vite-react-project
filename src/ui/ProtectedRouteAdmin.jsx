@@ -10,7 +10,7 @@ display: flex;
 align-items: center;
 justify-content: center;
 `
-const AdminContext = createContext(null)
+export const AdminContext = createContext(null)
 function ProtectedRouteAdmin({children}) {
     const navigate=useNavigate()
     /// 1 load the authentcated user

@@ -26,6 +26,7 @@ function CreateUserForm({ onClose, editUser }) {
   const { countries, isLoading } = useCountries()
   const [selectedCountry, setSelectedCountry] = useState(editUser ? editUser.nationality : null)
   const [currentPhoto, setCurrentPhoto] = useState(null);
+  const [nationalId, setNationalID] = useState(editUser ? editUser.nationalID : null);
 //  console.log(editUser.photo)
   useEffect(() => {
     if (editUser && editUser.photo) {
@@ -81,7 +82,7 @@ function CreateUserForm({ onClose, editUser }) {
     }
     const country = countries.find(c => c.name.common === selectedCountry)
     if (country) {
-      const nationalId = `${country.ccn3}${Math.floor(100000000 + Math.random() * 900000000)}`
+      // const nationalId = `${country.ccn3}${Math.floor(100000000 + Math.random() * 900000000)}`
       formData.append("nationalID", nationalId)
       formData.append("nationality", country.name.common)
       formData.append("countryFlag", country.flags.svg)
@@ -226,6 +227,8 @@ function CreateUserForm({ onClose, editUser }) {
                 const selected = e.target.value;
                 field.onChange(selected);
                 setSelectedCountry(selected);
+                const country = countries.find(c => c.name.common === selected);
+                setNationalID( `${countries.find(c => c.name.common === selected)?.ccn3}${Math.floor(100000000 + Math.random() * 900000000)}`);
               }}
             />
           )}
@@ -239,11 +242,16 @@ function CreateUserForm({ onClose, editUser }) {
             alt="Country flag"
             width={50}
           />
-          <Typography variant="body1">
+          <Typography variant="h5">
             {countries.find(c => c.name.common === selectedCountry)?.region}
           </Typography>
         </FormRow>
       )}
+      {selectedCountry && countries && (nationalId) && (
+        <Typography variant="h6">
+          National ID: {nationalId}
+        </Typography>
+      )} 
 
       <FormRow>
         <Button variation="secondary" type="reset">

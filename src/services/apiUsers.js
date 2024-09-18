@@ -103,3 +103,8 @@ export const confirmForgotPass = async (confirmForgotPassForm) => {
     throw new Error(error.response ? error.response.data.message : error.message);
   }
 };
+export const getTokenAuthorized = async ()=>{
+  const {data,error}=await axios.get('/get-authorized-token')
+  if(error) throw new Error(error.message)
+    return data;
+}

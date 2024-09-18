@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { findUserByEmail, findUserById } from '../../services/apiUsers';
+import { findUserByEmail, findUserById, getTokenAuthorized } from '../../services/apiUsers';
 
 export function useGetUserByEmail() {
   const [searchParams] = useSearchParams();
@@ -19,4 +19,11 @@ export function useGetUserById() {
     queryFn: findUserById,
   });
   return { user, isFinding };
+}
+export function useGetUserToken(){
+  const{data:token,isLoading}=useQuery({
+    queryFn: getTokenAuthorized,
+    queryKey:[`user-token`]
+  })
+  return {token,isLoading}
 }

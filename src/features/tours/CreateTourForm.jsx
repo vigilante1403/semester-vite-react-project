@@ -15,6 +15,7 @@ import { useTourGuides } from './useTourGuides';
 import { useUpdateTour } from './useUpdateTour';
 import Spinner from '../../ui/Spinner';
 import { useEffect, useState } from 'react';
+import FormRowVertical from '../../ui/FormRowVertical';
 import { geocodeAddress } from '../../utils/helpers';
 import useCountries from './useCountries';
 import { Typography } from '@mui/material';
@@ -29,7 +30,15 @@ function CreateTourForm({ onClose, editTour }) {
 
   const [currentPhoto, setCurrentPhoto] = useState(null);
   const [currentImages, setCurrentImages] = useState([]);
-  if(editTour) console.log(editTour)
+
+
+  const [selectedGuideName1, setSelectedGuideName1] = useState("chooseValue");
+  const [selectedGuideName2, setSelectedGuideName2] = useState('');
+  const [isGuide2Added, setIsGuide2Added] = useState(false);
+  const [selectedGuideTag, setSelectedGuideTag] = useState("guide1"); // Track which guide is selected
+  const [selectedGuides, setSelectedGuides] = useState(["chooseValue", null]);
+
+
   useEffect(() => {
     if (editTour && editTour.imageCover) {
       fetchFileFromUrl('tour', editTour.imageCover).then((file) =>
@@ -50,7 +59,61 @@ function CreateTourForm({ onClose, editTour }) {
     if (editTour) {
       setSelectedCountry(editTour.countryNameCommon || null);
     }
+    if (editTour && editTour.guides) {
+
+      const idArrays = editTour.guides.map(item => item.id);
+      const guideName = editTour.guides ? editTour.guides.map(item => item.name) : 'chooseValue';
+      setSelectedGuides(idArrays);
+      setSelectedGuideName1(guideName[0])
+      if (idArrays.length > 1) {
+        setIsGuide2Added(true);
+        setSelectedGuideName2(guideName[1] || 'chooseValue');
+      }  // set guides từ editTour vào state
+    }
+    fetchAndSetTourLocations(editTour);
   }, [editTour]);
+  
+
+    editTour ? console.log(editTour) : console.log('no editTour');
+  const handleGuideSelectChange = (event) => {
+    const selectedGuide = guides.find((guide) => guide.value === event.target.value);
+    const guideName = selectedGuide ? selectedGuide.label.split('-')[0] : 'chooseValue';
+
+    const newSelectedGuides = [...selectedGuides];  // Clone the array
+
+    if (selectedGuideTag === "guide2") {
+      newSelectedGuides[1] = event.target.value;
+      setSelectedGuideName2(guideName);  // Update guide2
+    } else {
+      newSelectedGuides[0] = event.target.value;
+      setSelectedGuideName1(guideName);  // Update guide1
+    }
+
+    setSelectedGuides(newSelectedGuides);  // Update state
+  };
+
+  const handleAddGuide2 = () => {
+    setIsGuide2Added(true);
+
+    setSelectedGuides([selectedGuides[0], 'chooseValue']);
+    setSelectedGuideName2('chooseValue')// Initialize guide2
+
+  };
+
+  const handleRemoveGuide1 = () => {
+
+    setSelectedGuides(['chooseValue', selectedGuides[1]]);
+    setSelectedGuideName1("chooseValue");  // Reset guide1
+  };
+
+  const handleRemoveGuide2 = () => {
+    setIsGuide2Added(false);
+    setSelectedGuides([selectedGuides[0], null]);  // Reset guide2
+    setSelectedGuideName2('');
+  };
+
+  ///
+  
 
   const {
     register,
@@ -82,9 +145,68 @@ function CreateTourForm({ onClose, editTour }) {
   };
 
   const [inputs, setInputs] = useState(['']);
-  const [dates, setDates] = useState(['']);
+  const [dates, setDates] = useState(editTour ? editTour?.startDates : ['']);
   const [descriptions, setDescriptions] = useState(['']);
   const [coordinates, setCoordinates] = useState([]);
+  const [showFormatted, setShowFormatted] = useState([]);
+
+  const fetchAndSetTourLocations = async (editTour) => {
+    if (editTour && editTour.locations) {
+      // Lấy tất cả các giá trị `address` và `description` từ `locations`
+      const locationAddresses = editTour.locations.map((location) => location.address);
+      const locationDescriptions = editTour.locations.map((location) => location.description);
+  
+      // Cập nhật vào state `inputs` và `descriptions`
+      setInputs(locationAddresses);
+      setDescriptions(locationDescriptions);
+  
+      console.log(locationAddresses);
+  
+      // Sử dụng for...of để đảm bảo async/await hoạt động đúng
+      for (let index = 0; index < locationAddresses.length; index++) {
+        const address = locationAddresses[index];
+        try {
+          const { place, index1 } = await geocodeAddress(address, index);
+          console.log('index ' + index);
+          console.log(address);
+  
+          if (place) {
+            console.log(coordinates);
+  
+            // Cập nhật `coordinates` dựa trên giá trị trước đó
+            setCoordinates((prevCoordinates) => {
+              const newCoordinates = prevCoordinates ? [...prevCoordinates] : [];
+              const coor = [place.geometry.lat, place.geometry.lng];
+              newCoordinates[index] = { index1, coor };
+              console.log('newCoordinates');
+              console.log(newCoordinates);
+              return newCoordinates;
+            });
+  
+            // Cập nhật `showFormatted` dựa trên giá trị trước đó
+            setShowFormatted((prevFormatted) => {
+              const newFormatted = prevFormatted ? [...prevFormatted] : [];
+              const formatted = place.formatted;
+              newFormatted[index] = { index1, formatted };
+              console.log(newFormatted);
+              console.log('after');
+              return newFormatted;
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching geocode:", error);
+        }
+      }
+    } else {
+      // Nếu không phải edit hoặc không có locations, để input trống
+      setInputs(['']);
+      setDescriptions(['']);
+      setCoordinates([]);
+      setShowFormatted([]);
+    }
+  };
+  
+  
 
   const handleInputDateChange = (index, event) => {
     const newInputs = dates.slice();
@@ -103,6 +225,9 @@ function CreateTourForm({ onClose, editTour }) {
   };
 
   const handleAddInput = () => {
+    console.log(inputs);
+
+    console.log(descriptions);
     setInputs([...inputs, '']);
     setDescriptions([...descriptions, '']);
     setCoordinates([...coordinates, '']);
@@ -189,8 +314,19 @@ function CreateTourForm({ onClose, editTour }) {
     formData.append('summary', data.summary);
     formData.append('price', data.price);
     formData.append('priceDiscount', data.priceDiscount);
-    data.guide = data.guide !== undefined ? data.guide : guides[0].value;
-    formData.append('guides', data.guide);
+
+
+    // data.guide = data.guide !== undefined ? data.guide : guides[0].value;
+    // formData.append('guides', data.guide);
+
+    selectedGuides.forEach((guide) => {
+      if ((guide !== "chooseValue" || guide !== '#') && guide) {
+        formData.append('guides', guide);  // Append each selected guide to the formData
+      } else {
+        toast.error('Choose a guide');
+        return;
+      }
+    });
 
     if (
       !selectedCountry ||
@@ -234,26 +370,53 @@ function CreateTourForm({ onClose, editTour }) {
     const day = String(today.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
+
+  const handleCheckLocation = async (place) => {
+    if (selectedCountry == null || selectedCountry == '#') {
+      toast.error('Please choose a country first');
+      return;
+    }
+
+    const c = Object.values(place.annotations.UN_M49.regions);
+    const country = countries.find((c) => c.name.common === selectedCountry);
+
+    if (!Object.values(place.annotations.UN_M49.regions).includes(country.ccn3)) {
+      toast.error('Please input locations in selected country');
+      return;
+
+    }
+    toast('Locations valid');
+  }
   const handleFetchCoordinates = async (index) => {
     console.log(inputs[index]);
     if (inputs[index].trim() === '') {
       toast.error('Please put valid address');
       return;
     }
+    console.log('index fect '+ index);
     const { place, index1 } = await geocodeAddress(inputs[index], index);
+
+    handleCheckLocation(place)
+    console.log(place);
     if (place) {
       const newInputs = coordinates ? [...coordinates] : []; // Use spread operator to clone the array
       const coor = [place.geometry.lat, place.geometry.lng];
       console.log(coor);
       newInputs[index] = { index1, coor };
+    
       setCoordinates(newInputs);
+      const newFormatted = showFormatted ? [...showFormatted] : [];
+      const formatted = place.formatted;
+  
+      newFormatted[index] = { index1, formatted };
+      setShowFormatted(newFormatted);
     }
   };
 
 
   if (isLoading || isCreating || isUpdating || isCountriesLoading)
     return <Spinner />;
-  
+
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
@@ -340,7 +503,7 @@ function CreateTourForm({ onClose, editTour }) {
           onChange={(e) => setValue('guide', e.target.value)}
         />
       </FormRow> */}
-      <FormRow label="Available Guide" error={errors?.guide?.message}>
+      {/* <FormRow label="Available Guide" error={errors?.guide?.message}>
         <Controller
           name="guide"
           control={control}
@@ -362,7 +525,145 @@ function CreateTourForm({ onClose, editTour }) {
             />
           )}
         />
+      </FormRow> */}
+      <FormRow label="Available Guide">
+
+        {/* <select
+          style={{color:'inherit', backgroundColor:'inherit'}}
+            value={selectedGuideTag === "guide2" ? selectedGuides[1] : selectedGuides[0]}
+            onChange={handleGuideSelectChange}
+          >
+            <option style={{color:'inherit', background:' var(--color-grey-0)'}} value="chooseValue">Choose a guide</option>
+            {guides
+              .filter(
+                (guide) => guide.value !== (selectedGuideTag === "guide1" ? selectedGuides[1] : selectedGuides[0]) // Exclude the other guide's selected value
+              )
+              .map((guide) => (
+                <option style={{color:'inherit', backgroundColor:' var(--color-grey-0)'}} key={guide.value} value={guide.value}>
+                  <span >{guide.label}</span>
+                </option>
+              ))}
+          </select> */}
+
+        <Select
+          options={guides.filter(
+            (guide) =>
+              guide.value !== (selectedGuideTag === 'guide1' ? selectedGuides[1] : selectedGuides[0])
+          )}
+          value={selectedGuideTag === 'guide2' ? selectedGuides[1] : selectedGuides[0]}
+          onChange={handleGuideSelectChange}
+          text="Choose a guide"
+          {...register('guide', {
+            required: 'required',
+            validate: (value) =>
+              String(value).length > 0 || 'This field is required',
+          })}// useForm hook register
+        />
+
+
       </FormRow>
+
+      {selectedGuides[0] !== "chooseValue" && !isGuide2Added && (
+        <FormRow>
+          <Button type="button" onClick={handleAddGuide2}>
+            Add Guide2
+          </Button>
+        </FormRow>
+
+      )}
+      {/* Display Selected Guides */}
+
+      {editTour?.guides && selectedGuides[0].email}
+      <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'flex-start' }}>
+        {/* Guide 1 with Remove Option */}
+
+
+        <div
+          style={{
+            display: 'inline-block',
+            marginRight: '10px',
+            cursor: 'pointer',
+            border: selectedGuideTag === 'guide1' ? '2px solid blue' : 'none',
+          }}
+          onClick={() => setSelectedGuideTag('guide1')}
+        >
+          <span>Guide 1: {selectedGuideName1}</span>
+          <button
+            onClick={handleRemoveGuide1}
+            type="button"
+            style={{
+              position: 'relative', // Đặt position relative để điều chỉnh vị trí bên trong button
+              cursor: 'pointer',
+              background: 'inherit', // Màu xám nhạt
+              color: 'var(--color-grey-400)', // Màu của dấu 'x' là xám nhạt
+              border: 'none',
+              borderRadius: '50%',
+              width: '20px',
+              height: '20px',
+              textAlign: 'center',
+              padding: 0,
+            }}
+          >
+            <span
+              style={{
+                position: 'absolute',
+                top: '-5px',  // Di chuyển dấu 'x' lên góc trên
+                right: '-5px', // Di chuyển dấu 'x' sang phải
+                color: 'var(--color-grey-400)', // Màu xám nhạt cho chữ 'x'
+                fontSize: '16px',
+                lineHeight: '20px', // Đảm bảo dấu 'x' căn giữa theo chiều dọc
+              }}
+            >
+              x
+            </span>
+          </button>
+        </div>
+
+        {/* Guide 2 with Remove Option */}
+        {isGuide2Added && (
+          <div
+            style={{
+              display: 'inline-block',
+              cursor: 'pointer',
+              border: selectedGuideTag === 'guide2' ? '2px solid blue' : 'none',
+            }}
+            onClick={() => setSelectedGuideTag('guide2')}
+          >
+            <span>Guide 2: {selectedGuideName2}</span>
+            <button
+              onClick={handleRemoveGuide2}
+              type="button"
+              style={{
+                position: 'relative', // Đặt position relative để điều chỉnh vị trí bên trong button
+                cursor: 'pointer',
+                background: 'inherit',
+                color: 'var(--color-grey-400)', // Màu của dấu 'x' là xám nhạt
+                border: 'none',
+                borderRadius: '50%',
+                width: '20px',
+                height: '20px',
+                textAlign: 'center',
+                padding: 0,
+              }}
+            >
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '-5px',  // Di chuyển dấu 'x' lên góc trên
+                  right: '-5px', // Di chuyển dấu 'x' sang phải
+                  color: 'var(--color-grey-400)', // Màu xám nhạt cho chữ 'x'
+                  fontSize: '16px',
+                  lineHeight: '20px', // Đảm bảo dấu 'x' căn giữa theo chiều dọc
+                }}
+              >
+                x
+              </span>
+            </button>
+          </div>
+        )}
+      </div>
+
+
       <FormRow label="Tour Photo">
         <FileInput
           id="imageCover"
@@ -410,6 +711,7 @@ function CreateTourForm({ onClose, editTour }) {
             <Input
               type="date"
               min={getTodayDate()}
+              value={input}
               onChange={(event) => handleInputDateChange(index, event)}
               placeholder={`Date ${index + 1}`}
             />
@@ -421,49 +723,6 @@ function CreateTourForm({ onClose, editTour }) {
           + Add Dates
         </Button>
       </FormRow>
-
-      {inputs.map((input, index) => (
-        <FormRow label={`Location ${index + 1}`} flex="flex-start">
-          <>
-            <Input
-              type="text"
-              value={input}
-              onChange={(event) => handleInputChange(index, event)}
-              placeholder={`Address ${index + 1}`}
-            />
-            <Input
-              type="text"
-              value={descriptions[index]}
-              onChange={(event) => handleInputDescriptionsChange(index, event)}
-              placeholder={`Description ${index + 1}`}
-              //     {...register('descriptions', {
-              //   required:  'This field is required',
-              // })}
-            />
-            <Button
-              type="button"
-              variation="secondary"
-              onClick={() => handleFetchCoordinates(index)}
-            >
-              Fetch loc
-            </Button>
-            {coordinates[index] && (
-              <Input
-                type="text"
-                value={`[${coordinates[index].coor[0]},${coordinates[index].coor[1]}]`}
-                disabled
-                style={{ marginLeft: '1rem' }}
-              />
-            )}
-          </>
-        </FormRow>
-      ))}
-      <FormRow>
-        <Button type="button" onClick={handleAddInput}>
-          + Add Input
-        </Button>
-      </FormRow>
-
       <FormRow label="Country">
         <Controller
           name="countryNameCommon"
@@ -499,7 +758,7 @@ function CreateTourForm({ onClose, editTour }) {
         />
       </FormRow>
 
-      {selectedCountry && countries && (
+      {selectedCountry && selectedCountry !== '#' && countries && (
         <FormRow>
           <img
             src={
@@ -509,11 +768,62 @@ function CreateTourForm({ onClose, editTour }) {
             alt="Country flag"
             width={50}
           />
-          <Typography variant="body1">
+          <Typography variant="h5">
             {countries.find((c) => c.name.common === selectedCountry)?.region}
           </Typography>
         </FormRow>
       )}
+
+      {inputs.map((input, index) => (
+        <>
+          <FormRow label={`Location ${index + 1}`} flex="flex-start">
+            <>
+              <Input
+                type="text"
+                value={input}
+                onChange={(event) => handleInputChange(index, event)}
+                placeholder={`Address ${index + 1}`}
+              />
+              <Input
+                type="text"
+                value={descriptions[index]}
+                onChange={(event) => handleInputDescriptionsChange(index, event)}
+                placeholder={`Description ${index + 1}`}
+              //     {...register('descriptions', {
+              //   required:  'This field is required',
+              // })}
+              />
+              <Button
+                type="button"
+                variation="secondary"
+                onClick={() => handleFetchCoordinates(index)}
+              >
+                Fetch loc
+              </Button>
+              {/* {coordinates[index] && (
+              <Input
+                type="text"
+                value={`[${coordinates[index].coor[0]},${coordinates[index].coor[1]}]`}
+                disabled
+                style={{ marginLeft: '1rem' }}
+              />
+            )} */}
+            </>
+
+
+          </FormRow>
+          {showFormatted[index] &&
+            showFormatted[index].formatted
+          }
+        </>
+      ))}
+      <FormRow>
+        <Button type="button" onClick={handleAddInput}>
+          + Add Input
+        </Button>
+      </FormRow>
+
+
 
       <FormRow>
         {/* type is an HTML attribute! */}
