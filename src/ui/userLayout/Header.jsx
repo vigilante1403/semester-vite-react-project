@@ -5,7 +5,7 @@
 // import {
 //   AppBar,
 //   Toolbar,
- 
+
 //   Button,
 //   IconButton,
 //   Drawer,
@@ -36,24 +36,24 @@
 //     const [openLoginSignup, setOpenLoginSignup] = useState(false);
 //     const [drawerOpen, setDrawerOpen] = useState(false);
 //     const [isLogin, setIsLogin] = useState(true);
-  
+
 //     const toggleDrawer = (open) => () => {
 //       setDrawerOpen(open);
 //     };
-  
+
 //     const handleLoginSignupOpen = (login) => {
 //       setIsLogin(login);
 //       setOpenLoginSignup(true);
 //     };
-  
+
 //     const handleLoginSignupClose = () => {
 //       setOpenLoginSignup(false);
 //     };
-  
+
 //     const handleSwitch = () => {
 //       setIsLogin(!isLogin);
 //     };
-  
+
 //     return (
 //       <StyledHeader>
 //         <AppBar
@@ -78,7 +78,7 @@
 //                 flexGrow: 1,
 //               }}
 //             >
-            
+
 //               <Button color="inherit" sx={{ fontSize: '2rem', marginRight: 2 }}>
 //                 <Link to="/home" style={{ textDecoration: 'none', color: 'inherit' }}>
 //                   Home
@@ -99,7 +99,7 @@
 //                   About
 //                 </Link>
 //               </Button>
-              
+
 //             </Box>
 //             <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
 //             <Modal>
@@ -155,7 +155,7 @@
 //             </List>
 //           </Box>
 //         </Drawer>
-        
+
 //         {/* <LoginSignupPage open={openLoginSignup} onClose={handleLoginSignupClose} isLogin={isLogin} onSwitch={handleSwitch} /> */}
 //       </StyledHeader>
 //     );
@@ -200,7 +200,7 @@ export default function Header() {
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
   };
-  
+
   const handleLoginSignupOpen = (login) => {
     setIsLogin(login);
     setIsForgotPassword(false);
@@ -214,7 +214,7 @@ export default function Header() {
 
   const handleSwitch = () => {
     setIsLogin(!isLogin);
-  };const handleSwitchForgotPassword = () => {
+  }; const handleSwitchForgotPassword = () => {
     setIsForgotPassword(!isForgotPassword);
     setIsLogin(!isLogin);
   };

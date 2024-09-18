@@ -4,23 +4,23 @@ import Logo from '../../ui/Logo';
 import { useSignup } from './useSignup';
 
 
-function SignupForm({ onSwitch,onClose }) {
-  
+function SignupForm({ onSwitch, onClose }) {
+
   const [email, setEmail] = useState('');
-  const [name,setName]=useState('')
+  const [name, setName] = useState('')
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const {signUp,isLoading}=useSignup()
+  const { signUp, isLoading } = useSignup()
   const [validate, setValidate] = useState(false);
 
   function onSubmit(e) {
     e.preventDefault();
-    if (!email || !password||!name||!confirmPassword) return;
+    if (!email || !password || !name || !confirmPassword) return;
 
     const formData = new FormData();
     formData.append('email', email);
     formData.append('password', password);
-    formData.append('name',name);
+    formData.append('name', name);
 
 
     signUp(formData, {
@@ -53,9 +53,9 @@ function SignupForm({ onSwitch,onClose }) {
         InputLabelProps={{ style: { fontSize: '1.5rem' } }}
         InputProps={{ style: { fontSize: '1.5rem' } }}
         error={name.trim() === '' && validate}
-        helperText={(name.trim() === '' ) && validate ? "Display name is required" : ""}
-        FormHelperTextProps={{   
-          style: { fontSize: '1rem',color: 'red' }
+        helperText={(name.trim() === '') && validate ? "Display name is required" : ""}
+        FormHelperTextProps={{
+          style: { fontSize: '1rem', color: 'red' }
         }}
       />
       <TextField
@@ -73,8 +73,8 @@ function SignupForm({ onSwitch,onClose }) {
         InputProps={{ style: { fontSize: '1.5rem' } }}
         error={email.trim() === '' && validate}
         helperText={(email.trim() === '') && validate ? "Email is required" : ""}
-        FormHelperTextProps={{   
-          style: { fontSize: '1rem',color: 'red' }
+        FormHelperTextProps={{
+          style: { fontSize: '1rem', color: 'red' }
         }}
       />
 
@@ -93,8 +93,8 @@ function SignupForm({ onSwitch,onClose }) {
         InputProps={{ style: { fontSize: '1.5rem' } }}
         error={password.trim() === '' && validate}
         helperText={(password.trim() === '' || password.length < 5) && validate ? "Password must be at least 5 characters long" : ""}
-        FormHelperTextProps={{   
-          style: { fontSize: '1rem',color: 'red' }
+        FormHelperTextProps={{
+          style: { fontSize: '1rem', color: 'red' }
         }}
       />
       <TextField
@@ -109,13 +109,13 @@ function SignupForm({ onSwitch,onClose }) {
         onChange={(e) => setConfirmPassword(e.target.value)}
         InputLabelProps={{ style: { fontSize: '1.5rem' } }}
         InputProps={{ style: { fontSize: '1.5rem' } }}
-        error={(confirmPassword.trim()===''&&validate)||(confirmPassword!==password&&validate)}
+        error={(confirmPassword.trim() === '' && validate) || (confirmPassword !== password && validate)}
         helperText={password !== confirmPassword && validate ? "Password do not match" : ""}
         FormHelperTextProps={{
           style: { fontSize: '1rem' }
         }}
       />
-      
+
 
       <Button
         type="submit"
@@ -127,12 +127,12 @@ function SignupForm({ onSwitch,onClose }) {
           backgroundColor: '#dcfce7',
           color: '#1f2937',
           fontSize: '1.5rem',
-          ':hover':{
-            'backgroundColor':'#e0f2fe',
-            'color':'#1f2937'
+          ':hover': {
+            'backgroundColor': '#e0f2fe',
+            'color': '#1f2937'
           }
         }}
-        
+
         disabled={isLoading}
         onClick={() => setValidate((prev) => true)}
       >
@@ -151,12 +151,12 @@ function SignupForm({ onSwitch,onClose }) {
       >
         Cancel
       </Button>
-      
-       <Button
+
+      <Button
         fullWidth
         variant="text"
         sx={{ mt: 2, fontSize: '1.2rem' }}
-        onClick={onSwitch} 
+        onClick={onSwitch}
       >
         Already have an account? Log in
       </Button>
