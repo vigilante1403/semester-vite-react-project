@@ -1,6 +1,12 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Box, Tabs, Tab, Typography, TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { UserContext } from "../../ui/userLayout/ProtectedRouteUser";
+import {format} from 'date-fns'
+import { isBeforeOrAfter } from "../../utils/helpers";
+import { useReviewsOfUser } from "./useReviews";
+import Spinner from "../../ui/Spinner";
+import ReviewsTable from "./ReviewsTable";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -29,13 +35,20 @@ function a11yProps(index) {
   };
 }
 
-const MyBookings = () => {
+const Reviews = () => {
+  
+  
+  const {user}=useContext(UserContext)
+  const {reviews,isLoading}=useReviewsOfUser(user.id)
+
   const [value, setValue] = useState(0);
+  const [select,setSelect]=useState('all');
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-
+  if(isLoading) return <Spinner/>
+  
   return (
     <Box sx={{ width: "100%", backgroundColor: 'var(--color-grey-0)', color: 'var(--color-grey-800)' }}>
       <Typography 
@@ -48,7 +61,7 @@ const MyBookings = () => {
           fontSize: '3rem' 
         }}
       >
-        My Bookings
+        My Reviews
       </Typography>
       <Tabs 
         value={value} 
@@ -57,20 +70,21 @@ const MyBookings = () => {
         sx={{ 
           borderBottom: '0.1rem solid var(--color-grey-300)', 
           '& .MuiTabs-flexContainer': {
-            justifyContent: 'space-between', 
+            justifyContent: 'center', 
+            
           },
           '& .MuiTab-root': {
-            fontSize: '1.25rem',
+            fontSize: '1.5rem',
           },
         }}
       >
-        <Tab label="All Bookings" {...a11yProps(0)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
-        <Tab label="Waiting Payment" {...a11yProps(1)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
-        <Tab label="Processing" {...a11yProps(2)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
-        <Tab label="Traveling" {...a11yProps(3)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
-        <Tab label="Completed Bookings" {...a11yProps(4)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
-        <Tab label="Cancelled Bookings" {...a11yProps(5)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
-      </Tabs>
+        <Tab label="Reviewed Tours"  custom={null}  {...a11yProps(0)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold',width:'100%' }} />
+        <Tab label="Waiting For Reviews"  {...a11yProps(1)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold',width:'100%' }} />
+         {/* <Tab label="Processing"  {...a11yProps(2)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
+        <Tab label="Traveling"  custom={4} {...a11yProps(3)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
+        <Tab label="Completed Bookings"  custom={5} {...a11yProps(4)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
+        <Tab label="Cancelled Bookings"  custom={6} {...a11yProps(5)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} /> */}
+      </Tabs> 
       <Box sx={{ p: 3 }}>
         <TextField
           fullWidth
@@ -96,26 +110,13 @@ const MyBookings = () => {
           }}
         />
       </Box>
-      <TabPanel value={value} index={0}>
-        No bookings available
+      <TabPanel value={value} index={value} >
+      {reviews&&reviews.length>0&&<ReviewsTable require={reviews}  />}
+      {(!reviews||reviews.length===0)&& <p>No review to show</p>}
       </TabPanel>
-      <TabPanel value={value} index={1}>
-        No bookings waiting for payment
-      </TabPanel>
-      <TabPanel value={value} index={2}>
-        No bookings in processing
-      </TabPanel>
-      <TabPanel value={value} index={3}>
-        No bookings in traveling
-      </TabPanel>
-      <TabPanel value={value} index={4}>
-        No bookings completed
-      </TabPanel>
-      <TabPanel value={value} index={5}>
-        No bookings cancelled
-      </TabPanel>
+      
     </Box>
   );
 };
 
-export default MyBookings;
+export default Reviews;

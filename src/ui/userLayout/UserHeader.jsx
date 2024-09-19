@@ -1,6 +1,7 @@
 import styled from "styled-components"
 import UserHeaderMenu from './UserHeaderMenu'
-// import UserAvatar from '../features/authentication/UserAvatar'
+import UserAvatar from "../../features/authentication/UserAvatar"
+
 
 const StyledHeader=styled.header`
 background-color: var(--color-grey-0);
@@ -15,7 +16,7 @@ justify-content: flex-end;
 function UserHeader() {
     return (
         <StyledHeader>
-        {/* <UserAvatar /> */}
+        <UserAvatar />
             <UserHeaderMenu /> 
         </StyledHeader>
     )

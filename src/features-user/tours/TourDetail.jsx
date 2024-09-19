@@ -36,9 +36,9 @@ const TourDetail = ({ tour }) => {
     setOpen(false);
     setSelectedImage('');
   };
-  if (isLoading) {
-    return <Spinner />
-  }
+  // if (isLoading) {
+  //   return <Spinner />
+  // }
   return (
     <Box>
       {/* Tour Name Section */}
@@ -229,7 +229,7 @@ const TourDetail = ({ tour }) => {
           />
         </Box>
       </Dialog>
-      <MapComponent locations={tour.locations} />
+      {tour.locations.length>0&&<MapComponent locations={tour.locations} />}
       <Box sx={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {/* Left Side: Overlapping Tour Images */}
         <Box sx={{bottom: '60px', position: 'relative', width: '50%', display: 'flex', justifyContent: 'flex-start' }}>

@@ -7,13 +7,14 @@ import ShowDetailButton from './ShowDetailButton';
 
 const Tour = ({ tour, bookings }) => {
 
-  const bookingsCount = bookings.filter(booking => booking.tour.id === tour.id);
+  const bookingsCount = bookings.filter(booking => booking.tour.id === tour.id&&booking.status===true);
   var participantCount=0;
   Array.from(bookingsCount).forEach(booking=>{
     participantCount=participantCount+booking.numJoin
     
   })
   const tour1 = {
+    id:1,
     name: 'Amazing Tour',
     summary: 'An amazing tour you won’t forget!',
     price: 5000, // price in cents
@@ -82,7 +83,7 @@ const Tour = ({ tour, bookings }) => {
               </Typography>
             </Box>
             </Box>
-          <CheckoutButton tour={tour1} />
+          <CheckoutButton tour={tour} />
           <ShowDetailButton id={tour.id} />
         </CardContent>
       </Card>

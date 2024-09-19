@@ -27,7 +27,7 @@ import AuthenticatedUserLayout from './ui/userLayout/AuthenticatedUserLayout';
 import ProtectedRouteUser from './ui/userLayout/ProtectedRouteUser'
 import MyDashboard from './pages/userpages/MyDashboard';
 import MyReviews from './pages/userpages/MyReviews'
-import MyBookings from './pages/userpages/MyBookings'
+import MyBookings from './features-user/bookings/MyBookings'
 import MyStatistics from './pages/userpages/MyStatistics'
 import MySettings from './pages/userpages/MySettings'
 import AboutMe from './pages/userpages/AboutMe'
@@ -73,7 +73,7 @@ function App() {
                     <Route path="me" element={<AboutMe/>} />
                     <Route path="bookings" element={<MyBookings/>} />
                     <Route path="reviews" element={<MyReviews/>} />
-                    <Route path="statistics" element={<MyStatistics/>} />
+                    {/* <Route path="statistics" element={<MyStatistics/>} /> */}
                     <Route path="settings" element={<MySettings/>} />
                     <Route path="*" element={<PageNotFound />} />
                   </Route>
