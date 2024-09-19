@@ -1,25 +1,20 @@
-import Heading from '../ui/Heading'
+import Heading from '../ui/Heading';
 
-import Profile from '../features/authentication/Profile'
+import Profile from '../features/authentication/Profile';
 
 import { useContext } from 'react';
 
 import { AdminContext } from '../ui/ProtectedRouteAdmin';
+
 function Users() {
+  const { user } = useContext(AdminContext);
 
-
-  const {user}=useContext(AdminContext)
-
-  
-
-  
-    return (
-      
-        <>
+  return (
+    <>
       <Heading as="h1">My info</Heading>
       <Profile user={user} />
     </>
-    )
+  );
 }
 
-export default Users
+export default Users;

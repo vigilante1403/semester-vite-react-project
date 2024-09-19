@@ -11,6 +11,7 @@ import { useDeleteTour } from './useDeleteTour';
 import { useCreateTour } from './userCreateTour';
 import TourDetail from './TourDetails';
 import { useNavigate } from 'react-router-dom';
+import { HasRole } from '../../utils/helpers';
 
 // const TableRow = styled.div`
 //   display: grid;
@@ -71,8 +72,12 @@ function TourRow({ tour }) {
     countryNameOfficial,
     region,
     status,
-    startDates
+    startDates,
   } = tour;
+  const isAdmin = HasRole('ADMIN');
+  const canEdit = isAdmin || HasRole('LEADGUIDE');
+  const canDelete = isAdmin;
+
   function handleDuplicate() {
     const formData = new FormData();
     formData.append(
@@ -116,12 +121,19 @@ function TourRow({ tour }) {
           <Menus.Menu>
             <Menus.Toggle id={id} />
             <Menus.List id={id}>
-              <Menus.Button
-                icon={<HiSquare2Stack />}
-                onClick={() => handleDuplicate()}
-              >
-                Duplicate
-              </Menus.Button>
+              {canEdit && (
+                <>
+                  <Menus.Button
+                    icon={<HiSquare2Stack />}
+                    onClick={() => handleDuplicate()}
+                  >
+                    Duplicate
+                  </Menus.Button>
+                  <Modal.Open opens={`edit-${id}`}>
+                    <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+                  </Modal.Open>
+                </>
+              )}
 
               <Menus.Button
                 onClick={() => navigate(`/admin/tours/${id}`)}
@@ -129,13 +141,11 @@ function TourRow({ tour }) {
               >
                 See details
               </Menus.Button>
-
-              <Modal.Open opens={`edit-${id}`}>
-                <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
-              </Modal.Open>
-              <Modal.Open opens={`delete-${id}`}>
-                <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
-              </Modal.Open>
+              {canDelete && (
+                <Modal.Open opens={`delete-${id}`}>
+                  <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+                </Modal.Open>
+              )}
             </Menus.List>
           </Menus.Menu>
           <Modal.Window name={`edit-${id}`}>

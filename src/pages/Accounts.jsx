@@ -3,6 +3,7 @@ import Heading from '../ui/Heading'
 import AccountTable from '../features/authentication/AccountTable';
 import AccountTableOperations from '../features/authentication/AccountTableOperations'
 import AddUser from '../features/authentication/AddUser';
+import Searchbar from '../ui/Searchbar';
 function Accounts() {
     return (
         <>
@@ -11,6 +12,7 @@ function Accounts() {
         <AccountTableOperations/>
       </Row>
       <Row>
+      <Searchbar placeholder="Search users by email or user name"/>
        <AccountTable/>
         <AddUser/>
       </Row>

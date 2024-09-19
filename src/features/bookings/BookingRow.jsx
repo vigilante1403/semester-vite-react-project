@@ -22,6 +22,7 @@ import { useDeleteBooking } from './useDeleteBooking';
 import { useCancelBookingById } from './useBookings';
 import toast from 'react-hot-toast';
 import CheckoutButton from '../../features-user/tours/CheckoutButton';
+import { HasRole } from '../../utils/helpers';
 
 const Tour = styled.div`
   font-size: 1.6rem;
@@ -95,7 +96,6 @@ function BookingRow({
   const statusToTagName = {
     unpaid: 'blue',
     paid: 'green',
-    // 'checked-out': 'silver',
   };
 
   const activeStatus = {
@@ -106,14 +106,19 @@ function BookingRow({
     new Date(startDate.replace('ICT', '+0700')),
     'yyyy-MM-dd'
   ).toString();
+
   const valid =
     isBeforeOrAfter(dateStr) === 'after' ||
     isBeforeOrAfter(dateStr) === 'equal';
   const navigate = useNavigate();
-  // const { checkout, isCheckingOut } = useCheckout();
+
   const { deleteBooking, isDeleting } = useDeleteBooking();
   const { cancelBooking, isCanceling } = useCancelBookingById();
   console.log(booking)
+  const isAdmin = HasRole('ADMIN');
+  const isLeadGuide = HasRole('LEADGUIDE');
+  const canEdit = isAdmin || isLeadGuide;
+  const canDelete = isAdmin;
   return (
     <Table.Row>
       <Tour>{tourName}</Tour>
@@ -182,14 +187,16 @@ function BookingRow({
                 </Menus.Button>
               </Modal.Open>
             )}
-            {require == null && (
+            {canEdit && require == null && (
               <>
                 <Modal.Open opens={`edit-${bookingId}`}>
                   <Menus.Button icon={<HiPencil />}>Edit booking</Menus.Button>
                 </Modal.Open>
-                <Modal.Open opens={`delete-${bookingId}`}>
-                  <Menus.Button icon={<HiTrash />}>Delete booking</Menus.Button>
-                </Modal.Open>
+                {canDelete && (
+                  <Modal.Open opens={`delete-${bookingId}`}>
+                    <Menus.Button icon={<HiTrash />}>Delete booking</Menus.Button>
+                  </Modal.Open>
+                )}
               </>
             )}
           </Menus.List>

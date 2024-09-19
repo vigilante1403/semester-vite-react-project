@@ -12,6 +12,8 @@ import {
 import Modal from '../../ui/Modal';
 import EditProfileForm from './EditProfileForm';
 import Spinner from '../../ui/Spinner';
+import ChangePasswordForm from './ChangePasswordForm';
+
 // const user = {
 //     name: 'John Doe',
 //     email: 'john.doe@example.com',
@@ -48,7 +50,7 @@ function Profile({ user }) {
         <CardContent
           sx={{
             p: 4,
-            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+            background: 'linear-gradient(135deg, var(--color-grey-300) 20%, var(--color-grey-300) 80%)',
             borderRadius: 3,
           }}
         >
@@ -154,14 +156,21 @@ function Profile({ user }) {
               </Modal>
             </Grid>
             <Grid item>
-              <Button
+            <Modal>
+                <Modal.Open opens="change-password-form">
+                <Button
                 variant="outlined"
                 color="secondary"
                 size="large"
-                sx={{ borderRadius: '20px', px: 4 }}
+                sx={{ borderRadius: '20px', px: 4 ,color: 'primary', }}
               >
                 Change Password
               </Button>
+              </Modal.Open>
+                <Modal.Window name="change-password-form">
+                  <ChangePasswordForm email={user.email} />
+                </Modal.Window>
+              </Modal>
             </Grid>
           </Grid>
         </CardContent>

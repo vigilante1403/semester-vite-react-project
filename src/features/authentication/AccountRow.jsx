@@ -11,6 +11,7 @@ import { useUpdate } from './useUpdateUser'
 import { useDeleteUser } from './useDeleteUser'
 import { useCreateUser } from './useCreateUser'
 import { useNavigate } from 'react-router-dom'
+import { HasRole } from '../../utils/helpers';
 
 const Img = styled.img`
   display: block;
@@ -68,7 +69,9 @@ function AccountRow({ user }) {
     formData.append("photo", photo)
     createUser(formData)
   }
-
+  const isAdmin = HasRole('ADMIN');
+  const canEdit = isAdmin || HasRole('LEADGUIDE');
+  const canDelete = isAdmin;
   return (
     <Table.Row>
       <Img src={'http://localhost:8080/api/v1/file/image/user/' + photo || ''} />
@@ -85,20 +88,28 @@ function AccountRow({ user }) {
           <Menus.Menu>
             <Menus.Toggle id={id} />
             <Menus.List id={id}>
-              <Menus.Button icon={<HiSquare2Stack />} onClick={() => handleDuplicate()}>
-                Duplicate
+            {canEdit && (
+                <>
+                  <Menus.Button icon={<HiSquare2Stack />} onClick={() => handleDuplicate()}>
+                    Duplicate
+                  </Menus.Button>
+                  <Modal.Open opens={`edit-${id}`}>
+                    <Menus.Button icon={<HiPencil />}>
+                      Edit
+                    </Menus.Button>
+                  </Modal.Open>
+                </>
+              )}
+              <Menus.Button icon={<HiEye />} onClick={() => navigate(`/admin/accounts/${id}`)}>
+                See details
               </Menus.Button>
-              <Modal.Open opens={`edit-${id}`}>
-                <Menus.Button icon={<HiPencil />}>
-                  Edit
-                </Menus.Button>
-              </Modal.Open>
-              <Menus.Button icon={<HiEye/>} onClick={()=>navigate(`/admin/accounts/${id}`)}>See details</Menus.Button>
-              <Modal.Open opens={`delete-${id}`}>
-                <Menus.Button icon={<HiTrash />}>
-                  Delete
-                </Menus.Button>
-              </Modal.Open>
+              {canDelete && (
+                <Modal.Open opens={`delete-${id}`}>
+                  <Menus.Button icon={<HiTrash />}>
+                    Delete
+                  </Menus.Button>
+                </Modal.Open>
+              )}
             </Menus.List>
             <Modal.Window name={`edit-${id}`}>
               <CreateUserForm editUser={user} />

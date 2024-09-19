@@ -4,6 +4,7 @@ import BookingTable from '../features/bookings/BookingTable';
 
 import BookingTableOperations from '../features/bookings/BookingTableOperations';
 import AddBooking from '../features/bookings/AddBooking';
+import Searchbar from '../ui/Searchbar';
 function Bookings() {
     return (
         <>
@@ -12,6 +13,7 @@ function Bookings() {
           <BookingTableOperations/>
         </Row>
         <Row>
+        <Searchbar placeholder={"Search bookings by Booking name"} />
          <BookingTable/>
          <AddBooking/>
           
