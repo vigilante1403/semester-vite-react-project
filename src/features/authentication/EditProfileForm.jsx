@@ -14,7 +14,7 @@ import { useUpdate } from "./useUpdateUser";
 
 // Email regex: /\S+@\S+\.\S+/
 
-function EditProfileForm({ user }) {
+function EditProfileForm({onClose, user }) {
   const { updateUser, isUpdating } = useUpdate()
   const { countries, isLoading } = useCountries()
   const [selectedCountry, setSelectedCountry] = useState(user ? user.nationality : null);
@@ -68,10 +68,7 @@ function EditProfileForm({ user }) {
       toast.error('Photo is empty');
       return;
     }else{
-      if(photoFile ==='u') {
-        toast.error("Can't load your photo");
-        return;
-      }
+      
       formData.append("photo", photoFile);
     }
     console.log('name:', formData.get('name'));
@@ -89,6 +86,7 @@ function EditProfileForm({ user }) {
       updateUser(formData, {
         onSettled: () => {
           reset();
+          onClose?.();
         }
       })
     }

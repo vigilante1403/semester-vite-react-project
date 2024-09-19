@@ -5,7 +5,7 @@ import FormRow from "../../ui/FormRow";
 import Input from "../../ui/Input";
 import { useChangePassword } from "./useChangePassword";
 
-function ChangePasswordForm({email}) {
+function ChangePasswordForm({onClose, email}) {
 const {changePass,isChanging} = useChangePassword();
   const { register, formState, handleSubmit, getValues, reset } = useForm({
     defaultValues: {
@@ -27,8 +27,7 @@ const {changePass,isChanging} = useChangePassword();
     changePass(formData, {
         onSettled: () => {
           reset();
-          console.log(isChanging);
-          
+          onClose?.();
         }
       })
    
