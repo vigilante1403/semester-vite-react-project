@@ -1,7 +1,9 @@
 import { formatDistance, parse, parseISO,format } from 'date-fns';
 import { differenceInDays } from 'date-fns';
 import opencage from 'opencage-api-client';
+import { useContext } from 'react';
 import toast from 'react-hot-toast';
+import { AdminContext } from '../ui/ProtectedRouteAdmin';
 
 // We want to make this function work for both Date objects and strings (which come from Supabase)
 export const subtractDates = (dateStr1, dateStr2) =>
@@ -98,3 +100,10 @@ export const geocodeAddress = async (address, index) => {
     return { error: error.message };
   }
 };
+
+export const HasRole = (roleName)=>{
+  const { user } = useContext(AdminContext);
+  const hasRole = user.authorities.some(role => role.authority === roleName);
+  console.log(hasRole);
+  return hasRole;
+}

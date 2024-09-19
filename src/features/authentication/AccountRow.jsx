@@ -1,16 +1,16 @@
-/* eslint-disable react/prop-types */
-import styled from 'styled-components'
-import toast from 'react-hot-toast'
-import Table from '../../ui/Table'
-import { HiEye, HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2'
-import Modal from '../../ui/Modal'
-import ConfirmDelete from '../../ui/ConfirmDelete'
-import Menus from '../../ui/Menus'
-import CreateUserForm from './CreateUserForm'
-import { useUpdate } from './useUpdateUser'
-import { useDeleteUser } from './useDeleteUser'
-import { useCreateUser } from './useCreateUser'
-import { useNavigate } from 'react-router-dom'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDeleteUser } from './useDeleteUser';
+import { useCreateUser } from './useCreateUser';
+
+import styled from 'styled-components';
+import Table from '../../ui/Table';
+import Modal from '../../ui/Modal';
+import ConfirmDelete from '../../ui/ConfirmDelete';
+import Menus from '../../ui/Menus';
+import CreateUserForm from './CreateUserForm';
+import { HiEye, HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
+import { HasRole } from '../../utils/helpers';
 
 const Img = styled.img`
   display: block;
@@ -19,55 +19,63 @@ const Img = styled.img`
   object-fit: cover;
   object-position: center;
   transform: scale(1.5) translateX(-7px);
-`
+`;
+
 const Email = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--color-grey-600);
   font-family: 'Sono';
-`
+`;
+
 const UserName = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
   color: var(--color-grey-600);
   font-family: 'Sono';
-`
-
+`;
 
 const Role = styled.div`
   font-family: 'Sono';
   font-weight: 600;
-`
+`;
 
 const Enable = styled.div`
   font-family: 'Sono';
   font-weight: 500;
   color: var(--color-green-700);
-`
+`;
+
 const Country = styled.div`
   display: flex;
   align-items: center;
   gap: 0.8rem;
 `;
+
 const Flag = styled.img`
   width: 3rem;
   height: auto;
 `;
+
 function AccountRow({ user }) {
-  const { deleteUser, isDeleting } = useDeleteUser()
-  const { createUser } = useCreateUser()
-  const { id,email, name, role, enabled, photo, countryFlag,nationality } = user
-  const navigate = useNavigate()
+  const { deleteUser, isDeleting } = useDeleteUser();
+  const { createUser } = useCreateUser();
+  const { id, email, name, role, enabled, photo, countryFlag, nationality } = user;
+  const navigate = useNavigate();
 
   function handleDuplicate() {
-    const formData = new FormData()
-    formData.append("name", "Copy of " + name)
-    formData.append("email","Copy" +Math.floor(Math.random() * 100) + email)
-    formData.append("password",Math.floor(Math.random() * 1000000) )
-    formData.append("role", role)
-    formData.append("photo", photo)
-    createUser(formData)
+    const formData = new FormData();
+    formData.append("name", "Copy of " + name);
+    formData.append("email", "Copy" + Math.floor(Math.random() * 100) + email);
+    formData.append("password", Math.floor(Math.random() * 1000000));
+    formData.append("role", role);
+    formData.append("photo", photo);
+    createUser(formData);
   }
+
+  const isAdmin = HasRole('ADMIN');
+  const canEdit = isAdmin || HasRole('LEADGUIDE');
+  const canDelete = isAdmin;
 
   return (
     <Table.Row>
@@ -85,20 +93,28 @@ function AccountRow({ user }) {
           <Menus.Menu>
             <Menus.Toggle id={id} />
             <Menus.List id={id}>
-              <Menus.Button icon={<HiSquare2Stack />} onClick={() => handleDuplicate()}>
-                Duplicate
+              {canEdit && (
+                <>
+                  <Menus.Button icon={<HiSquare2Stack />} onClick={() => handleDuplicate()}>
+                    Duplicate
+                  </Menus.Button>
+                  <Modal.Open opens={`edit-${id}`}>
+                    <Menus.Button icon={<HiPencil />}>
+                      Edit
+                    </Menus.Button>
+                  </Modal.Open>
+                </>
+              )}
+              <Menus.Button icon={<HiEye />} onClick={() => navigate(`/admin/accounts/${id}`)}>
+                See details
               </Menus.Button>
-              <Modal.Open opens={`edit-${id}`}>
-                <Menus.Button icon={<HiPencil />}>
-                  Edit
-                </Menus.Button>
-              </Modal.Open>
-              <Menus.Button icon={<HiEye/>} onClick={()=>navigate(`/admin/accounts/${id}`)}>See details</Menus.Button>
-              <Modal.Open opens={`delete-${id}`}>
-                <Menus.Button icon={<HiTrash />}>
-                  Delete
-                </Menus.Button>
-              </Modal.Open>
+              {canDelete && (
+                <Modal.Open opens={`delete-${id}`}>
+                  <Menus.Button icon={<HiTrash />}>
+                    Delete
+                  </Menus.Button>
+                </Modal.Open>
+              )}
             </Menus.List>
             <Modal.Window name={`edit-${id}`}>
               <CreateUserForm editUser={user} />
@@ -114,7 +130,7 @@ function AccountRow({ user }) {
         </Modal>
       </div>
     </Table.Row>
-  )
+  );
 }
 
-export default AccountRow
+export default AccountRow;

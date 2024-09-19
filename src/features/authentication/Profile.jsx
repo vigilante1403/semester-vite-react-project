@@ -12,16 +12,7 @@ import {
 import Modal from '../../ui/Modal';
 import EditProfileForm from './EditProfileForm';
 import Spinner from '../../ui/Spinner';
-// const user = {
-//     name: 'John Doe',
-//     email: 'john.doe@example.com',
-//     fullName: 'Johnathan Doe',
-//     nationality: 'United States',
-//     countryFlag: 'https://flagcdn.com/w320/us.png',
-//     role: 'USER',
-//     createdAt: '2023-01-01',
-//     lastLoginDate: '2024-09-18',
-// };
+import ChangePasswordForm from './ChangePasswordForm';
 
 function Profile({ user }) {
   const formattedDate = (isoDate) => {
@@ -48,7 +39,8 @@ function Profile({ user }) {
         <CardContent
           sx={{
             p: 4,
-            background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+            // background color of profile
+            background: 'linear-gradient(135deg, var(--color-grey-300) 20%, var(--color-grey-300) 80%)',
             borderRadius: 3,
           }}
         >
@@ -154,14 +146,22 @@ function Profile({ user }) {
               </Modal>
             </Grid>
             <Grid item>
-              <Button
+            <Modal>
+                <Modal.Open opens="change-password-form">
+                <Button
                 variant="outlined"
-                color="secondary"
+                // color="primary"
                 size="large"
-                sx={{ borderRadius: '20px', px: 4 }}
+                sx={{ borderRadius: '20px', px: 4 ,color: 'primary', }}
               >
                 Change Password
               </Button>
+                </Modal.Open>
+                <Modal.Window name="change-password-form">
+                  <ChangePasswordForm email={user.email} />
+                </Modal.Window>
+              </Modal>
+              
             </Grid>
           </Grid>
         </CardContent>

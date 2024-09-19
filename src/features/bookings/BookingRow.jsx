@@ -1,11 +1,10 @@
+import React from 'react';
 import styled from 'styled-components';
 import { format, isToday } from 'date-fns';
-
 import Tag from '../../ui/Tag';
 import Table from '../../ui/Table';
 import Modal from '../../ui/Modal';
 import ConfirmDelete from '../../ui/ConfirmDelete';
-
 import { formatCurrency, isBeforeOrAfter } from '../../utils/helpers';
 import { formatDistanceFromNow } from '../../utils/helpers';
 import CreateBookingForm from '../bookings/CreateBookingForm';
@@ -22,6 +21,7 @@ import { useDeleteBooking } from './useDeleteBooking';
 import { useCancelBookingById } from './useBookings';
 import toast from 'react-hot-toast';
 import CheckoutButton from '../../features-user/tours/CheckoutButton';
+import { HasRole } from '../../utils/helpers'; // Import your role-checking function
 
 const Tour = styled.div`
   font-size: 1.6rem;
@@ -53,20 +53,17 @@ const Amount = styled.div`
 function BookingRow({
   booking: {
     id: bookingId,
-    // created_at,
     startDate,
-    // endDate,
-    // numNights,
-    // numGuests,
     priceOrigin,
     priceDiscount,
     priceFinal,
     paid,
     numJoin,
     user: { name: guestName, email, id: userid },
-    tour: { name: tourName, id: tourId,summary },
+    tour: { name: tourName, id: tourId, summary },
     status,
-    sessionId,creationTime
+    sessionId,
+    creationTime
   },
   require = null,
 }) {
@@ -78,24 +75,23 @@ function BookingRow({
     priceFinal,
     paid,
     user: { name: guestName, email, id: userid },
-    tour: { name: tourName, id: tourId,summary },
+    tour: { name: tourName, id: tourId, summary },
     numJoin,
     status,
-    sessionId,creationTime
+    sessionId,
+    creationTime
   };
   const tour = {
-    id:tourId,
-    price:priceOrigin,
-    priceDiscount:priceDiscount,
-    name:tourName,
+    id: tourId,
+    price: priceOrigin,
+    priceDiscount: priceDiscount,
+    name: tourName,
     summary
-    
-  }
+  };
   const paidValue = paid ? 'paid' : 'unpaid';
   const statusToTagName = {
     unpaid: 'blue',
     paid: 'green',
-    // 'checked-out': 'silver',
   };
 
   const activeStatus = {
@@ -110,10 +106,15 @@ function BookingRow({
     isBeforeOrAfter(dateStr) === 'after' ||
     isBeforeOrAfter(dateStr) === 'equal';
   const navigate = useNavigate();
-  // const { checkout, isCheckingOut } = useCheckout();
   const { deleteBooking, isDeleting } = useDeleteBooking();
   const { cancelBooking, isCanceling } = useCancelBookingById();
-  console.log(booking)
+
+  // Check roles
+  const isAdmin = HasRole('ADMIN');
+  const isLeadGuide = HasRole('LEADGUIDE');
+  const canEdit = isAdmin || isLeadGuide;
+  const canDelete = isAdmin;
+
   return (
     <Table.Row>
       <Tour>{tourName}</Tour>
@@ -145,7 +146,7 @@ function BookingRow({
       </Tag>
       <Modal>
         <Menus.Menu>
-          <Menus.Toggle id={bookingId}></Menus.Toggle>
+          <Menus.Toggle id={bookingId} />
           <Menus.List id={bookingId}>
             <Menus.Button
               icon={<HiEye />}
@@ -182,14 +183,16 @@ function BookingRow({
                 </Menus.Button>
               </Modal.Open>
             )}
-            {require == null && (
+            {canEdit && require == null && (
               <>
                 <Modal.Open opens={`edit-${bookingId}`}>
                   <Menus.Button icon={<HiPencil />}>Edit booking</Menus.Button>
                 </Modal.Open>
-                <Modal.Open opens={`delete-${bookingId}`}>
-                  <Menus.Button icon={<HiTrash />}>Delete booking</Menus.Button>
-                </Modal.Open>
+                {canDelete && (
+                  <Modal.Open opens={`delete-${bookingId}`}>
+                    <Menus.Button icon={<HiTrash />}>Delete booking</Menus.Button>
+                  </Modal.Open>
+                )}
               </>
             )}
           </Menus.List>

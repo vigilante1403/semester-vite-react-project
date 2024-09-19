@@ -3,6 +3,9 @@ import Heading from '../ui/Heading'
 import AccountTable from '../features/authentication/AccountTable';
 import AccountTableOperations from '../features/authentication/AccountTableOperations'
 import AddUser from '../features/authentication/AddUser';
+import { Box, InputAdornment, TextField } from '@mui/material';
+import SearchIcon from "@mui/icons-material/Search";
+
 function Accounts() {
     return (
         <>
@@ -11,6 +14,31 @@ function Accounts() {
         <AccountTableOperations/>
       </Row>
       <Row>
+      <Box sx={{ p: 3 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Search users by email or user name"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ color: 'var(--color-grey-800)' }} />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              backgroundColor: 'var(--color-grey-100)',
+            },
+            '& .MuiInputBase-input': {
+              color: 'var(--color-grey-800)',
+            },
+            '& .MuiInputLabel-root': {
+              color: 'var(--color-grey-800)',
+            },
+          }}
+        />
+      </Box>
        <AccountTable/>
         <AddUser/>
       </Row>

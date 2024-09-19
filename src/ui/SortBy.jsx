@@ -13,7 +13,7 @@ function SortBy({options}) {
         
     }
     return (
-        <Select options={options} type="white" value={currentSelectValue} onChange={handleChange} />
+        <Select text={'Default'} options={options} type="white" value={currentSelectValue} onChange={handleChange} />
     )
 }
 

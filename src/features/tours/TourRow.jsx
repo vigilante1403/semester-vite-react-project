@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+import React from 'react';
 import styled from 'styled-components';
 import { formatCurrency } from '../../utils/helpers';
 import Table from '../../ui/Table';
@@ -9,20 +9,8 @@ import Menus from '../../ui/Menus';
 import CreateTourForm from './CreateTourForm';
 import { useDeleteTour } from './useDeleteTour';
 import { useCreateTour } from './userCreateTour';
-import TourDetail from './TourDetails';
 import { useNavigate } from 'react-router-dom';
-
-// const TableRow = styled.div`
-//   display: grid;
-//   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
-//   column-gap: 2.4rem;
-//   align-items: center;
-//   padding: 1.4rem 2.4rem;
-
-//   &:not(:last-child) {
-//     border-bottom: 1px solid var(--color-grey-100);
-//   }
-// `
+import { HasRole } from '../../utils/helpers'; // Import role checking utility
 
 const Img = styled.img`
   display: block;
@@ -50,14 +38,14 @@ const Discount = styled.div`
   font-weight: 500;
   color: var(--color-green-700);
 `;
+
 function TourRow({ tour }) {
   const navigate = useNavigate();
   const { deleteTour, isDeleting } = useDeleteTour();
-  const { createTour, isCreating } = useCreateTour();
+  const { createTour } = useCreateTour();
   const {
     id,
     name,
-    slug,
     maxGroupSize,
     price,
     priceDiscount,
@@ -73,12 +61,10 @@ function TourRow({ tour }) {
     status,
     startDates
   } = tour;
+
   function handleDuplicate() {
     const formData = new FormData();
-    formData.append(
-      'name',
-      'Copy of ' + name + ' ' + Math.floor(Math.random() * 100)
-    );
+    formData.append('name', 'Copy of ' + name + ' ' + Math.floor(Math.random() * 100));
     formData.append('maxGroupSize', maxGroupSize);
     formData.append('imageCoverCopy', imageCover);
     formData.append('description', description);
@@ -98,11 +84,14 @@ function TourRow({ tour }) {
 
     createTour(formData);
   }
+
+  const isAdmin = HasRole('ADMIN');
+  const canEdit = isAdmin || HasRole('LEADGUIDE');
+  const canDelete = isAdmin;
+
   return (
     <Table.Row>
-      <Img
-        src={'http://localhost:8080/api/v1/file/image/tour/' + imageCover || ''}
-      />
+      <Img src={'http://localhost:8080/api/v1/file/image/tour/' + imageCover || ''} />
       <Tour>{name}</Tour>
       <div>Fits up {maxGroupSize} guests</div>
       <Price>{formatCurrency(price)}</Price>
@@ -116,26 +105,30 @@ function TourRow({ tour }) {
           <Menus.Menu>
             <Menus.Toggle id={id} />
             <Menus.List id={id}>
-              <Menus.Button
-                icon={<HiSquare2Stack />}
-                onClick={() => handleDuplicate()}
-              >
-                Duplicate
-              </Menus.Button>
-
+              {canEdit && (
+                <>
+                  <Menus.Button
+                    icon={<HiSquare2Stack />}
+                    onClick={() => handleDuplicate()}
+                  >
+                    Duplicate
+                  </Menus.Button>
+                  <Modal.Open opens={`edit-${id}`}>
+                    <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+                  </Modal.Open>
+                </>
+              )}
               <Menus.Button
                 onClick={() => navigate(`/admin/tours/${id}`)}
                 icon={<HiEye />}
               >
                 See details
               </Menus.Button>
-
-              <Modal.Open opens={`edit-${id}`}>
-                <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
-              </Modal.Open>
-              <Modal.Open opens={`delete-${id}`}>
-                <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
-              </Modal.Open>
+              {canDelete && (
+                <Modal.Open opens={`delete-${id}`}>
+                  <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+                </Modal.Open>
+              )}
             </Menus.List>
           </Menus.Menu>
           <Modal.Window name={`edit-${id}`}>

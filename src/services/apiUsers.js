@@ -97,8 +97,6 @@ export const confirmForgotPass = async (confirmForgotPassForm) => {
     });
     return data;
   } catch (error) {
-    console.error('Error resetting password:', error);
-    console.error('Error resetting password:', error.response.data.message);
     toast.error( error.response.data.message);
     throw new Error(error.response ? error.response.data.message : error.message);
   }
@@ -108,3 +106,26 @@ export const getTokenAuthorized = async ()=>{
   if(error) throw new Error(error.message)
     return data;
 }
+export const changePassword = async (changePasswordForm) => {
+  const email = changePasswordForm.get('email');
+  const oldPassword = changePasswordForm.get('currentPassword');
+  const confirmPassword = changePasswordForm.get('confirmNewPassword');
+  const newPassword = changePasswordForm.get('newPassword');
+  const url = `/users/change-password`;
+
+  try {
+
+    const { data } = await axios.post(url, null, {
+      params: {
+        email,
+        oldPassword,
+        newPassword,
+        confirmPassword
+      },
+    });
+    return data;
+  } catch (error) {
+    toast.error( error.response.data.message);
+    throw new Error(error.response ? error.response.data.message : error.message);
+  }
+};
