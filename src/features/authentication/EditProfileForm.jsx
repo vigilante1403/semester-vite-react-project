@@ -14,7 +14,7 @@ import { useUpdateUser } from './useUpdateUser';
 
 // Email regex: /\S+@\S+\.\S+/
 
-function EditProfileForm({ user }) {
+function EditProfileForm({ user,onClose }) {
   const { updateUser, isUpdating } = useUpdateUser();
   const { countries, isLoading } = useCountries();
   const [selectedCountry, setSelectedCountry] = useState(
@@ -24,6 +24,7 @@ function EditProfileForm({ user }) {
   const { register, formState, handleSubmit, reset, control } = useForm({
     defaultValues: {
       photo: user.photo || '',
+      name:user.name||'',
       fullName: user.fullName || '',
       nationality: user.nationality || '',
       nationalID: user.nationalID || '',
@@ -74,6 +75,7 @@ function EditProfileForm({ user }) {
         updateUser(formData, {
           onSettled: () => {
             reset();
+            onClose?.();
           },
         });
       }

@@ -37,7 +37,12 @@ function a11yProps(index) {
 }
 const customString = [
   booking=>booking.paid===false&&booking.status===true,
-  booking=>booking.paid===true&&booking.status===true,
+  booking=>{
+    const dateStr = format(new Date(booking.startDate.replace('ICT', '+0700')), 'yyyy-MM-dd').toString()
+    const valid = isBeforeOrAfter(dateStr) === 'after'
+    
+    return valid&&booking.status===true&&booking.paid===true?booking:null
+  },
   booking=>{
     const dateStr = format(new Date(booking.startDate.replace('ICT', '+0700')), 'yyyy-MM-dd').toString()
     const valid = isBeforeOrAfter(dateStr) === 'equal'

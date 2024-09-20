@@ -13,7 +13,7 @@ import { UserContext } from '../../ui/userLayout/ProtectedRouteUser';
 import Tag from '../../ui/Tag';
 import { convertToReadableDateTimeFromISOTimestamp } from '../../utils/helpers';
 const StyledReviewDetailBox = styled.div`
-  max-width: 40vw;
+  min-width: 40vw;
 `;
 const UserInfoAndDate = styled.div`
   display: flex;

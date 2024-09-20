@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { Box, Tabs, Tab, Typography } from '@mui/material';
 import { UserContext } from '../../ui/userLayout/ProtectedRouteUser';
 import { useReviewsOfUser } from './useReviews';
@@ -7,28 +7,39 @@ import ReviewsTable from './ReviewsTable';
 import Searchbar from '../../ui/Searchbar';
 import { useBookingsOfUser } from '../bookings/useBookings';
 import BookingTable from '../../features/bookings/BookingTable';
-import {format} from 'date-fns'
-import { isBeforeOrAfter } from "../../utils/helpers";
+import { format } from 'date-fns';
+import { isBeforeOrAfter } from '../../utils/helpers';
+import { useSearchParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import Empty from '../../ui/Empty';
 
 const customString = [
-  booking=>booking.paid===false&&booking.status===true,
-  booking=>booking.paid===true&&booking.status===true,
-  booking=>{
-    const dateStr = format(new Date(booking.startDate.replace('ICT', '+0700')), 'yyyy-MM-dd').toString()
-    const valid = isBeforeOrAfter(dateStr) === 'equal'
-    
-    return valid&&booking.status===true&&booking.paid===true?booking:null
-  },
-  booking=>{
-    const dateStr = format(new Date(booking.startDate.replace('ICT', '+0700')), 'yyyy-MM-dd').toString()
-    const valid = isBeforeOrAfter(dateStr) === 'before'
-    
-    return valid&&booking.status===true&&booking.paid===true?booking:null
-  },
-  booking=>booking.status===false
+  (booking) => booking.paid === false && booking.status === true,
+  (booking) => booking.paid === true && booking.status === true,
+  (booking) => {
+    const dateStr = format(
+      new Date(booking.startDate.replace('ICT', '+0700')),
+      'yyyy-MM-dd'
+    ).toString();
+    const valid = isBeforeOrAfter(dateStr) === 'equal';
 
+    return valid && booking.status === true && booking.paid === true
+      ? booking
+      : null;
+  },
+  (booking) => {
+    const dateStr = format(
+      new Date(booking.startDate.replace('ICT', '+0700')),
+      'yyyy-MM-dd'
+    ).toString();
+    const valid = isBeforeOrAfter(dateStr) === 'before';
 
-]
+    return valid && booking.status === true && booking.paid === true
+      ? booking
+      : null;
+  },
+  (booking) => booking.status === false,
+];
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -55,21 +66,73 @@ function a11yProps(index) {
     'aria-controls': `simple-tabpanel-${index}`,
   };
 }
-
+export const ReviewContext = createContext(null);
 const Reviews = () => {
   const { user } = useContext(UserContext);
   const { reviews, isLoading } = useReviewsOfUser(user.id);
-  const {bookings,isLoading:isLoading2}=useBookingsOfUser(user.id)
-
+  const { bookings, isLoading: isLoading2 } = useBookingsOfUser(user.id);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [value, setValue] = useState(0);
   const [select, setSelect] = useState('review');
+  const [searchTour, setSearchTour] = useState(searchParams.get('tour') ?? '');
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-  if (isLoading||isLoading2) return <Spinner />;
+  if (isLoading || isLoading2) return <Spinner />;
+  if (!reviews) return <Spinner />;
 
+  let filteredReviews=[];
+  if (searchParams.get('tour') !== 'all' && searchParams.get('tour') !== '' && searchParams.get('tour')!==null) {
+    filteredReviews = [];
+    var tempReviews = reviews;
+
+    filteredReviews = tempReviews.filter((review) => {
+      const name = review.tourName.toLowerCase();
+      
+      return name.startsWith(searchTour) ? name : null;
+    });
+    
+  } else {
+    
+    filteredReviews = [];
+    
+    filteredReviews = reviews;
+    console.log('filter reviews',filteredReviews)
+  }
+  const handleSearch = (data) => {
+    if(data.trim()===''){
+      searchParams.delete('tour')
+      setSearchParams(searchParams)
+      filteredReviews=reviews
+      return;
+
+    }
+    const newData = data.toLowerCase();
+    setSearchTour(newData);
+    searchParams.set('tour', newData);
+    setSearchParams(searchParams);
+  };
+  let reviewsToursId;
+  if (reviews !== undefined) {
+    reviewsToursId = reviews.map((review) => {
+      return review.tourId;
+    });
+   
+  }
+
+  let filteredBooking = [];
+  if (bookings !== undefined) {
+    filteredBooking = bookings.filter((booking) => {
+      
+      const isExist =
+        reviewsToursId.filter((id) => id === booking.tour.id).length > 0;
+      return !isExist ? booking : null;
+    });
+   
+  }
   return (
+    <ReviewContext.Provider value={{ filteredReviews }}>
     <Box
       sx={{
         width: '100%',
@@ -112,7 +175,7 @@ const Reviews = () => {
             fontWeight: 'bold',
             width: '100%',
           }}
-          onClick={()=>setSelect('review')}
+          onClick={() => setSelect('review')}
         />
         <Tab
           label="Waiting For Reviews"
@@ -122,16 +185,26 @@ const Reviews = () => {
             fontWeight: 'bold',
             width: '100%',
           }}
-          onClick={()=>setSelect(prev=>customString[1])}
+          onClick={() => setSelect((prev) => customString[1])}
         />
       </Tabs>
-      <Searchbar placeholder={'Search review by tour name'} />
+      <Searchbar
+        placeholder={'Search review by tour name'}
+        text={searchTour}
+        onChangeText={handleSearch}
+      />
       <TabPanel value={value} index={value}>
-        {reviews && reviews.length > 0 &&select==='review' && <ReviewsTable require={reviews} />}
-        {(!reviews || reviews.length === 0)&&select==='review' && <p>No review to show</p>}
-        {select!=='review'&&<BookingTable require={bookings} select={select}  review   />}
+        {filteredReviews &&
+          filteredReviews.length > 0 &&
+          select === 'review' && <ReviewsTable  />}
+        {(!filteredReviews || filteredReviews.length === 0) &&
+          select === 'review' && <p>No review to show</p>}
+        {select !== 'review' && (
+          <BookingTable require={filteredBooking} select={select} review />
+        )}
       </TabPanel>
     </Box>
+    </ReviewContext.Provider>
   );
 };
 

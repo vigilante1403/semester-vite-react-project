@@ -19,10 +19,10 @@ export const formatDistanceFromNow = (dateStr) =>{
   }).replace('about ', '')
   .replace('in', 'In');
 }
-export const formatDateToCalendar= (dateStr)=>{
+export const formatDateToCalendar= (dateStr,formatDesire='')=>{
   const cleanedDateString = dateStr.replace(/ ICT/, '');
   const parsedDate = parse(cleanedDateString, 'EEE MMM dd HH:mm:ss yyyy', new Date());
-  const formattedDate = format(parsedDate, 'yyyy-MM-dd');
+  const formattedDate = format(parsedDate,formatDesire!==''?formatDesire: 'yyyy-MM-dd');
   return formattedDate;
 }
 export const isBeforeOrAfter = (dateStr)=>{
