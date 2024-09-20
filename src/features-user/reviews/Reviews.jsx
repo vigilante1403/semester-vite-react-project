@@ -5,7 +5,30 @@ import { useReviewsOfUser } from './useReviews';
 import Spinner from '../../ui/Spinner';
 import ReviewsTable from './ReviewsTable';
 import Searchbar from '../../ui/Searchbar';
+import { useBookingsOfUser } from '../bookings/useBookings';
+import BookingTable from '../../features/bookings/BookingTable';
+import {format} from 'date-fns'
+import { isBeforeOrAfter } from "../../utils/helpers";
 
+const customString = [
+  booking=>booking.paid===false&&booking.status===true,
+  booking=>booking.paid===true&&booking.status===true,
+  booking=>{
+    const dateStr = format(new Date(booking.startDate.replace('ICT', '+0700')), 'yyyy-MM-dd').toString()
+    const valid = isBeforeOrAfter(dateStr) === 'equal'
+    
+    return valid&&booking.status===true&&booking.paid===true?booking:null
+  },
+  booking=>{
+    const dateStr = format(new Date(booking.startDate.replace('ICT', '+0700')), 'yyyy-MM-dd').toString()
+    const valid = isBeforeOrAfter(dateStr) === 'before'
+    
+    return valid&&booking.status===true&&booking.paid===true?booking:null
+  },
+  booking=>booking.status===false
+
+
+]
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -36,14 +59,15 @@ function a11yProps(index) {
 const Reviews = () => {
   const { user } = useContext(UserContext);
   const { reviews, isLoading } = useReviewsOfUser(user.id);
+  const {bookings,isLoading:isLoading2}=useBookingsOfUser(user.id)
 
   const [value, setValue] = useState(0);
-  const [select, setSelect] = useState('all');
+  const [select, setSelect] = useState('review');
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-  if (isLoading) return <Spinner />;
+  if (isLoading||isLoading2) return <Spinner />;
 
   return (
     <Box
@@ -88,6 +112,7 @@ const Reviews = () => {
             fontWeight: 'bold',
             width: '100%',
           }}
+          onClick={()=>setSelect('review')}
         />
         <Tab
           label="Waiting For Reviews"
@@ -97,12 +122,14 @@ const Reviews = () => {
             fontWeight: 'bold',
             width: '100%',
           }}
+          onClick={()=>setSelect(prev=>customString[1])}
         />
       </Tabs>
       <Searchbar placeholder={'Search review by tour name'} />
       <TabPanel value={value} index={value}>
-        {reviews && reviews.length > 0 && <ReviewsTable require={reviews} />}
-        {(!reviews || reviews.length === 0) && <p>No review to show</p>}
+        {reviews && reviews.length > 0 &&select==='review' && <ReviewsTable require={reviews} />}
+        {(!reviews || reviews.length === 0)&&select==='review' && <p>No review to show</p>}
+        {select!=='review'&&<BookingTable require={bookings} select={select}  review   />}
       </TabPanel>
     </Box>
   );

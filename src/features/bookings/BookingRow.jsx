@@ -24,6 +24,9 @@ import { useCancelBookingById } from './useBookings';
 import CheckoutButton from '../../features-user/tours/CheckoutButton';
 import { AdminContext } from '../../ui/ProtectedRouteAdmin';
 import { useContext } from 'react';
+import { Button } from '@mui/material';
+import ReviewForm from '../../features-user/reviews/ReviewForm';
+
 
 
 const Tour = styled.div`
@@ -72,6 +75,7 @@ function BookingRow({
     sessionId,creationTime
   },
   require = null,
+  review=false
 }) {
   var valueAuthenticated=useContext(AdminContext)
   const booking = {
@@ -160,10 +164,22 @@ function BookingRow({
         {formatCurrency(priceFinal)}&nbsp;&nbsp;
         <Tag type={statusToTagName[paidValue]}>{paidValue}</Tag>
       </Amount>
-      <Tag type={activeStatus[status ? 'active' : 'inactive']}>
+      {!review&&<Tag type={activeStatus[status ? 'active' : 'inactive']}>
         {status ? 'Active' : 'Inactive'}
-      </Tag>
-      <Modal>
+      </Tag>}
+      {review && <Modal><Modal.Open opens="review-form"><Button
+                    variant="contained"
+                    color="info"
+                    size="large"
+                    sx={{ borderRadius: '20px', px: 4 }}
+                  >
+                    Review
+                  </Button></Modal.Open>
+                  <Modal.Window name="review-form">
+                    <ReviewForm booking={booking} />
+                  </Modal.Window>
+                  </Modal>}
+      {!review&&<Modal>
         <Menus.Menu>
           <Menus.Toggle id={bookingId}></Menus.Toggle>
           <Menus.List id={bookingId}>
@@ -238,7 +254,7 @@ function BookingRow({
             action="cancel"
           />
         </Modal.Window>
-      </Modal>
+      </Modal>}
     </Table.Row>
   );
 }

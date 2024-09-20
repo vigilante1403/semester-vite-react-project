@@ -9,7 +9,7 @@ import BookingRow from './BookingRow';
 import { PAGE_SIZE } from '../../utils/constants';
 import { useSearchParams } from 'react-router-dom';
 
-function BookingTable({require=null,select=null}) {
+function BookingTable({require=null,select=null,review=false}) {
   const [searchParams] = useSearchParams();
   var { bookings, isLoading } = useBookingsTotal();
 
@@ -49,13 +49,13 @@ function BookingTable({require=null,select=null}) {
           <div>Guest</div>
           <div>Dates</div>
           <div>Amount</div>
-          <div>Status</div>
+          <div>{!review ?'Status':'Action'}</div>
           
           <div></div>
         </Table.Header>
         <Table.Body
           data={paginatedBookings}
-          render={(booking) => <BookingRow booking={booking} key={booking.id} require={select} />}
+          render={(booking) => <BookingRow review={review} booking={booking} key={booking.id} require={select} />}
         />
         <Table.Footer>
           <Pagination count={filteredBookings.length} />
