@@ -11,7 +11,9 @@ import { useDeleteTour } from './useDeleteTour';
 import { useCreateTour } from './userCreateTour';
 import TourDetail from './TourDetails';
 import { useNavigate } from 'react-router-dom';
-import { HasRole } from '../../utils/helpers';
+import { useContext } from 'react';
+import { AdminContext } from '../../ui/ProtectedRouteAdmin';
+
 
 // const TableRow = styled.div`
 //   display: grid;
@@ -52,6 +54,7 @@ const Discount = styled.div`
   color: var(--color-green-700);
 `;
 function TourRow({ tour }) {
+  var valueAuthenticated=useContext(AdminContext)
   const navigate = useNavigate();
   const { deleteTour, isDeleting } = useDeleteTour();
   const { createTour, isCreating } = useCreateTour();
@@ -74,9 +77,15 @@ function TourRow({ tour }) {
     status,
     startDates,
   } = tour;
-  const isAdmin = HasRole('ADMIN');
-  const canEdit = isAdmin || HasRole('LEADGUIDE');
-  const canDelete = isAdmin;
+  var isAdmin;
+  var canEdit;
+  var canDelete;
+  if(valueAuthenticated!=null){
+    isAdmin = valueAuthenticated.user.authorities.some(role => role.authority === 'ADMIN')
+    canEdit = isAdmin
+    canDelete = isAdmin
+  }
+
 
   function handleDuplicate() {
     const formData = new FormData();

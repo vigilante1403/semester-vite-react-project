@@ -7,11 +7,13 @@ import Modal from '../../ui/Modal'
 import ConfirmDelete from '../../ui/ConfirmDelete'
 import Menus from '../../ui/Menus'
 import CreateUserForm from './CreateUserForm'
-import { useUpdate } from './useUpdateUser'
+
 import { useDeleteUser } from './useDeleteUser'
 import { useCreateUser } from './useCreateUser'
 import { useNavigate } from 'react-router-dom'
-import { HasRole } from '../../utils/helpers';
+import { useContext } from 'react'
+import { AdminContext } from '../../ui/ProtectedRouteAdmin'
+
 
 const Img = styled.img`
   display: block;
@@ -59,7 +61,7 @@ function AccountRow({ user }) {
   const { createUser } = useCreateUser()
   const { id,email, name, role, enabled, photo, countryFlag,nationality } = user
   const navigate = useNavigate()
-
+  const {user:userAuthenticated}=useContext(AdminContext)
   function handleDuplicate() {
     const formData = new FormData()
     formData.append("name", "Copy of " + name)
@@ -69,8 +71,8 @@ function AccountRow({ user }) {
     formData.append("photo", photo)
     createUser(formData)
   }
-  const isAdmin = HasRole('ADMIN');
-  const canEdit = isAdmin || HasRole('LEADGUIDE');
+  const isAdmin = userAuthenticated.authorities.some(role => role.authority === 'ADMIN')
+  const canEdit = isAdmin 
   const canDelete = isAdmin;
   return (
     <Table.Row>

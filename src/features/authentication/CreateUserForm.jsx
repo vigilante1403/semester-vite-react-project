@@ -10,7 +10,7 @@ import Select from '../../ui/Select'
 import { Controller, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { useCreateUser } from './useCreateUser'
-import { useUpdate } from './useUpdateUser'
+import { useUpdateUser } from './useUpdateUser'
 import Spinner from '../../ui/Spinner'
 import { useEffect, useState } from 'react'
 import useCountries from '../tours/useCountries'
@@ -22,7 +22,7 @@ import { roles } from '../../utils/constants'
 
 function CreateUserForm({ onClose, editUser }) {
   const { createUser, isCreating } = useCreateUser()
-  const { updateUser, isUpdating } = useUpdate()
+  const { updateUser, isUpdating } = useUpdateUser()
   const { countries, isLoading } = useCountries()
   const [selectedCountry, setSelectedCountry] = useState(editUser ? editUser.nationality : null)
   const [currentPhoto, setCurrentPhoto] = useState(null);

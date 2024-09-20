@@ -20,9 +20,11 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useDeleteBooking } from './useDeleteBooking';
 import { useCancelBookingById } from './useBookings';
-import toast from 'react-hot-toast';
+
 import CheckoutButton from '../../features-user/tours/CheckoutButton';
-import { HasRole } from '../../utils/helpers';
+import { AdminContext } from '../../ui/ProtectedRouteAdmin';
+import { useContext } from 'react';
+
 
 const Tour = styled.div`
   font-size: 1.6rem;
@@ -71,6 +73,7 @@ function BookingRow({
   },
   require = null,
 }) {
+  var valueAuthenticated=useContext(AdminContext)
   const booking = {
     id: bookingId,
     startDate,
@@ -84,6 +87,21 @@ function BookingRow({
     status,
     sessionId,creationTime
   };
+
+  var isAdmin;
+  var isLeadGuide;
+  var canEdit;
+  var canDelete;
+  if(valueAuthenticated!=null){
+  
+   
+    isAdmin = valueAuthenticated.user.authorities.some(role => role.authority === 'ADMIN')
+    isLeadGuide = valueAuthenticated.user.authorities.some(role => role.authority === 'LEADGUIDE')
+    canEdit = isAdmin||isLeadGuide
+    canDelete = isAdmin
+   
+  }
+  
   const tour = {
     id:tourId,
     price:priceOrigin,
@@ -115,10 +133,7 @@ function BookingRow({
   const { deleteBooking, isDeleting } = useDeleteBooking();
   const { cancelBooking, isCanceling } = useCancelBookingById();
   console.log(booking)
-  const isAdmin = HasRole('ADMIN');
-  const isLeadGuide = HasRole('LEADGUIDE');
-  const canEdit = isAdmin || isLeadGuide;
-  const canDelete = isAdmin;
+  
   return (
     <Table.Row>
       <Tour>{tourName}</Tour>
@@ -187,7 +202,7 @@ function BookingRow({
                 </Menus.Button>
               </Modal.Open>
             )}
-            {canEdit && require == null && (
+            {(canEdit || require == null) && (
               <>
                 <Modal.Open opens={`edit-${bookingId}`}>
                   <Menus.Button icon={<HiPencil />}>Edit booking</Menus.Button>
