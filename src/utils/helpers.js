@@ -1,9 +1,10 @@
 import { formatDistance, parse, parseISO,format } from 'date-fns';
 import { differenceInDays } from 'date-fns';
 import opencage from 'opencage-api-client';
-import { useContext } from 'react';
 import toast from 'react-hot-toast';
+import { useContext } from 'react';
 import { AdminContext } from '../ui/ProtectedRouteAdmin';
+import { UserContext } from '../ui/userLayout/ProtectedRouteUser';
 
 // We want to make this function work for both Date objects and strings (which come from Supabase)
 export const subtractDates = (dateStr1, dateStr2) =>
@@ -18,10 +19,10 @@ export const formatDistanceFromNow = (dateStr) =>{
   }).replace('about ', '')
   .replace('in', 'In');
 }
-export const formatDateToCalendar= (dateStr)=>{
+export const formatDateToCalendar= (dateStr,formatDesire='')=>{
   const cleanedDateString = dateStr.replace(/ ICT/, '');
   const parsedDate = parse(cleanedDateString, 'EEE MMM dd HH:mm:ss yyyy', new Date());
-  const formattedDate = format(parsedDate, 'yyyy-MM-dd');
+  const formattedDate = format(parsedDate,formatDesire!==''?formatDesire: 'yyyy-MM-dd');
   return formattedDate;
 }
 export const isBeforeOrAfter = (dateStr)=>{
@@ -101,9 +102,3 @@ export const geocodeAddress = async (address, index) => {
   }
 };
 
-export const HasRole = (roleName)=>{
-  const { user } = useContext(AdminContext);
-  const hasRole = user.authorities.some(role => role.authority === roleName);
-  console.log(hasRole);
-  return hasRole;
-}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Table from '../../ui/Table';
 import Menus from '../../ui/Menus';
 import Empty from '../../ui/Empty';
@@ -9,11 +9,13 @@ import Pagination from '../../ui/Pagination';
 import { PAGE_SIZE } from '../../utils/constants';
 import { useSearchParams } from 'react-router-dom';
 import ReviewsRow from './ReviewsRow';
+import { ReviewContext } from './Reviews';
 
-function ReviewsTable({require=null}) {
+function ReviewsTable() {
+  const {filteredReviews:reviews}=useContext(ReviewContext)
   const [searchParams] = useSearchParams();
-  const [reviews,setReviews]=useState(require);
-
+ 
+  console.log('review bang nay la: ',reviews)
   
   if (!reviews) return <Empty resourceName='reviews' />;
   

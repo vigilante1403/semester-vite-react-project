@@ -1,101 +1,92 @@
-import { Controller, useForm } from "react-hook-form";
-import Button from "../../ui/Button";
-import Form from "../../ui/Form";
-import FormRow from "../../ui/FormRow";
-import Input from "../../ui/Input";
-import { useEffect, useState } from "react";
-import useCountries from "../tours/useCountries";
-import Select from "../../ui/Select";
-import Spinner from "../../ui/Spinner";
-import { Box, Typography } from "@mui/material";
-import fetchFileFromUrl from "../../services/useFetchFileFromUrl";
-import toast from "react-hot-toast";
-import { useUpdate } from "./useUpdateUser";
+import { Controller, useForm } from 'react-hook-form';
+import Button from '../../ui/Button';
+import Form from '../../ui/Form';
+import FormRow from '../../ui/FormRow';
+import Input from '../../ui/Input';
+import { useEffect, useState } from 'react';
+import useCountries from '../tours/useCountries';
+import Select from '../../ui/Select';
+import Spinner from '../../ui/Spinner';
+import { Box, Typography } from '@mui/material';
+import fetchFileFromUrl from '../../services/useFetchFileFromUrl';
+import toast from 'react-hot-toast';
+import { useUpdateUser } from './useUpdateUser';
 
 // Email regex: /\S+@\S+\.\S+/
 
-function EditProfileForm({onClose, user }) {
-  const { updateUser, isUpdating } = useUpdate()
-  const { countries, isLoading } = useCountries()
-  const [selectedCountry, setSelectedCountry] = useState(user ? user.nationality : null);
+function EditProfileForm({ user,onClose }) {
+  const { updateUser, isUpdating } = useUpdateUser();
+  const { countries, isLoading } = useCountries();
+  const [selectedCountry, setSelectedCountry] = useState(
+    user ? user.nationality : null
+  );
   const [nationalId, setNationalID] = useState(user ? user.nationalID : null);
-  const { register, formState, handleSubmit, reset,control } = useForm({
+  const { register, formState, handleSubmit, reset, control } = useForm({
     defaultValues: {
-      name: user.name|| "",
-      photo: user.photo || "",
-      fullName: user.fullName || "",
-      nationality: user.nationality || "",
-      nationalID: user.nationalID || "",
+      photo: user.photo || '',
+      name:user.name||'',
+      fullName: user.fullName || '',
+      nationality: user.nationality || '',
+      nationalID: user.nationalID || '',
     },
   });
   const { errors } = formState;
   const [photoPreview, setPhotoPreview] = useState(null);
-
   const [currentPhoto, setCurrentPhoto] = useState(null);
   useEffect(() => {
     if (user && user.photo) {
-      console.log('fetch')
-      fetchFileFromUrl("user",user.photo).then(file => setCurrentPhoto(file));
+      console.log('fetch');
+      fetchFileFromUrl('user', user.photo).then((file) =>
+        setCurrentPhoto(file)
+      );
     }
   }, [user]);
+
   const handleChangeInfo = (data) => {
     console.log(data);
-    const country = countries.find(c => c.name.common === selectedCountry)
-   
-    console.log(currentPhoto);
-    console.log(data.photo);
-    
+    const country = countries.find((c) => c.name.common === selectedCountry);
     const formData = new FormData();
-    formData.append("id", user.id);
-    formData.append("name", data.name );
-    formData.append("fullName", data.fullName );
-    formData.append("nationality", data.nationality );
-    formData.append("nationalID", data.nationalID );
-   
-    formData.append("role",user.role);
-    formData.append("enable", user.enable);
-   if (country) {
+    formData.append('id', user.id);
+    formData.append('name', data.name);
+    formData.append('fullName', data.fullName);
+    formData.append('nationality', data.nationality);
+    formData.append('nationalID', data.nationalID);
+
+    formData.append('role', user.role);
+    formData.append('enable', user.enable);
+    if (country) {
       // const nationalId = `${country.ccn3}${Math.floor(100000000 + Math.random() * 900000000)}`
-     
+
       // formData.append("nationality", country.name.common)
-      formData.append("countryFlag", country.flags.svg)
+      formData.append('countryFlag', country.flags.svg);
     }
     const photoFile = data.photo?.[0] || currentPhoto;
-    console.log(photoFile);
-    console.log(photoFile === 'u');
-    
+
     if (!photoFile) {
       toast.error('Photo is empty');
       return;
-    }else{
-      
-      formData.append("photo", photoFile);
+    } else {
+      if (photoFile === 'u') {
+        toast.error("Can't load your photo");
+        return;
+      }
+      formData.append('photo', photoFile);
+      if (user !== undefined) {
+        updateUser(formData, {
+          onSettled: () => {
+            reset();
+            onClose?.();
+          },
+        });
+      }
     }
-    console.log('name:', formData.get('name'));
-    console.log('fullName:', formData.get('fullName'));
-    console.log('role:', formData.get('role'));
-    console.log('enable:', formData.get('enable'));
-    console.log('id:', formData.get('id'));
-    console.log('photo:', formData.get('photo'));
-    console.log('nationalID:', formData.get('nationalID'));
-    console.log('nationality:', formData.get('nationality'));
-    console.log('countryFlag:', formData.get('countryFlag'));
 
-
-    if (user !== undefined) {
-      updateUser(formData, {
-        onSettled: () => {
-          reset();
-          onClose?.();
-        }
-      })
-    }
     // Gọi API cập nhật thông tin ở đây...
   };
-  const handleReset =() => {
+  const handleReset = () => {
     setPhotoPreview(null);
     setCurrentPhoto(null);
-  }
+  };
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -105,29 +96,30 @@ function EditProfileForm({onClose, user }) {
       };
       reader.readAsDataURL(file);
     }
-   console.log('van chay');
-   
   };
-  if(isLoading) return <Spinner/>;
+  if (isLoading) return <Spinner />;
   return (
     <Form onSubmit={handleSubmit(handleChangeInfo)}>
-   
-      {/* Photo */}
       <Box display="flex" justifyContent="center" alignItems="center" mb={3}>
         {photoPreview ? (
           <img
             src={photoPreview}
             alt="Profile Preview"
             style={{
-              width: "150px",
-              height: "150px",
-              borderRadius: "50%",
-              boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+              width: '150px',
+              height: '150px',
+              borderRadius: '50%',
+              boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
             }}
           />
         ) : (
-          user && currentPhoto && (
-            <img src={URL.createObjectURL(currentPhoto)} alt="current user" width={100} />
+          user &&
+          currentPhoto && (
+            <img
+              src={URL.createObjectURL(currentPhoto)}
+              alt="current user"
+              width={100}
+            />
           )
         )}
       </Box>
@@ -136,20 +128,16 @@ function EditProfileForm({onClose, user }) {
           type="file"
           id="photo"
           accept="image/*"
-          {...register("photo")}
+          {...register('photo')}
           onChange={handlePhotoChange}
         />
-       
-
       </FormRow>
-
-      {/* Name */}
       <FormRow label="Name" error={errors?.name?.message}>
         <Input
           type="text"
           id="name"
-          {...register("name", {
-            required: "This field is required",
+          {...register('name', {
+            required: 'This field is required',
           })}
         />
       </FormRow>
@@ -159,8 +147,8 @@ function EditProfileForm({onClose, user }) {
         <Input
           type="text"
           id="fullName"
-          {...register("fullName", {
-            required: "This field is required",
+          {...register('fullName', {
+            required: 'This field is required',
           })}
         />
       </FormRow>
@@ -187,7 +175,11 @@ function EditProfileForm({onClose, user }) {
                 const selected = e.target.value;
                 field.onChange(selected);
                 setSelectedCountry(selected);
-                setNationalID( `${countries.find(c => c.name.common === selected)?.ccn3}${Math.floor(100000000 + Math.random() * 900000000)}`);
+                setNationalID(
+                  `${
+                    countries.find((c) => c.name.common === selected)?.ccn3
+                  }${Math.floor(100000000 + Math.random() * 900000000)}`
+                );
               }}
             />
           )}
@@ -195,13 +187,16 @@ function EditProfileForm({onClose, user }) {
       </FormRow>
 
       {/* National ID */}
-      <FormRow label="National ID (Optional)" error={errors?.nationalID?.message}>
+      <FormRow
+        label="National ID (Optional)"
+        error={errors?.nationalID?.message}
+      >
         <Input
-        disabled={true}
+          disabled={true}
           type="text"
           id="nationalID"
+          {...register('nationalID')}
           value={nationalId}
-          {...register("nationalID")}
         />
       </FormRow>
       {selectedCountry && countries && (
@@ -219,7 +214,7 @@ function EditProfileForm({onClose, user }) {
 
       {/* Buttons */}
       <FormRow>
-        <Button onClick={() => {reset(); handleReset()}} variation="secondary" type="reset">
+      <Button onClick={() => {reset(); handleReset()}} variation="secondary" type="reset">
           Cancel
         </Button>
         <Button type="submit">Update Profile</Button>

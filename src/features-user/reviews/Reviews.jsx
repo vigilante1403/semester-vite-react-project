@@ -1,13 +1,45 @@
-import React, { useContext, useState } from "react";
-import { Box, Tabs, Tab, Typography, TextField, InputAdornment } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import { UserContext } from "../../ui/userLayout/ProtectedRouteUser";
-import {format} from 'date-fns'
-import { isBeforeOrAfter } from "../../utils/helpers";
-import { useReviewsOfUser } from "./useReviews";
-import Spinner from "../../ui/Spinner";
-import ReviewsTable from "./ReviewsTable";
+import React, { createContext, useContext, useState } from 'react';
+import { Box, Tabs, Tab, Typography } from '@mui/material';
+import { UserContext } from '../../ui/userLayout/ProtectedRouteUser';
+import { useReviewsOfUser } from './useReviews';
+import Spinner from '../../ui/Spinner';
+import ReviewsTable from './ReviewsTable';
+import Searchbar from '../../ui/Searchbar';
+import { useBookingsOfUser } from '../bookings/useBookings';
+import BookingTable from '../../features/bookings/BookingTable';
+import { format } from 'date-fns';
+import { isBeforeOrAfter } from '../../utils/helpers';
+import { useSearchParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import Empty from '../../ui/Empty';
 
+const customString = [
+  (booking) => booking.paid === false && booking.status === true,
+  (booking) => booking.paid === true && booking.status === true,
+  (booking) => {
+    const dateStr = format(
+      new Date(booking.startDate.replace('ICT', '+0700')),
+      'yyyy-MM-dd'
+    ).toString();
+    const valid = isBeforeOrAfter(dateStr) === 'equal';
+
+    return valid && booking.status === true && booking.paid === true
+      ? booking
+      : null;
+  },
+  (booking) => {
+    const dateStr = format(
+      new Date(booking.startDate.replace('ICT', '+0700')),
+      'yyyy-MM-dd'
+    ).toString();
+    const valid = isBeforeOrAfter(dateStr) === 'before';
+
+    return valid && booking.status === true && booking.paid === true
+      ? booking
+      : null;
+  },
+  (booking) => booking.status === false,
+];
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -31,91 +63,148 @@ function TabPanel(props) {
 function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
   };
 }
-
+export const ReviewContext = createContext(null);
 const Reviews = () => {
-  
-  
-  const {user}=useContext(UserContext)
-  const {reviews,isLoading}=useReviewsOfUser(user.id)
-
+  const { user } = useContext(UserContext);
+  const { reviews, isLoading } = useReviewsOfUser(user.id);
+  const { bookings, isLoading: isLoading2 } = useBookingsOfUser(user.id);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [value, setValue] = useState(0);
-  const [select,setSelect]=useState('all');
+  const [select, setSelect] = useState('review');
+  const [searchTour, setSearchTour] = useState(searchParams.get('tour') ?? '');
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
-  if(isLoading) return <Spinner/>
-  
+  if (isLoading || isLoading2) return <Spinner />;
+  if (!reviews) return <Spinner />;
+
+  let filteredReviews=[];
+  if (searchParams.get('tour') !== 'all' && searchParams.get('tour') !== '' && searchParams.get('tour')!==null) {
+    filteredReviews = [];
+    var tempReviews = reviews;
+
+    filteredReviews = tempReviews.filter((review) => {
+      const name = review.tourName.toLowerCase();
+      
+      return name.startsWith(searchTour) ? name : null;
+    });
+    
+  } else {
+    
+    filteredReviews = [];
+    
+    filteredReviews = reviews;
+    console.log('filter reviews',filteredReviews)
+  }
+  const handleSearch = (data) => {
+    if(data.trim()===''){
+      searchParams.delete('tour')
+      setSearchParams(searchParams)
+      filteredReviews=reviews
+      return;
+
+    }
+    const newData = data.toLowerCase();
+    setSearchTour(newData);
+    searchParams.set('tour', newData);
+    setSearchParams(searchParams);
+  };
+  let reviewsToursId;
+  if (reviews !== undefined) {
+    reviewsToursId = reviews.map((review) => {
+      return review.tourId;
+    });
+   
+  }
+
+  let filteredBooking = [];
+  if (bookings !== undefined) {
+    filteredBooking = bookings.filter((booking) => {
+      
+      const isExist =
+        reviewsToursId.filter((id) => id === booking.tour.id).length > 0;
+      return !isExist ? booking : null;
+    });
+   
+  }
   return (
-    <Box sx={{ width: "100%", backgroundColor: 'var(--color-grey-0)', color: 'var(--color-grey-800)' }}>
-      <Typography 
-        variant="h5" 
-        sx={{ 
-          marginBottom: '2rem', 
-          paddingTop: '2rem', 
-          textAlign: 'center', 
+    <ReviewContext.Provider value={{ filteredReviews }}>
+    <Box
+      sx={{
+        width: '100%',
+        backgroundColor: 'var(--color-grey-0)',
+        color: 'var(--color-grey-800)',
+      }}
+    >
+      <Typography
+        variant="h5"
+        sx={{
+          marginBottom: '2rem',
+          paddingTop: '2rem',
+          textAlign: 'center',
           fontWeight: 'bold',
-          fontSize: '3rem' 
+          fontSize: '3rem',
         }}
       >
         My Reviews
       </Typography>
-      <Tabs 
-        value={value} 
-        onChange={handleChange} 
+      <Tabs
+        value={value}
+        onChange={handleChange}
         aria-label="booking tabs"
-        sx={{ 
-          borderBottom: '0.1rem solid var(--color-grey-300)', 
+        sx={{
+          borderBottom: '0.1rem solid var(--color-grey-300)',
           '& .MuiTabs-flexContainer': {
-            justifyContent: 'center', 
-            
+            justifyContent: 'center',
           },
           '& .MuiTab-root': {
             fontSize: '1.5rem',
           },
         }}
       >
-        <Tab label="Reviewed Tours"  custom={null}  {...a11yProps(0)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold',width:'100%' }} />
-        <Tab label="Waiting For Reviews"  {...a11yProps(1)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold',width:'100%' }} />
-         {/* <Tab label="Processing"  {...a11yProps(2)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
-        <Tab label="Traveling"  custom={4} {...a11yProps(3)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
-        <Tab label="Completed Bookings"  custom={5} {...a11yProps(4)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
-        <Tab label="Cancelled Bookings"  custom={6} {...a11yProps(5)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} /> */}
-      </Tabs> 
-      <Box sx={{ p: 3 }}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Search bookings by Booking name"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon sx={{ color: 'var(--color-grey-800)' }} />
-              </InputAdornment>
-            ),
-          }}
+        <Tab
+          label="Reviewed Tours"
+          custom={null}
+          {...a11yProps(0)}
           sx={{
-            '& .MuiOutlinedInput-root': {
-              backgroundColor: 'var(--color-grey-100)',
-            },
-            '& .MuiInputBase-input': {
-              color: 'var(--color-grey-800)',
-            },
-            '& .MuiInputLabel-root': {
-              color: 'var(--color-grey-800)',
-            },
+            color: 'var(--color-grey-800)',
+            fontWeight: 'bold',
+            width: '100%',
           }}
+          onClick={() => setSelect('review')}
         />
-      </Box>
-      <TabPanel value={value} index={value} >
-      {reviews&&reviews.length>0&&<ReviewsTable require={reviews}  />}
-      {(!reviews||reviews.length===0)&& <p>No review to show</p>}
+        <Tab
+          label="Waiting For Reviews"
+          {...a11yProps(1)}
+          sx={{
+            color: 'var(--color-grey-800)',
+            fontWeight: 'bold',
+            width: '100%',
+          }}
+          onClick={() => setSelect((prev) => customString[1])}
+        />
+      </Tabs>
+      <Searchbar
+        placeholder={'Search review by tour name'}
+        text={searchTour}
+        onChangeText={handleSearch}
+      />
+      <TabPanel value={value} index={value}>
+        {filteredReviews &&
+          filteredReviews.length > 0 &&
+          select === 'review' && <ReviewsTable  />}
+        {(!filteredReviews || filteredReviews.length === 0) &&
+          select === 'review' && <p>No review to show</p>}
+        {select !== 'review' && (
+          <BookingTable require={filteredBooking} select={select} review />
+        )}
       </TabPanel>
-      
     </Box>
+    </ReviewContext.Provider>
   );
 };
 

@@ -97,6 +97,8 @@ export const confirmForgotPass = async (confirmForgotPassForm) => {
     });
     return data;
   } catch (error) {
+    console.error('Error resetting password:', error);
+    console.error('Error resetting password:', error.response.data.message);
     toast.error( error.response.data.message);
     throw new Error(error.response ? error.response.data.message : error.message);
   }
@@ -112,9 +114,7 @@ export const changePassword = async (changePasswordForm) => {
   const confirmPassword = changePasswordForm.get('confirmNewPassword');
   const newPassword = changePasswordForm.get('newPassword');
   const url = `/users/change-password`;
-
   try {
-
     const { data } = await axios.post(url, null, {
       params: {
         email,

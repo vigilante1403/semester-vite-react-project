@@ -1,10 +1,11 @@
-import React from 'react';
 import styled from 'styled-components';
 import { format, isToday } from 'date-fns';
+
 import Tag from '../../ui/Tag';
 import Table from '../../ui/Table';
 import Modal from '../../ui/Modal';
 import ConfirmDelete from '../../ui/ConfirmDelete';
+
 import { formatCurrency, isBeforeOrAfter } from '../../utils/helpers';
 import { formatDistanceFromNow } from '../../utils/helpers';
 import CreateBookingForm from '../bookings/CreateBookingForm';
@@ -19,9 +20,14 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useDeleteBooking } from './useDeleteBooking';
 import { useCancelBookingById } from './useBookings';
-import toast from 'react-hot-toast';
+
 import CheckoutButton from '../../features-user/tours/CheckoutButton';
-import { HasRole } from '../../utils/helpers'; // Import your role-checking function
+import { AdminContext } from '../../ui/ProtectedRouteAdmin';
+import { useContext } from 'react';
+import { Button } from '@mui/material';
+import ReviewForm from '../../features-user/reviews/ReviewForm';
+
+
 
 const Tour = styled.div`
   font-size: 1.6rem;
@@ -53,20 +59,25 @@ const Amount = styled.div`
 function BookingRow({
   booking: {
     id: bookingId,
+    // created_at,
     startDate,
+    // endDate,
+    // numNights,
+    // numGuests,
     priceOrigin,
     priceDiscount,
     priceFinal,
     paid,
     numJoin,
     user: { name: guestName, email, id: userid },
-    tour: { name: tourName, id: tourId, summary },
+    tour: { name: tourName, id: tourId,summary },
     status,
-    sessionId,
-    creationTime
+    sessionId,creationTime
   },
   require = null,
+  review=false
 }) {
+  var valueAuthenticated=useContext(AdminContext)
   const booking = {
     id: bookingId,
     startDate,
@@ -75,19 +86,34 @@ function BookingRow({
     priceFinal,
     paid,
     user: { name: guestName, email, id: userid },
-    tour: { name: tourName, id: tourId, summary },
+    tour: { name: tourName, id: tourId,summary },
     numJoin,
     status,
-    sessionId,
-    creationTime
+    sessionId,creationTime
   };
+
+  var isAdmin;
+  var isLeadGuide;
+  var canEdit;
+  var canDelete;
+  if(valueAuthenticated!=null){
+  
+   
+    isAdmin = valueAuthenticated.user.authorities.some(role => role.authority === 'ADMIN')
+    isLeadGuide = valueAuthenticated.user.authorities.some(role => role.authority === 'LEADGUIDE')
+    canEdit = isAdmin||isLeadGuide
+    canDelete = isAdmin
+   
+  }
+  
   const tour = {
-    id: tourId,
-    price: priceOrigin,
-    priceDiscount: priceDiscount,
-    name: tourName,
+    id:tourId,
+    price:priceOrigin,
+    priceDiscount:priceDiscount,
+    name:tourName,
     summary
-  };
+    
+  }
   const paidValue = paid ? 'paid' : 'unpaid';
   const statusToTagName = {
     unpaid: 'blue',
@@ -102,19 +128,16 @@ function BookingRow({
     new Date(startDate.replace('ICT', '+0700')),
     'yyyy-MM-dd'
   ).toString();
+
   const valid =
     isBeforeOrAfter(dateStr) === 'after' ||
     isBeforeOrAfter(dateStr) === 'equal';
   const navigate = useNavigate();
+
   const { deleteBooking, isDeleting } = useDeleteBooking();
   const { cancelBooking, isCanceling } = useCancelBookingById();
-
-  // Check roles
-  const isAdmin = HasRole('ADMIN');
-  const isLeadGuide = HasRole('LEADGUIDE');
-  const canEdit = isAdmin || isLeadGuide;
-  const canDelete = isAdmin;
-
+  console.log(booking)
+  
   return (
     <Table.Row>
       <Tour>{tourName}</Tour>
@@ -141,12 +164,24 @@ function BookingRow({
         {formatCurrency(priceFinal)}&nbsp;&nbsp;
         <Tag type={statusToTagName[paidValue]}>{paidValue}</Tag>
       </Amount>
-      <Tag type={activeStatus[status ? 'active' : 'inactive']}>
+      {!review&&<Tag type={activeStatus[status ? 'active' : 'inactive']}>
         {status ? 'Active' : 'Inactive'}
-      </Tag>
-      <Modal>
+      </Tag>}
+      {review && <Modal><Modal.Open opens="review-form"><Button
+                    variant="contained"
+                    color="info"
+                    size="large"
+                    sx={{ borderRadius: '20px', px: 4 }}
+                  >
+                    Review
+                  </Button></Modal.Open>
+                  <Modal.Window name="review-form">
+                    <ReviewForm booking={booking} />
+                  </Modal.Window>
+                  </Modal>}
+      {!review&&<Modal>
         <Menus.Menu>
-          <Menus.Toggle id={bookingId} />
+          <Menus.Toggle id={bookingId}></Menus.Toggle>
           <Menus.List id={bookingId}>
             <Menus.Button
               icon={<HiEye />}
@@ -183,7 +218,7 @@ function BookingRow({
                 </Menus.Button>
               </Modal.Open>
             )}
-            {canEdit && require == null && (
+            {(canEdit || require == null) && (
               <>
                 <Modal.Open opens={`edit-${bookingId}`}>
                   <Menus.Button icon={<HiPencil />}>Edit booking</Menus.Button>
@@ -219,7 +254,7 @@ function BookingRow({
             action="cancel"
           />
         </Modal.Window>
-      </Modal>
+      </Modal>}
     </Table.Row>
   );
 }

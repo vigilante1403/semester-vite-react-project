@@ -1,26 +1,28 @@
-import Heading from '../ui/Heading'
+import Heading from '../ui/Heading';
 
-import Profile from '../features/authentication/Profile'
+import Profile from '../features/authentication/Profile';
 
 import { useContext } from 'react';
 
 import { AdminContext } from '../ui/ProtectedRouteAdmin';
-import { HasRole } from '../utils/helpers';
+import { UserContext } from '../ui/userLayout/ProtectedRouteUser';
+
 function Users() {
+  var user;
+  const valueAuthenticated1 = useContext(AdminContext);
+  const valueAuthenticated2=useContext(UserContext)
+  if(valueAuthenticated1){
+    user = valueAuthenticated1.user
+  }else if(valueAuthenticated2){
+    user=valueAuthenticated2.user
+  }
 
-
-  const { user } = useContext(AdminContext);
-
-  const role = HasRole('USER');
-  console.log(user);
-  
   return (
-
     <>
-      <Heading as="h1">My info</Heading>
+      <Heading as="h1" style={{ display:'flex',justifyContent:'center' }}>My info</Heading>
       <Profile user={user} />
     </>
-  )
+  );
 }
 
-export default Users
+export default Users;

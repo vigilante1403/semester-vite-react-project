@@ -1,4 +1,4 @@
-import React from 'react';
+/* eslint-disable react/prop-types */
 import styled from 'styled-components';
 import { formatCurrency } from '../../utils/helpers';
 import Table from '../../ui/Table';
@@ -9,8 +9,23 @@ import Menus from '../../ui/Menus';
 import CreateTourForm from './CreateTourForm';
 import { useDeleteTour } from './useDeleteTour';
 import { useCreateTour } from './userCreateTour';
+import TourDetail from './TourDetails';
 import { useNavigate } from 'react-router-dom';
-import { HasRole } from '../../utils/helpers'; // Import role checking utility
+import { useContext } from 'react';
+import { AdminContext } from '../../ui/ProtectedRouteAdmin';
+
+
+// const TableRow = styled.div`
+//   display: grid;
+//   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
+//   column-gap: 2.4rem;
+//   align-items: center;
+//   padding: 1.4rem 2.4rem;
+
+//   &:not(:last-child) {
+//     border-bottom: 1px solid var(--color-grey-100);
+//   }
+// `
 
 const Img = styled.img`
   display: block;
@@ -38,14 +53,15 @@ const Discount = styled.div`
   font-weight: 500;
   color: var(--color-green-700);
 `;
-
 function TourRow({ tour }) {
+  var valueAuthenticated=useContext(AdminContext)
   const navigate = useNavigate();
   const { deleteTour, isDeleting } = useDeleteTour();
-  const { createTour } = useCreateTour();
+  const { createTour, isCreating } = useCreateTour();
   const {
     id,
     name,
+    slug,
     maxGroupSize,
     price,
     priceDiscount,
@@ -59,12 +75,24 @@ function TourRow({ tour }) {
     countryNameOfficial,
     region,
     status,
-    startDates
+    startDates,
   } = tour;
+  var isAdmin;
+  var canEdit;
+  var canDelete;
+  if(valueAuthenticated!=null){
+    isAdmin = valueAuthenticated.user.authorities.some(role => role.authority === 'ADMIN')
+    canEdit = isAdmin
+    canDelete = isAdmin
+  }
+
 
   function handleDuplicate() {
     const formData = new FormData();
-    formData.append('name', 'Copy of ' + name + ' ' + Math.floor(Math.random() * 100));
+    formData.append(
+      'name',
+      'Copy of ' + name + ' ' + Math.floor(Math.random() * 100)
+    );
     formData.append('maxGroupSize', maxGroupSize);
     formData.append('imageCoverCopy', imageCover);
     formData.append('description', description);
@@ -84,14 +112,11 @@ function TourRow({ tour }) {
 
     createTour(formData);
   }
-
-  const isAdmin = HasRole('ADMIN');
-  const canEdit = isAdmin || HasRole('LEADGUIDE');
-  const canDelete = isAdmin;
-
   return (
     <Table.Row>
-      <Img src={'http://localhost:8080/api/v1/file/image/tour/' + imageCover || ''} />
+      <Img
+        src={'http://localhost:8080/api/v1/file/image/tour/' + imageCover || ''}
+      />
       <Tour>{name}</Tour>
       <div>Fits up {maxGroupSize} guests</div>
       <Price>{formatCurrency(price)}</Price>
@@ -118,6 +143,7 @@ function TourRow({ tour }) {
                   </Modal.Open>
                 </>
               )}
+
               <Menus.Button
                 onClick={() => navigate(`/admin/tours/${id}`)}
                 icon={<HiEye />}

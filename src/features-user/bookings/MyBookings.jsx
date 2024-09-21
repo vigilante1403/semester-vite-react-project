@@ -7,6 +7,7 @@ import BookingTable from '../../features/bookings/BookingTable'
 import { UserContext } from "../../ui/userLayout/ProtectedRouteUser";
 import {format} from 'date-fns'
 import { isBeforeOrAfter } from "../../utils/helpers";
+import Searchbar from "../../ui/Searchbar";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -36,7 +37,12 @@ function a11yProps(index) {
 }
 const customString = [
   booking=>booking.paid===false&&booking.status===true,
-  booking=>booking.paid===true&&booking.status===true,
+  booking=>{
+    const dateStr = format(new Date(booking.startDate.replace('ICT', '+0700')), 'yyyy-MM-dd').toString()
+    const valid = isBeforeOrAfter(dateStr) === 'after'
+    
+    return valid&&booking.status===true&&booking.paid===true?booking:null
+  },
   booking=>{
     const dateStr = format(new Date(booking.startDate.replace('ICT', '+0700')), 'yyyy-MM-dd').toString()
     const valid = isBeforeOrAfter(dateStr) === 'equal'
@@ -102,31 +108,7 @@ const MyBookings = () => {
         <Tab label="Completed Bookings" onClick={()=>setSelect(prev=>customString[3])} custom={5} {...a11yProps(4)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
         <Tab label="Cancelled Bookings" onClick={()=>setSelect(prev=>customString[4])} custom={6} {...a11yProps(5)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
       </Tabs>
-      <Box sx={{ p: 3 }}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Search bookings by Booking name"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon sx={{ color: 'var(--color-grey-800)' }} />
-              </InputAdornment>
-            ),
-          }}
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              backgroundColor: 'var(--color-grey-100)',
-            },
-            '& .MuiInputBase-input': {
-              color: 'var(--color-grey-800)',
-            },
-            '& .MuiInputLabel-root': {
-              color: 'var(--color-grey-800)',
-            },
-          }}
-        />
-      </Box>
+      <Searchbar placeholder={"Search bookings by Booking name"} />
       <TabPanel value={value} index={value} >
         {bookings&&bookings.length>0&&<BookingTable require={bookings} select={select}  />}
         {(!bookings||bookings.length===0)&& <p>No booking to show</p>}
