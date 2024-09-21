@@ -101,15 +101,17 @@ function CreateUserForm({ onClose, editUser }) {
     if (editUser !== undefined) {
       updateUser(formData, {
         onSettled: () => {
-          reset()
           onClose?.()
+          reset()
+          
         }
       })
     } else {
       createUser(formData, {
         onSettled: () => {
-          reset()
           onClose?.()
+          reset()
+          
         }
       })
     }

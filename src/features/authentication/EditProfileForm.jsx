@@ -53,7 +53,7 @@ function EditProfileForm({ user,onClose }) {
     formData.append('nationalID', data.nationalID);
 
     formData.append('role', user.role);
-    formData.append('enable', user.enable);
+    formData.append('enable', user.enabled);
     if (country) {
       // const nationalId = `${country.ccn3}${Math.floor(100000000 + Math.random() * 900000000)}`
 
@@ -74,8 +74,8 @@ function EditProfileForm({ user,onClose }) {
       if (user !== undefined) {
         updateUser(formData, {
           onSettled: () => {
-            reset();
             onClose?.();
+            reset();
           },
         });
       }

@@ -7,12 +7,12 @@ export function useUpdateUser() {
   const { mutate: updateUser, isLoading: isUpdating } = useMutation({
     mutationFn: (userForm) => updateUserApi(userForm),
     onError: (err) => toast.error(err.message),
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success('User updated');
       queryClient.invalidateQueries({
         predicate: (queries) =>
-          queries.queryKey[0].startsWith(`user-email-${data.email}`) ||
-          queries.queryKey[0].startsWith(`user-id-${data.id}`),
+          queries.queryKey[0].startsWith(`users`)
+         
       });
     },
   });

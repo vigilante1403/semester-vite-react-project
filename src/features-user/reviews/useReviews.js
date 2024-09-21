@@ -26,7 +26,7 @@ export const useWriteNewReview = () => {
     onSuccess: () => {
       toast.success('New review added');
       queryClient.invalidateQueries({
-        predicate: (queries) => queries.queryKey[0].startsWith(`booking`),
+        predicate: (queries) => queries.queryKey[0].startsWith(`booking`)||queries.queryKey[0].startsWith(`reviews`)
       });
     },
     onError: () => toast.error('Cannot add review'),
