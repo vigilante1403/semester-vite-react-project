@@ -4,8 +4,6 @@ import Menus from '../../ui/Menus';
 import Empty from '../../ui/Empty';
 import Spinner from '../../ui/Spinner';
 import Pagination from '../../ui/Pagination';
-
-
 import { PAGE_SIZE } from '../../utils/constants';
 import { useSearchParams } from 'react-router-dom';
 import ReviewsRow from './ReviewsRow';
@@ -14,23 +12,14 @@ import { ReviewContext } from './Reviews';
 function ReviewsTable() {
   const {filteredReviews:reviews}=useContext(ReviewContext)
   const [searchParams] = useSearchParams();
- 
-  console.log('review bang nay la: ',reviews)
   
   if (!reviews) return <Empty resourceName='reviews' />;
-  
-  // Xử lý lọc theo trạng thái
-  const filterStatus = searchParams.get('status') || 'all';
+
 
   
   let filteredReviews = reviews;
 
-  if (filterStatus !== 'all') {
-    filteredReviews = filteredReviews.filter((review) => {
-      // Xác định trạng thái từ booking
-      return review
-    });
-  }
+ 
 
   // Xử lý phân trang
   const currentPage = !searchParams.get('page') ? 1 : Number(searchParams.get('page'));

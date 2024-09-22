@@ -11,6 +11,9 @@ import { HiEye, HiPencil, HiTrash } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import ReviewDetail from './ReviewDetail';
 import Star from '../../ui/Star';
+import ReviewForm from './ReviewForm';
+import ConfirmDelete from '../../ui/ConfirmDelete';
+import { useDeleteReview } from './useReviews';
 
 const Display = styled.div`
   font-size: 1.6rem;
@@ -75,6 +78,7 @@ function ReviewsRow({
     tourId,
     shown,
     tourImageCover,
+    userId,travelDate,bookingId
   },
 
   color = '#fcc419',
@@ -91,6 +95,7 @@ function ReviewsRow({
     tourId,
     shown,
     tourImageCover,
+    userId,travelDate,bookingId
   };
 
   const showValue = shown ? 'show' : 'not-show';
@@ -106,6 +111,7 @@ function ReviewsRow({
   const updatedDateStr = convertToReadableDateTimeFromISOTimestamp(
     new Date(updatedAt)
   );
+  const {deleteReview,isDeleting}=useDeleteReview()
   const navigate = useNavigate();
 
   return (
@@ -158,6 +164,19 @@ function ReviewsRow({
         </Menus.Menu>
         <Modal.Window name={`review-${reviewId}`}>
             <ReviewDetail review={review} />
+        </Modal.Window>
+        <Modal.Window name={`edit-${reviewId}`}>
+            <ReviewForm review={review} />
+        </Modal.Window>
+        <Modal.Window name={`delete-${reviewId}`}>
+          <ConfirmDelete
+            onConfirm={() => {
+              deleteReview({reviewId:reviewId});
+            }}
+            disabled={isDeleting}
+            resourceName="review"
+            action="delete"
+          />
         </Modal.Window>
       </Modal>
     </Table.Row>

@@ -10,8 +10,8 @@ import BookingTable from '../../features/bookings/BookingTable';
 import { format } from 'date-fns';
 import { isBeforeOrAfter } from '../../utils/helpers';
 import { useSearchParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
-import Empty from '../../ui/Empty';
+import { getAllReviewsOfSpecificUser } from '../../services/apiReviews';
+
 
 const customString = [
   (booking) => booking.paid === false && booking.status === true,
@@ -66,23 +66,34 @@ function a11yProps(index) {
     'aria-controls': `simple-tabpanel-${index}`,
   };
 }
-export const ReviewContext = createContext(null);
-const Reviews = () => {
-  const { user } = useContext(UserContext);
-  const { reviews, isLoading } = useReviewsOfUser(user.id);
+export const ReviewContext = createContext();
+const Reviews = ({onSetKey}) => {
+  const { user, } = useContext(UserContext);
+ 
+  const { reviews, isLoading,refetch } = useReviewsOfUser(user.id);
+  let [filteredReviews,setFilteredReviews]=useState([])
   const { bookings, isLoading: isLoading2 } = useBookingsOfUser(user.id);
   const [searchParams, setSearchParams] = useSearchParams();
   const [value, setValue] = useState(0);
   const [select, setSelect] = useState('review');
   const [searchTour, setSearchTour] = useState(searchParams.get('tour') ?? '');
 
+  const handleReload=()=>{
+    onSetKey()
+    // setFilteredReviews(prev=>[])
+    
+
+  }
+
+ 
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    refetch()
   };
   if (isLoading || isLoading2) return <Spinner />;
   if (!reviews) return <Spinner />;
 
-  let filteredReviews=[];
+  
   if (searchParams.get('tour') !== 'all' && searchParams.get('tour') !== '' && searchParams.get('tour')!==null) {
     filteredReviews = [];
     var tempReviews = reviews;
@@ -95,10 +106,14 @@ const Reviews = () => {
     
   } else {
     
-    filteredReviews = [];
+    // filteredReviews = [];
     
-    filteredReviews = reviews;
-    console.log('filter reviews',filteredReviews)
+    // filteredReviews = reviews;
+    if(filteredReviews.length===0){
+      
+      filteredReviews=reviews
+    }
+    // console.log('filter reviews',filteredReviews)
   }
   const handleSearch = (data) => {
     if(data.trim()===''){
@@ -132,7 +147,7 @@ const Reviews = () => {
    
   }
   return (
-    <ReviewContext.Provider value={{ filteredReviews }}>
+    <ReviewContext.Provider value={{ filteredReviews,handleReload }}>
     <Box
       sx={{
         width: '100%',
