@@ -19,14 +19,16 @@ const stripePromise = loadStripe(
 const CheckoutButton = ({ tour, payAfter = null,bill=null }) => {
   const { user, isAuthenticated, isLoading } = useAuthenticate();
   const { createBooking, isCreating } = useCreateBooking();
+
    const stripeRedirect = async (sessionId, stripe) => {
-    const { error } = await stripe.redirectToCheckout({
+    const { error } = await stripe.redirectToCheckout({// con meo
       sessionId: sessionId,
     });
   
     if (error) {
       console.error('Error redirecting to checkout:', error);
     }
+    // sau khi TT tren web stripe thanh cong, no se gui api (hook) method POST toi link api minh da dk
   };
   const handleClick = async () => {
     const stripe = await stripePromise;
@@ -42,7 +44,7 @@ const CheckoutButton = ({ tour, payAfter = null,bill=null }) => {
       // tao booking with paid =false
       var sessionId = data.sessionId;
       var creationTime = data.creationTime;
-      if (payAfter==null) {
+      if (payAfter==null) {//tt lan dau
         const formData = new FormData();
         formData.append('tour', tour.id);
         formData.append('user', user.id);

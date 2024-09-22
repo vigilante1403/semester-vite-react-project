@@ -20,6 +20,7 @@ export const formatDistanceFromNow = (dateStr) =>{
   .replace('in', 'In');
 }
 export const formatDateToCalendar= (dateStr,formatDesire='')=>{
+  if(dateStr==null) return '--/--/----'
   const cleanedDateString = dateStr.replace(/ ICT/, '');
   const parsedDate = parse(cleanedDateString, 'EEE MMM dd HH:mm:ss yyyy', new Date());
   const formattedDate = format(parsedDate,formatDesire!==''?formatDesire: 'yyyy-MM-dd');

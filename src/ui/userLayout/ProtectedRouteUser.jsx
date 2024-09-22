@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { createContext, useEffect } from "react";
+import { createContext, useEffect, useState } from "react";
 import { useAuthenticate } from "../../features-user/security/useAuthenticate";
 import Spinner from "../Spinner";
 import toast from "react-hot-toast";
@@ -13,6 +13,7 @@ justify-content: center;
 `
 export const UserContext = createContext(null);
 function ProtectedRouteUser({children}) {
+
     const navigate=useNavigate();
     // /// 1 load the authentcated user
      const {isAuthenticated,isLoading,user}=useAuthenticate();
