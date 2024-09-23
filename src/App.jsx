@@ -1,4 +1,5 @@
 import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
+import { GeoapifyGeocoderAutocomplete, GeoapifyContext } from '@geoapify/react-geocoder-autocomplete'
 import { Toaster } from 'react-hot-toast';
 import AppLayout from './ui/AppLayout';
 import GlobalStyles from './styles/GlobalStyles';
@@ -36,6 +37,8 @@ import VerifySuccess from './pages/userpages/VerifySuccess';
 import TourDetailPage from './pages/userpages/TourDetailPage';
 import ResetPasswordPage from './pages/userpages/ResetPasswordPage';
 import ResetPasswordSuccess from './pages/userpages/ResetPasswordSuccess';
+import MapPage from './pages/userpages/MapPage';
+import '@geoapify/geocoder-autocomplete/styles/minimal.css'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -43,14 +46,21 @@ const queryClient = new QueryClient({
     },
   },
 });
-
+const geoApiKeyList=[
+  "6ce212cb0a444c32823ca37d09ec89ce",
+  "996201d284364643aa06073308396d55",
+  "98acd77dbcae4bd08aca3ce6353e1539"
+]
+const geoApiKey="98acd77dbcae4bd08aca3ce6353e1539"
 function App() {
   return (
     <>
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools initialIsOpen={false} />
+        
         <GlobalStyles />
         <DarkModeProvider>
+        <GeoapifyContext apiKey={geoApiKey} >
           <BrowserRouter>
             <Routes>
               <Route element={<AppLayout />}>
@@ -60,6 +70,7 @@ function App() {
                   <Route index element={<Navigate replace to="home" />} />
                   <Route path="home" element={<HomePage />} />
                   <Route path="tours" element={<TourPage />} />
+                  <Route path='map' element={<MapPage />} />
                   <Route path="contact" element={<ContactPage />} />
                   <Route path="signup/signUpVerificationRequired" element={<Verification/>} />
                   <Route path="/verifyAccount/:email/:token" element={<VerifySuccess/>} />
@@ -103,6 +114,7 @@ function App() {
               <Route path="*" element={<PageNotFound />} />
             </Routes>
           </BrowserRouter>
+          </GeoapifyContext>
         </DarkModeProvider>
         <Toaster
           position="top-center"

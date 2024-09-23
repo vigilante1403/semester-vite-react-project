@@ -261,6 +261,14 @@ export default function Header() {
             </Button>
             <Button color="inherit" sx={{ fontSize: '2rem', marginRight: 2 }}>
               <Link
+                to="/map"
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                Map
+              </Link>
+            </Button>
+            <Button color="inherit" sx={{ fontSize: '2rem', marginRight: 2 }}>
+              <Link
                 to="/contact"
                 style={{ textDecoration: 'none', color: 'inherit' }}
               >

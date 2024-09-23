@@ -88,12 +88,12 @@ function UserNav() {
             <span>My Reviews</span>
           </StyledNavLink>
         </li>
-        <li>
+        {/* <li>
           <StyledNavLink to="/user/statistics">
             <HiOutlineChartBar />
-            <span>My Statistics</span>
+            <span>To</span>
           </StyledNavLink>
-        </li>
+        </li> */}
         <li>
           <StyledNavLink to="/user/settings">
             <HiOutlineCog6Tooth />
