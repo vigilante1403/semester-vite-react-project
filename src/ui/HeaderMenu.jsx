@@ -14,7 +14,7 @@ function HeaderMenu() {
     return (
         <StyledHeaderMenu>
         <li>
-            <ButtonIcon onClick={()=>navigate('/account')}><HiOutlineUser/></ButtonIcon>
+            <ButtonIcon onClick={()=>navigate('/admin/user')}><HiOutlineUser/></ButtonIcon>
         </li>
         <li><DarkModeToggle/></li>
         <li>

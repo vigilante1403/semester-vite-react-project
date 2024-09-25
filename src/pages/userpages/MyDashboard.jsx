@@ -1,15 +1,20 @@
+import { useContext } from 'react';
+import Heading from '../../ui/Heading';
+import Row from '../../ui/Row';
+import { UserContext } from '../../ui/userLayout/ProtectedRouteUser';
+import Spinner from '../../ui/Spinner';
+import DashboardLayout from '../../features-user/dashboard/DashboardLayout';
 function MyDashboard() {
-    // hien thi thong bao tu admin trang web
-    // hien thi bang top 10 chuyen di hap dan nhat trong nam voi gia uu dai
-    // lich trinh chuyen tour hien tai
-    // list nhung tour sap ra mat
-    // tra cuu thong tin hdv
-    
-    return (
-        <div>
-            
-        </div>
-    )
+  const { user } = useContext(UserContext);
+  if (!user) return <Spinner />;
+  return (
+    <>
+      <Row type="horizontal">
+        <Heading as="h1">Welcome, {user.name}</Heading>
+      </Row>
+      <DashboardLayout />
+    </>
+  );
 }
 
-export default MyDashboard
+export default MyDashboard;

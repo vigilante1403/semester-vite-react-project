@@ -97,7 +97,7 @@ function App() {
                   <Route path="geo" element={<GeocodeComponent />} />
                   <Route path="accounts" element={<Accounts />} />
                   <Route path="accounts/:id" element={<AccountDetail/>} />
-                  <Route path="users" element={<Users />} />
+                  <Route path="user" element={<Users />} />
                   <Route path="bookings" element={<Bookings />} />
                   <Route
                     path="bookings/:bookingId"
