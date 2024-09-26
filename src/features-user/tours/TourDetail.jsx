@@ -5,6 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import MapComponent from "../../features/tours/Map";
 import { useAuthenticate } from "../security/useAuthenticate";
 import Spinner from "../../ui/Spinner";
+import CheckoutButton from "./CheckoutButton";
 
 const TourDetail = ({ tour }) => {
   console.log(tour);
@@ -21,7 +22,7 @@ const TourDetail = ({ tour }) => {
     'https://via.placeholder.com/300x200?text=Image+5'
   ];
 
-  const images = tour.images || fakeImages;
+  const images = tour.images && tour.image !== null ? tour.images : fakeImages;
 
   // State to manage the modal
   const [open, setOpen] = useState(false);
@@ -174,7 +175,7 @@ const TourDetail = ({ tour }) => {
             >
               <Box
                 component="img"
-                src={`http://localhost:8080/api/v1/file/image/tour/${image}`}
+                src={  tour.images && tour.image !== null ? `http://localhost:8080/api/v1/file/image/tour/${image}`: image}
                 alt={`Tour Image ${index + 1}`}
                 sx={{
                   width: '30vw',
@@ -219,7 +220,7 @@ const TourDetail = ({ tour }) => {
           </IconButton>
           <Box
             component="img"
-            src={`http://localhost:8080/api/v1/file/image/tour/${selectedImage}`}
+            src={ tour.images && tour.image !== null ? `http://localhost:8080/api/v1/file/image/tour/${selectedImage}` : selectedImage}
             alt="Selected Tour"
             sx={{
               width: '100%',
@@ -237,11 +238,11 @@ const TourDetail = ({ tour }) => {
             <Box
               key={index}
               component="img"
-              src={`http://localhost:8080/api/v1/file/image/tour/${image}`}
-              alt={`Tour Image ${index + 1}`}
+              src={ tour.images && tour.image !== null ? `http://localhost:8080/api/v1/file/image/tour/${image}` : image}
+              alt={''}
               sx={{
                 position: 'absolute',
-                left: `${index * 80}px`,
+                left: `${index * 30}px`,
                 width: '120px',
                 height: '120px',
                 borderRadius: '50%',
@@ -260,7 +261,7 @@ const TourDetail = ({ tour }) => {
           <Typography variant="h6" sx={{ marginBottom: '20px' }}>
             Welcome to Vina travel. Thank you for trying to produce my page!
           </Typography>
-          <Box
+          {/* <Box
             component="button"
             sx={{
               padding: '10px 20px',
@@ -277,7 +278,25 @@ const TourDetail = ({ tour }) => {
             onClick={() => console.log("Login to booking clicked")}
           >
             {!isAuthenticated ? "Login to booking" : "Booking now"}
-          </Box>
+          </Box> */}
+          {isAuthenticated ? <CheckoutButton tour={tour}/> : <Box
+            component="button"
+            sx={{
+              padding: '10px 20px',
+              backgroundColor: 'black',
+              color: 'white',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              textTransform: 'uppercase',
+              border: 'none',
+              '&:hover': {
+                backgroundColor: 'darkgray',
+              },
+            }}
+            onClick={() => console.log("Login to booking clicked")}
+          >
+            {"Login to booking"}
+          </Box>}
         </Box>
       </Box>
 

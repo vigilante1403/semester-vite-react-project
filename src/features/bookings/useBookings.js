@@ -10,10 +10,22 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 export function useBookingsTotal() {
+  const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const tourName = searchParams.get('tour') || 'all';
+  const searchStatusValue = searchParams.get('status') || 'all';
+  const sortBy = searchParams.get('sortBy') || 'name-asc';
+  const currentPage = !searchParams.get('page')?1:Number(searchParams.get('page'))
+
   const { data: bookings, isLoading } = useQuery({
-    queryKey: ['bookings'],
+    queryKey: ['bookings',currentPage],
     retry: false,
     queryFn: getAllBookings,
+    staleTime:0,
+    cacheTime: 0,  
+    refetchOnMount:true,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
   return { bookings, isLoading };
 }

@@ -25,9 +25,7 @@ function UserSidebar() {
   };
   return (
     <StyledSidebar>
-        <LogoWrapper onClick={handleLogoClick}>
-        <Logo />
-      </LogoWrapper>
+       
       <UserNav />
     </StyledSidebar>
   );

@@ -66,8 +66,8 @@ function App() {
                   {/* user part */}
                   <Route path="/tours/tour-detail/:id" element={<TourDetailPage/>} />
                   <Route path="*" element={<PageNotFound />} />
-                </Route>
-                <Route path="user" element={<ProtectedRouteUser><AuthenticatedUserLayout/></ProtectedRouteUser>}>
+
+                  <Route path="user" element={<ProtectedRouteUser><AuthenticatedUserLayout/></ProtectedRouteUser>}>
                     <Route index element={<Navigate replace to="dashboard"/>} />
                     <Route path="dashboard" element={<MyDashboard/>} />
                     <Route path="me" element={<AboutMe/>} />
@@ -77,6 +77,9 @@ function App() {
                     <Route path="settings" element={<MySettings/>} />
                     <Route path="*" element={<PageNotFound />} />
                   </Route>
+
+                </Route>
+               
               {/* for admin */}
                 <Route path="admin" element={<ProtectedRouteAdmin><AdminLayout /></ProtectedRouteAdmin>}>
                   <Route index element={<Navigate replace to="dashboard" />} />

@@ -185,7 +185,11 @@ import DarkModeToggle from '../DarkModeToggle';
 import LoginSignupPage from '../../pages/userpages/LoginSignupPage';
 
 import { useAuthenticate } from '../../features-user/security/useAuthenticate';
-
+import Logo from '../Logo';
+import UserHeader from './UserHeader';
+const LogoWrapper = styled.div`
+  cursor: pointer; 
+`;
 const StyledHeader = styled.header`
   background-color: var(--color-grey-100);
 `;
@@ -219,6 +223,9 @@ export default function Header() {
     setIsLogin(!isLogin);
   };
 
+  const handleLogoClick = () => {
+    navigate("/");
+  };
   return (
     <StyledHeader>
       <AppBar
@@ -230,11 +237,9 @@ export default function Header() {
         }}
       >
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Avatar
-            src={logo}
-            alt="VINA TRAVEL"
-            sx={{ marginRight: '16px', height: '100px', width: '100px' }}
-          />
+        <LogoWrapper onClick={handleLogoClick}>
+        <Logo />
+      </LogoWrapper>
           <Box
             sx={{
               display: { xs: 'none', md: 'flex' },
@@ -303,16 +308,17 @@ export default function Header() {
               </Button>
             </Box>
           ) : (
-            <Box>
-              <Button
-                variant="contained"
-                color="primary"
-                sx={{ fontSize: '1.2rem' }}
-                onClick={() => navigate(`/user/dashboard`)}
-              >
-                Dash board
-              </Button>
-            </Box>
+            // <Box>
+            //   <Button
+            //     variant="contained"
+            //     color="primary"
+            //     sx={{ fontSize: '1.2rem' }}
+            //     onClick={() => navigate(`/user/dashboard`)}
+            //   >
+            //     Dash board
+            //   </Button>
+            // </Box>
+            <UserHeader/>
           )}
           <Box sx={{ display: { xs: 'block', md: 'none' } }}>
             <IconButton color="inherit" onClick={toggleDrawer(true)}>

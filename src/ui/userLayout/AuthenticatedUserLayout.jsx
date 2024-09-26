@@ -18,7 +18,7 @@ const Main = styled.main`
 function AuthenticatedUserLayout() {
     return (
         <StyledAppLayout>
-            <UserHeader/>
+            {/* <UserHeader/> */}
             <UserSidebar/>
             <Main>
             <Outlet/>

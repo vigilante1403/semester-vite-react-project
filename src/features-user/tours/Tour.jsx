@@ -145,7 +145,7 @@ const Tour = ({ tour, bookings }) => {
               </Typography>
             </Box>
           </Box>
-          <CheckoutButton tour={tour} />
+          {/* <CheckoutButton tour={tour} /> */}
           <ShowDetailButton id={tour.id} />
         </CardContent>
       </Card>
