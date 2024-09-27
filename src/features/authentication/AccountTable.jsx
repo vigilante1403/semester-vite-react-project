@@ -8,6 +8,9 @@ import { useUsers } from './useUsers'; // Ensure this hook is implemented correc
 import AccountRow from './AccountRow';
 import Pagination from '../../ui/Pagination';
 import { PAGE_SIZE } from '../../utils/constants';
+import { UserContext } from '../../ui/userLayout/ProtectedRouteUser';
+import { AccountContext } from '../../pages/Accounts';
+import { useContext } from 'react';
 
 const TableHeader = styled.header`
   display: grid;
@@ -27,9 +30,10 @@ const TableHeader = styled.header`
 function AccountTable() {
   const [searchParams] = useSearchParams();
   const searchRoleValue = searchParams.get('role') || 'all';
-  const { users, isLoading } = useUsers();
+  // const { users, isLoading } = useUsers();
 
-  if (isLoading) return <Spinner />;
+  // if (isLoading) return <Spinner />;
+  const {filteredUsers:users}=useContext(AccountContext);
   if(!users) return <Empty resourceName="users"/>;
 
   // Filter by role

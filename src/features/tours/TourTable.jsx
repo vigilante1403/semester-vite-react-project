@@ -10,6 +10,8 @@ import { useTours } from './useTours';
 import TourRow from './TourRow';
 import { PAGE_SIZE } from '../../utils/constants';
 import { useOpencage } from './useOpenCage';
+import { useContext } from 'react';
+import { TourContext } from '../../pages/Tours';
 // const Table = styled.div`
 //   border: 1px solid var(--color-grey-200);
 
@@ -39,8 +41,7 @@ function TourTable() {
   
 
   const searchDiscountValue = searchParams.get('discount') || 'all';
-  const { tours, isLoading } = useTours();
-  if (isLoading) return <Spinner />;
+  const {filteredTours:tours} = useContext(TourContext);
 
   if (!tours) return <Empty resourceName="tours" />;
   /// filter

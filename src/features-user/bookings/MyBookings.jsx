@@ -8,6 +8,7 @@ import { UserContext } from "../../ui/userLayout/ProtectedRouteUser";
 import {format} from 'date-fns'
 import { isBeforeOrAfter } from "../../utils/helpers";
 import Searchbar from "../../ui/Searchbar";
+import { useSearchParams } from "react-router-dom";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -67,6 +68,22 @@ const MyBookings = () => {
   const {bookings,isLoading}=useBookingsOfUser(user.id)
   const [value, setValue] = useState(0);
   const [select,setSelect]=useState('all');
+  const [searchParams,setSearchParams]= useSearchParams();
+  const [searchTour,setSearchTour]=useState(searchParams.get('tour') ?? '');
+   
+  const handleSearch = (data) => {
+    if(data.trim()===''){
+      searchParams.delete('tour')
+      setSearchTour('');
+      setSearchParams(searchParams)
+     
+      return;
+    }
+    const newData = data.toLowerCase();
+    setSearchTour(newData);
+    searchParams.set('tour', newData);
+    setSearchParams(searchParams);
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -108,9 +125,9 @@ const MyBookings = () => {
         <Tab label="Completed Bookings" onClick={()=>setSelect(prev=>customString[3])} custom={5} {...a11yProps(4)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
         <Tab label="Cancelled Bookings" onClick={()=>setSelect(prev=>customString[4])} custom={6} {...a11yProps(5)} sx={{ color: 'var(--color-grey-800)', fontWeight: 'bold' }} />
       </Tabs>
-      <Searchbar placeholder={"Search bookings by Booking name"} />
+      <Searchbar placeholder={"Search bookings by Booking name"}  text={searchTour} onChangeText={handleSearch}/>
       <TabPanel value={value} index={value} >
-        {bookings&&bookings.length>0&&<BookingTable require={bookings} select={select}  />}
+      {bookings&&bookings.length>0&&<BookingTable searchTour={searchTour} require={bookings} select={select}  />}
         {(!bookings||bookings.length===0)&& <p>No booking to show</p>}
       </TabPanel>
       

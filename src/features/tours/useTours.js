@@ -10,21 +10,21 @@ export function useTours(){
     const sortBy = searchParams.get('sortBy') || 'name-asc';
     const currentPage = !searchParams.get('page')?1:Number(searchParams.get('page'))
     const {data:tours,isLoading}=useQuery({
-        queryKey:['tours',searchDiscountValue,sortBy,currentPage],
+        queryKey:['tours',currentPage],
         retry:false,
         queryFn: getAllTours
     })
     const pageCount = tours? Math.ceil(tours.length/PAGE_SIZE):1
     if(currentPage<pageCount){
         queryClient.prefetchQuery({
-            queryKey:['tours',searchDiscountValue,sortBy,currentPage+1],
+            queryKey:['tours',currentPage+1],
             retry:false,
             queryFn: getAllTours
         })
     }
     if(currentPage>1){
         queryClient.prefetchQuery({
-            queryKey:['tours',searchDiscountValue,sortBy,currentPage-1],
+            queryKey:['tours',currentPage-1],
             retry:false,
             queryFn: getAllTours
         })

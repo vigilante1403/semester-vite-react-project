@@ -8,6 +8,7 @@ export function useUsers(){
     const queryClient = useQueryClient();
     const [searchParams] = useSearchParams();
     const searchRoleValue = searchParams.get('role') || 'all';
+    // const userName = searchParams.get('user') || 'all';
     const sortBy = searchParams.get('sortBy') || 'name-asc';
     const currentPage = !searchParams.get('page')?1:Number(searchParams.get('page'))
     const {data:users,isLoading}=useQuery({

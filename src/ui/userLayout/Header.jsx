@@ -185,7 +185,11 @@ import DarkModeToggle from '../DarkModeToggle';
 import LoginSignupPage from '../../pages/userpages/LoginSignupPage';
 
 import { useAuthenticate } from '../../features-user/security/useAuthenticate';
-
+import Logo from '../Logo';
+import UserHeader from './UserHeader';
+const LogoWrapper = styled.div`
+  cursor: pointer; 
+`;
 const StyledHeader = styled.header`
   background-color: var(--color-grey-100);
 `;
@@ -200,7 +204,9 @@ export default function Header() {
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
   };
-
+  const handleLogoClick = () => {
+    navigate("/");
+  };
   const handleLoginSignupOpen = (login) => {
     setIsLogin(login);
     setIsForgotPassword(false);
@@ -230,11 +236,9 @@ export default function Header() {
         }}
       >
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Avatar
-            src={logo}
-            alt="VINA TRAVEL"
-            sx={{ marginRight: '16px', height: '100px', width: '100px' }}
-          />
+        <LogoWrapper onClick={handleLogoClick}>
+        <Logo />
+      </LogoWrapper>
           <Box
             sx={{
               display: { xs: 'none', md: 'flex' },
@@ -310,8 +314,9 @@ export default function Header() {
                 Sign Up
               </Button>
             </Box>
-          ) : (
-            <Box>
+          ) : (<UserHeader/>)
+        
+              /* <Box>
               <Button
                 variant="contained"
                 color="primary"
@@ -320,8 +325,9 @@ export default function Header() {
               >
                 Dash board
               </Button>
-            </Box>
-          )}
+            </Box> */
+            
+          }
           <Box sx={{ display: { xs: 'block', md: 'none' } }}>
             <IconButton color="inherit" onClick={toggleDrawer(true)}>
               <MenuIcon />
