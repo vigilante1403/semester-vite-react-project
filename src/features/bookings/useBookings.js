@@ -5,6 +5,7 @@ import {
   getBookingById,
   getBookingsByTourId,
   getBookingsOfUser,
+  updateAllBookingsAfterUpdateTour,
 } from '../../services/apiBookings';
 import { useParams, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -73,4 +74,11 @@ export function useCancelBookingById() {
     },
   });
   return { cancelBooking, isCanceling };
+}
+export function useUpdateAllRelatedBookings(){
+  const{mutate:updateAllBookingsRelated,isLoading}=useMutation({
+    mutationFn:updateAllBookingsAfterUpdateTour,
+    onError:(err)=>toast.error(err)
+  })
+  return {updateAllBookingsRelated,isLoading}
 }

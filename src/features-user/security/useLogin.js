@@ -10,7 +10,9 @@ export function useLogin(){
         onError:()=>toast.error('Provided email or password are incorrect'),
         onSuccess:(data)=>{
             queryClient.setQueryData(['user-isSignedIn'],data.email)
-            navigate('/',{replace:true})
+            
+            // navigate('/',{replace:true})
+            window.location.reload();
         }
     })
     return {login,isLoading}

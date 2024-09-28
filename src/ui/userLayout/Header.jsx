@@ -161,7 +161,7 @@
 //     );
 //   }
 import { Link, useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import logo from '../../../public/logo_light.png';
 import {
   AppBar,
@@ -187,6 +187,7 @@ import LoginSignupPage from '../../pages/userpages/LoginSignupPage';
 import { useAuthenticate } from '../../features-user/security/useAuthenticate';
 import Logo from '../Logo';
 import UserHeader from './UserHeader';
+import { LoginContext } from '../../context/LoginContext';
 const LogoWrapper = styled.div`
   cursor: pointer; 
 `;
@@ -194,10 +195,11 @@ const StyledHeader = styled.header`
   background-color: var(--color-grey-100);
 `;
 export default function Header() {
-  const [openLoginSignup, setOpenLoginSignup] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
-  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const {openLoginSignup,isLogin,isForgotPassword,drawerOpen,handleLoginSignupOpen,handleLoginSignupClose,setIsLogin,setDrawerOpen,setIsForgotPassword}=useContext(LoginContext)
+  // const [openLoginSignup, setOpenLoginSignup] = useState(false);
+  // const [drawerOpen, setDrawerOpen] = useState(false);
+  // const [isLogin, setIsLogin] = useState(true);
+  // const [isForgotPassword, setIsForgotPassword] = useState(false);
 
   const { user, isAuthenticated, isLoading } = useAuthenticate();
   const navigate = useNavigate();
@@ -207,16 +209,16 @@ export default function Header() {
   const handleLogoClick = () => {
     navigate("/");
   };
-  const handleLoginSignupOpen = (login) => {
-    setIsLogin(login);
-    setIsForgotPassword(false);
-    setOpenLoginSignup(true);
-  };
+  // const handleLoginSignupOpen = (login) => {
+  //   setIsLogin(login);
+  //   setIsForgotPassword(false);
+  //   setOpenLoginSignup(true);
+  // };
 
-  const handleLoginSignupClose = () => {
-    setOpenLoginSignup(false);
+  // const handleLoginSignupClose = () => {
+  //   setOpenLoginSignup(false);
 
-  };
+  // };
 
   const handleSwitch = () => {
     setIsLogin(!isLogin);

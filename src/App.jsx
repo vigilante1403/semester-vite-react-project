@@ -39,6 +39,7 @@ import ResetPasswordPage from './pages/userpages/ResetPasswordPage';
 import ResetPasswordSuccess from './pages/userpages/ResetPasswordSuccess';
 import MapPage from './pages/userpages/MapPage';
 import '@geoapify/geocoder-autocomplete/styles/minimal.css'
+import LoginContextProvider from './context/LoginContext';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -65,8 +66,9 @@ function App() {
             <Routes>
               <Route element={<AppLayout />}>
                 <Route index element={<Navigate replace to="home" />} />
-                <Route path="" element={<UserLayout />}>
+                <Route path="" element={<LoginContextProvider><UserLayout /></LoginContextProvider>}>
                 {/* for all */}
+                
                   <Route index element={<Navigate replace to="home" />} />
                   <Route path="home" element={<HomePage />} />
                   <Route path="tours" element={<TourPage />} />
@@ -77,6 +79,7 @@ function App() {
                   {/* user part */}
                   <Route path="/tours/tour-detail/:id" element={<TourDetailPage/>} />
                   <Route path="*" element={<PageNotFound />} />
+                  
                 </Route>
                 <Route path="user" element={<ProtectedRouteUser><AuthenticatedUserLayout/></ProtectedRouteUser>}>
                     <Route index element={<Navigate replace to="dashboard"/>} />

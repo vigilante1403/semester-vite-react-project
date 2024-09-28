@@ -76,6 +76,7 @@ function TourRow({ tour }) {
     region,
     status,
     startDates,
+    keyOfDatesRelation
   } = tour;
   var isAdmin;
   var canEdit;

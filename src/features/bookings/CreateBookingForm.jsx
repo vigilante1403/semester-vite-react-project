@@ -64,6 +64,9 @@ function CreateBookingForm({ onClose, editBooking }) {
   const [userChose, setUserChose] = useState(
     editBooking ? editBooking.user.id : ''
   );
+  const [keyChose,setKeyChose]=useState(
+    editBooking &&editBooking.keysOfStartDate?editBooking.keysOfStartDate:''
+  )
   const [change, setChange] = useState(false);
   const [price, setPrice] = useState(editBooking ? editBooking.priceOrigin : 0);
   const [priceDiscount, setPriceDiscount] = useState(
@@ -71,7 +74,8 @@ function CreateBookingForm({ onClose, editBooking }) {
   );
   const [isPaid, setIsPaid] = useState(editBooking ? editBooking.paid : true); // Added state for "paid"
   const [datesSelected, setDatesSelected] = useState([]);
-  const [numJoin, setNumJoin] = useState(editBooking?editBooking.numJoin:1);
+  const [keys, setKeys] = useState([]);
+  const [numJoin, setNumJoin] = useState(editBooking ? editBooking.numJoin : 1);
   const onError = (errors) => {
     toast.error('Form submit fail');
   };
@@ -94,13 +98,32 @@ function CreateBookingForm({ onClose, editBooking }) {
     if (editBooking !== undefined) {
       formData.append('id', editBooking.id);
     }
+    // handle key
+    if(keys.length>0){
+      var arr = []
+      Array.from(keys).forEach(key=>{
+        var value = Object.values(key)[0]
+        arr.push(value)
+      })
+      console.log('arr',arr)
+      console.log('dateChoose',dateChose)
+      var index = arr.indexOf(dateChose)
+      if(index!==-1){
+        var specialKey = Object.keys(keys[index])[0]
+        formData.append('keysOfStartDate',specialKey)
+      }else{
+        toast.error('Cannot get key')
+        return;
+      }
+    }
+    console.log(keys)
     formData.append('tour', tourChose);
     formData.append('user', userChose);
     formData.append('date', dateChose);
     formData.append('paid', isPaid);
     formData.append('priceOrigin', price);
     formData.append('priceDiscount', priceDiscount);
-    formData.append('numJoin',numJoin)
+    formData.append('numJoin', numJoin);
     // console.log(formData.get('paid'));
     // console.log(formData.get('user'));
     // console.log(formData.get('tour'));
@@ -141,8 +164,8 @@ function CreateBookingForm({ onClose, editBooking }) {
     if (tourChose !== '') {
       const tour = tours.filter((el) => el.id === tourChose)[0] || null;
       if (tour != null) {
-        setPrice(tour.price );
-        setPriceDiscount(tour.priceDiscount );
+        setPrice(tour.price);
+        setPriceDiscount(tour.priceDiscount);
       }
     }
     setPrice((price) => price * p);
@@ -178,7 +201,14 @@ function CreateBookingForm({ onClose, editBooking }) {
                 const filteredDates = tours
                   .filter((tour) => tour.id === selectedTour)[0]
                   .startDates.map((date) => ({ label: date, value: date }));
-
+                var tour1 = tours.filter((tour) => tour.id === selectedTour)[0];
+                if (tour1.keyOfDatesRelation) {
+                  console.log(typeof(tour1.keyOfDatesRelation['165e8c37-e234-4']))
+                 
+                  setKeys((prev) => [tour1.keyOfDatesRelation]);
+                  var firstTempKey = Object.keys(keys)[0]
+                  setKeyChose(prevKey=>firstTempKey)
+                }
                 setDatesSelected(filteredDates);
                 setTourChose(selectedTour);
                 const tour =

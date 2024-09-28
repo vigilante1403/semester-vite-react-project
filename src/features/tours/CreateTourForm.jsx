@@ -21,6 +21,7 @@ import useCountries from './useCountries';
 import { Typography, Box } from '@mui/material';
 import fetchFileFromUrl from '../../services/useFetchFileFromUrl';
 import { json } from 'react-router-dom';
+import { useUpdateAllRelatedBookings } from '../bookings/useBookings';
 
 function CreateTourForm({ onClose, editTour }) {
   const { createTour, isCreating } = useCreateTour();
@@ -28,7 +29,7 @@ function CreateTourForm({ onClose, editTour }) {
   const { guides, isLoading } = useTourGuides();
   const { countries, isLoading: isCountriesLoading } = useCountries();
   const [selectedCountry, setSelectedCountry] = useState(null);
-
+  const{updateAllBookingsRelated}=useUpdateAllRelatedBookings()
   const [currentPhoto, setCurrentPhoto] = useState(null);
   const [currentImages, setCurrentImages] = useState([]);
 
@@ -146,11 +147,12 @@ function CreateTourForm({ onClose, editTour }) {
 
   const [inputs, setInputs] = useState(['']);
   const [dates, setDates] = useState(editTour ? editTour?.startDates : ['']);
+  const [keys,setKeys]=useState(editTour?[editTour.keyOfDatesRelation]:[])
   const [descriptions, setDescriptions] = useState(['']);
   const [subDescriptions, setSubDescriptions] = useState([['']]);
   const [coordinates, setCoordinates] = useState([]);
   const [showFormatted, setShowFormatted] = useState([]);
-
+console.log(keys[0])
   const fetchAndSetTourLocations = async (editTour) => {
     if (editTour && editTour.locations) {
       // Lấy tất cả các giá trị `address` và `description` từ `locations`
@@ -227,6 +229,24 @@ function CreateTourForm({ onClose, editTour }) {
   const handleInputDateChange = (index, event) => {
     const newInputs = dates.slice();
     newInputs[index] = event.target.value;
+    if(!keys[index]||keys[index]===undefined){
+      let r = (Math.random() + 1).toString(36).substring(7);
+      console.log(r)
+      var temp = keys
+      var newObject={}
+      newObject[r]=event.target.value
+      setKeys(prev=>[...prev,newObject])
+    }else{
+      var temp = keys;
+      var k = Object.keys(temp[index])[0]
+      var newObject = {};
+      newObject[k]=event.target.value;
+      temp[index]=newObject
+      console.log(temp)
+      console.log('json string',JSON.stringify(newObject).replace('{','').replace('}',''))
+     setKeys(temp)
+
+    }
     setDates(newInputs);
   };
   const handleInputChange = (index, event) => {
@@ -345,6 +365,14 @@ function CreateTourForm({ onClose, editTour }) {
       toast.error('Please add startDate for tour');
       return;
     }
+    if(editTour){
+      //submit mapofkey
+      Array.from(keys).forEach((key)=>{
+        var obj = JSON.stringify(key).replace('{','').replace('}','').trim();
+        formData.append('mapOfKeysAndStartDates',obj)
+      
+      })
+    }
     formData.append('description', data.description);
     formData.append('summary', data.summary);
     formData.append('price', data.price);
@@ -382,6 +410,7 @@ function CreateTourForm({ onClose, editTour }) {
     if (editTour !== undefined) {
       updateTour(formData, {
         onSettled: () => {
+          updateAllBookingsRelated({tourId:editTour.id})
           reset();
           onClose?.();
         },
@@ -765,7 +794,7 @@ function CreateTourForm({ onClose, editTour }) {
           <>
             <Input
               type="date"
-              min={getTodayDate()}
+              // min={getTodayDate()}
               value={input}
               onChange={(event) => handleInputDateChange(index, event)}
               placeholder={`Date ${index + 1}`}

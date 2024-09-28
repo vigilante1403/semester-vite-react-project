@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Box, Typography, Grid, Avatar, Card, CardContent, Rating, Dialog, IconButton } from "@mui/material";
 // import { styled } from "@mui/system";
 import CloseIcon from '@mui/icons-material/Close';
@@ -6,9 +6,13 @@ import MapComponent from "../../features/tours/Map";
 import { useAuthenticate } from "../security/useAuthenticate";
 import Spinner from "../../ui/Spinner";
 import CheckoutButton from "./CheckoutButton";
+import Modal from "../../ui/Modal";
+import Button from "../../ui/Button";
+import StepConfirmBookingTour from "./StepConfirmBookingTour";
+import { LoginContext } from "../../context/LoginContext";
 
 const TourDetail = ({ tour }) => {
-  console.log(tour);
+  const {handleLoginSignupOpen}=useContext(LoginContext)
   const { user, isAuthenticated, isLoading } = useAuthenticate();
 
 
@@ -279,7 +283,20 @@ const TourDetail = ({ tour }) => {
           >
             {!isAuthenticated ? "Login to booking" : "Booking now"}
           </Box> */}
-          {isAuthenticated ? <CheckoutButton tour={tour}/> : <Box
+          {isAuthenticated ? <Modal>
+            <Modal.Open opens={'book-tour'}>
+            <Button
+      variant="contained"
+      color="primary"
+      sx={{ marginTop: '1rem', fontSize: '1.2rem' }}
+     
+    >Book now</Button>
+            </Modal.Open>
+            <Modal.Window name='book-tour'>
+              <StepConfirmBookingTour tour={tour} user={user} />
+            </Modal.Window>
+          </Modal> : <Box
+          // {isAuthenticated ? <CheckoutButton tour={tour}/> : <Box
             component="button"
             sx={{
               padding: '10px 20px',
@@ -293,7 +310,7 @@ const TourDetail = ({ tour }) => {
                 backgroundColor: 'darkgray',
               },
             }}
-            onClick={() => console.log("Login to booking clicked")}
+            onClick={() => handleLoginSignupOpen(true)}
           >
             {"Login to booking"}
           </Box>}
