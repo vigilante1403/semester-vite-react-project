@@ -3,6 +3,8 @@ import styled from "styled-components";
 import {
   HiOutlineCalendarDays,
   HiOutlineCog6Tooth,
+  HiOutlineDocumentCheck,
+  HiOutlineDocumentText,
   HiOutlineHome,
   HiOutlineHomeModern,
   HiOutlinePaperAirplane,
@@ -75,6 +77,12 @@ function MainNav() {
           <StyledNavLink to="/admin/tours">
             <HiOutlinePaperAirplane />
             <span>Tours</span>
+          </StyledNavLink>
+        </li>
+        <li>
+          <StyledNavLink to="/admin/bills">
+            <HiOutlineDocumentText />
+            <span>Bills</span>
           </StyledNavLink>
         </li>
         <li>

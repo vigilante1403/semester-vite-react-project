@@ -40,6 +40,7 @@ import ResetPasswordSuccess from './pages/userpages/ResetPasswordSuccess';
 import MapPage from './pages/userpages/MapPage';
 import '@geoapify/geocoder-autocomplete/styles/minimal.css'
 import LoginContextProvider from './context/LoginContext';
+import Bills from './pages/Bills';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -98,6 +99,7 @@ function App() {
                   <Route path="tours" element={<Tours />} />
                   <Route path='tours/:id' element={<TourDetail/>} />
                   <Route path="geo" element={<GeocodeComponent />} />
+                  <Route path="bills" element={<Bills />} />
                   <Route path="accounts" element={<Accounts />} />
                   <Route path="accounts/:id" element={<AccountDetail/>} />
                   <Route path="user" element={<Users />} />
