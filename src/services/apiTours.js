@@ -52,4 +52,30 @@ export const getAllCountries = async () => {
 
   return sortedCountries;
 };
+export const addStartDatesOfTour = async(form)=>{
+  const {data,error}=await axios.post('/tours/add/startDate',form)
+  if(error) throw new Error(error.message)
+    return data;
+}
+export const editStartDatesOfTour = async(form)=>{
+  const {data,error}=await axios.post('/tours/edit/startDate',form)
+  if(error) throw new Error(error.message)
+    return data;
+}
+export const getAllSchedules = async()=>{
+  const {data,error}=await axios.get('/tours/get-all-schedules')
+  if(error) throw new Error(error.message)
+    return data;
+}
+export const getAllSchedulesOfAGuide = async({guideId})=>{
+  const {data,error}=await axios.get(`/tours/get-all-schedules-of-a-guide?guideId=${guideId}`)
+  if(error) throw new Error(error.message)
+    return data;
+}
+export const getAllSchedulesOfATour = async({tourId})=>{
+  const {data,error}=await axios.get(`/tours/get-all-schedules-of-a-tour?tourId=${tourId}`)
+  if(error) throw new Error(error.message)
+    return data;
+}
+
 

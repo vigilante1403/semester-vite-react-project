@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import {
+  HiOutlineBriefcase,
   HiOutlineCalendarDays,
   HiOutlineCog6Tooth,
   HiOutlineDocumentCheck,
@@ -69,7 +70,7 @@ function MainNav() {
         </li>
         <li>
           <StyledNavLink to="/admin/bookings">
-            <HiOutlineCalendarDays />
+            <HiOutlineBriefcase />
             <span>Bookings</span>
           </StyledNavLink>
         </li>
@@ -83,6 +84,12 @@ function MainNav() {
           <StyledNavLink to="/admin/bills">
             <HiOutlineDocumentText />
             <span>Bills</span>
+          </StyledNavLink>
+        </li>
+        <li>
+          <StyledNavLink to="/admin/bills">
+            <HiOutlineCalendarDays />
+            <span>Schedules</span>
           </StyledNavLink>
         </li>
         <li>
