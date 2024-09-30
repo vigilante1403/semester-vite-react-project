@@ -77,5 +77,10 @@ export const getAllSchedulesOfATour = async({tourId})=>{
   if(error) throw new Error(error.message)
     return data;
 }
+export const getDetailSchedule = async({scheduleId})=>{
+  const {data,error}=await axios.get(`/tours/get-detail-schedule?scheduleId=${scheduleId}`)
+  if(error) throw new Error(error.message)
+    return data;
+}
 
 

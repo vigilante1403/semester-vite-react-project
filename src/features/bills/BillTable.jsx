@@ -39,7 +39,7 @@ function BillTable() {
           render={(bill) => <BillRow bill={bill} key={bill.id} />}
         />
         <Table.Footer>
-            <Pagination count={paginatedBills.length} />
+            <Pagination count={bills.length} />
         </Table.Footer>
       </Table>
     </Menus>

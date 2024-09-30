@@ -12,6 +12,9 @@ import {
   HiOutlineUser,
   HiOutlineUsers,
 } from "react-icons/hi2";
+import { useAuthenticate } from "../features/authentication/useAuthenticate";
+import { useContext } from "react";
+import { AdminContext } from "./ProtectedRouteAdmin";
 
 const NavList = styled.ul`
   display: flex;
@@ -59,6 +62,7 @@ const StyledNavLink = styled(NavLink)`
 `;
 
 function MainNav() {
+  const {user}=useContext(AdminContext)
   return (
     <nav>
       <NavList>
@@ -87,7 +91,7 @@ function MainNav() {
           </StyledNavLink>
         </li>
         <li>
-          <StyledNavLink to="/admin/bills">
+          <StyledNavLink to="/admin/schedules">
             <HiOutlineCalendarDays />
             <span>Schedules</span>
           </StyledNavLink>
