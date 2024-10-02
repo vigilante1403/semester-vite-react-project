@@ -16,8 +16,6 @@ function Bookings() {
   const [searchParams,setSearchParams]= useSearchParams();
   const [searchTour,setSearchTour]=useState(searchParams.get('tour') ?? '');
 
-   
-
   const handleSearch = (data) => {
     if(data.trim()===''){
       searchParams.delete('tour')

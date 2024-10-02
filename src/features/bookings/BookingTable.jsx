@@ -54,10 +54,8 @@ if(isLoading) return <Spinner/>
       Sep: '09', Oct: '10', Nov: '11', Dec: '12'
     };
   
-    // Tách chuỗi dựa trên khoảng trắng
     const parts = dateStr.split(' ');
   
-    // Tạo chuỗi định dạng YYYY-MM-DD
     const day = parts[2]; 
     const month = months[parts[1]]; 
     const year = parts[5]; 
@@ -74,7 +72,7 @@ let sortedBookings = filteredBookings.sort((a, b) => {
     return (a.priceFinal - b.priceFinal) * modifier;
    
   }
-  // Sort by date for startDate
+
   if (field === 'startDate') {
     const dateA = new Date(convertToValidDate(a.startDate));
     const dateB = new Date(convertToValidDate(b.startDate));
@@ -86,13 +84,10 @@ let sortedBookings = filteredBookings.sort((a, b) => {
   if (field === 'name' ) {
     return modifier * a.tour.name.localeCompare(b.tour.name);
   }
-  // Sort by totalPrice (numerical)
-console.log(a[field])
-  // Default case if field is not recognized (optional)
+
   return modifier * a.tour.name.localeCompare(b.tour.name);
 });
 
-  // Xử lý phân trang
   const currentPage = !searchParams.get('page') ? 1 : Number(searchParams.get('page'));
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const endIndex = currentPage * PAGE_SIZE;

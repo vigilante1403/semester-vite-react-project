@@ -59,7 +59,7 @@ export default function MyDashboard() {
      
      function filterBookingsAfterToday(bookings) {
         const todayString = new Date().toISOString().split('T')[0];
-        return bookings.filter(booking =>convertToValidDate(booking.startDate) > '2024-08-12' );
+        return bookings.filter(booking =>convertToValidDate(booking.startDate) > todayString );
     }
 
     return (
