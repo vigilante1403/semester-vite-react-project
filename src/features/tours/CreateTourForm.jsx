@@ -152,6 +152,8 @@ function CreateTourForm({ onClose, editTour }) {
   const [subDescriptions, setSubDescriptions] = useState([['']]);
   const [coordinates, setCoordinates] = useState([]);
   const [showFormatted, setShowFormatted] = useState([]);
+  const [dateApplyGuide,setDateApplyGuide]=useState('')
+  const [dateApplyLocation,setDateApplyLocation]=useState('')
 console.log(keys[0])
   const fetchAndSetTourLocations = async (editTour) => {
     if (editTour && editTour.locations) {
@@ -296,6 +298,12 @@ console.log(keys[0])
     const formData = new FormData();
     if (editTour !== undefined) {
       formData.append('id', editTour.id);
+      if(dateApplyGuide===''||dateApplyLocation===''){
+        toast.error('Please choose date apply for guides and locations')
+        return;
+      }
+      formData.append('dateOfLocationAfter',dateApplyLocation)
+      formData.append('dateOfGuideAfter',dateApplyGuide)
     }
     console.log(data);
     console.log('-------------------');
@@ -407,6 +415,7 @@ console.log(keys[0])
     }
     formData.append('status', 'active');
     formData.append('startTime', time);
+
     if (editTour !== undefined) {
       updateTour(formData, {
         onSettled: () => {
@@ -738,7 +747,14 @@ console.log(keys[0])
           </div>
         )}
       </div>
-
+        {editTour&&<FormRow label="Apply changes of guide after selected date">
+        <Input
+              type="date"
+              min={getTodayDate()}
+              onChange={(event) => setDateApplyGuide(event.target.value)}
+              placeholder={`Guide date`}
+            />
+        </FormRow>}
       <FormRow label="Tour Photo">
         <FileInput
           id="imageCover"
@@ -789,7 +805,7 @@ console.log(keys[0])
      />
     
    </FormRow>
-      {dates.slice().reverse().map((input, index) => (
+      {!editTour&&dates.slice().reverse().map((input, index) => (
         <FormRow label={`Date ${index + 1}`}>
           <>
             <Input
@@ -801,12 +817,12 @@ console.log(keys[0])
             />
           </>
         </FormRow>
-      ))}
+      )) &&
       <FormRow>
         <Button type="button" onClick={handleAddDates}>
           + Add Dates
         </Button>
-      </FormRow>
+      </FormRow>}
       <FormRow label="Country">
         <Controller
           name="countryNameCommon"
@@ -927,7 +943,14 @@ console.log(keys[0])
           + Add Input
         </Button>
       </FormRow>
-
+      {editTour&&<FormRow label="Apply changes of location after selected date">
+        <Input
+              type="date"
+              min={getTodayDate()}
+              onChange={(event) => setDateApplyLocation(event.target.value)}
+              placeholder={`Location date`}
+            />
+        </FormRow>}
       <FormRow>
         {/* type is an HTML attribute! */}
         <Button variation="secondary" type="reset">

@@ -26,10 +26,10 @@ export function useGetAllSchedulesOfATour({tourId=null}){
     return {schedules,isLoading}
 }
 export function useGetDetailSchedule({scheduleId=null}){
-    const {data:schedules,isLoading}=useQuery({
-        queryKey:['schedules','detail',scheduleId],
+    const {data:schedule,isLoading}=useQuery({
+        queryKey:['schedule','detail',scheduleId],
         queryFn: ()=>getDetailSchedule({scheduleId:scheduleId}),
         enabled:!!scheduleId
     })
-    return {schedules,isLoading}
+    return {schedule,isLoading}
 }

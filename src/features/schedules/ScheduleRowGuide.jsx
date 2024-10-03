@@ -2,6 +2,7 @@ import styled from "styled-components"
 import Table from "../../ui/Table";
 import Modal from "../../ui/Modal";
 import Menus from "../../ui/Menus";
+import Tag from '../../ui/Tag'
 import { HiEye, HiTrash } from "react-icons/hi2";
 import { format } from "date-fns";
 import ShowDetailSchedule from "./ShowDetailSchedule";
@@ -68,16 +69,17 @@ startDateId,
 from,
 to,
 countryFlag,
-countryName,guestList}=schedule
+countryName,guestList,status,tourStatus}=schedule
 const scheduleStatus = {
   upcoming: 'yellow',
+  ongoing:'blue',
   completed: 'grey',
   canceled:'red'
 };
 const currentPage = searchParams.get('page')||1
     return (
         <Table.Row>
-      <span>{(index+1)*currentPage}</span>
+      <span>x</span>
       
       <Stacked>
         <Guide>{tourName}</Guide>
@@ -87,34 +89,17 @@ const currentPage = searchParams.get('page')||1
         {countryFlag && <Flag src={countryFlag} alt={`${countryName} flag`} />}
         <div>{countryName}</div>
       </Country>
-      <Guide>Completed</Guide>
-      <Button>View Guest List</Button>
-      {/* <div>
-        <Modal>
-          <Menus.Menu>
-            <Menus.Toggle id={id} />
-            <Menus.List id={id}>
-             
-<Modal.Open opens={`detail-${id}`}>
-              <Menus.Button
-                
-                icon={<HiEye />}
-              >
-                See details
-              </Menus.Button>
-              </Modal.Open>
-                <Modal.Open opens={`delete-${id}`}>
-                  <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
-                </Modal.Open>
-           
-            </Menus.List>
-          </Menus.Menu>
-          <Modal.Window name={`detail-${id}`}>
-            <ShowDetailSchedule scheduleId={id} />
-          </Modal.Window>
-          
-        </Modal>
-      </div> */}
+      <Tag type={scheduleStatus[tourStatus]}>{tourStatus}</Tag>
+      <Modal>
+        <Modal.Open opens={`schedule-detail-${id}`}>
+        <Button>View Details</Button>
+        </Modal.Open>
+        <Modal.Window name={`schedule-detail-${id}`}>
+        <ShowDetailSchedule scheduleId={id} />
+        </Modal.Window>
+      </Modal>
+      
+      
     </Table.Row>
     )
 }
