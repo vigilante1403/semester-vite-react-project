@@ -8,6 +8,7 @@ import Table from "../../ui/Table";
 import LocationRow from "./LocationRow";
 import Pagination from "../../ui/Pagination";
 import GuestRow from "./GuestRow";
+import Empty from '../../ui/Empty'
 import { HiOutlineCalendar, HiOutlineUserGroup } from "react-icons/hi2";
 const StyledScheduleDetail = styled.div`
   min-width: 70vw;
@@ -22,11 +23,11 @@ font-size: ${(props)=>props.fontSize}rem;
 function ShowDetailSchedule({scheduleId=null}) {
     const {schedule,isLoading}=useGetDetailSchedule({scheduleId:scheduleId})
     if(isLoading) return <Spinner />
-    console.log(Object.values([schedule.locations][0]) )
+    // console.log(Object.values([schedule.locations][0]) )
     return (
         <StyledScheduleDetail>
         <Stacked>
-            <Typo fontSize={24}>{schedule.tourName}{' '}&mdash;{' '}{Object.keys(schedule.locations).length} day trip</Typo>
+            <Typo fontSize={24}>{schedule.tourName}{' '}&mdash;{' '}{schedule.locations?Object.keys(schedule.locations).length:1} day trip</Typo>
             <Typo fontSize={12} color={"GrayText"} fontStyle={"revert-layer"}>{format(new Date(schedule.from), 'MMM dd yyyy')}{' '}&mdash;{' '}{format(new Date(schedule.to), 'MMM dd yyyy')}</Typo>
             <Spacer space={1} />
             <Typo fontSize={18}>Guide: {schedule.guideName}</Typo>
@@ -42,11 +43,12 @@ function ShowDetailSchedule({scheduleId=null}) {
                     <div>Address</div>
                     <div>Exact coordinates</div>
                 </Table.Header>
-                <Table.Body data={Object.values([schedule.locations][0])}
+                {[schedule.locations][0]&&<Table.Body data={Object.values([schedule.locations][0])}
                 render={(location,index)=><LocationRow location={location} key={index} />}
-                 />
+                 />}
+                 {!schedule.locations&&<Table.Body />}
                 <Table.Footer>
-                    <Pagination count={Object.values([schedule.locations][0]).length} />
+                    <Pagination count={schedule.locations?Object.values([schedule.locations][0]).length:1} />
                 </Table.Footer>
                 
             </Table>

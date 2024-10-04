@@ -6,6 +6,7 @@ export function useGetAllStartDatesOfTour({tourId}){
         queryKey:['startDates',tourId],
         queryFn:()=>getAllStartDatesOfATour({tourId:tourId}),
         enabled:!!tourId
+       
     })
     return {startDates,isLoading}
 }

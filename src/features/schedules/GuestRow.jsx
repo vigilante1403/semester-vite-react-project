@@ -8,7 +8,7 @@ function GuestRow({guest,index}) {
     return (
         <Table.Row>
         <div>{index+1}</div>
-            <div>{fullName}</div>
+            <div>{fullName??"Some guest"}</div>
             <div>{numPerson}{' '}{numPerson>1?'tickets':'ticket'}</div>
             <div>{userEmail}</div>
             <div>{userId}</div>

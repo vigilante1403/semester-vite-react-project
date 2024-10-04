@@ -2,7 +2,7 @@
 import styled from 'styled-components';
 import { formatCurrency } from '../../utils/helpers';
 import Table from '../../ui/Table';
-import { HiEye, HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
+import { HiCalendar, HiEye, HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
 import Modal from '../../ui/Modal';
 import ConfirmDelete from '../../ui/ConfirmDelete';
 import Menus from '../../ui/Menus';
@@ -13,6 +13,7 @@ import TourDetail from './TourDetails';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AdminContext } from '../../ui/ProtectedRouteAdmin';
+import ReArrangeDateTour from './ReArrangeDateTour';
 
 
 // const TableRow = styled.div`
@@ -142,6 +143,9 @@ function TourRow({ tour }) {
                   <Modal.Open opens={`edit-${id}`}>
                     <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
                   </Modal.Open>
+                  <Modal.Open opens={`date-${id}`}>
+                    <Menus.Button icon={<HiCalendar/>}>Manage dates</Menus.Button>
+                  </Modal.Open>
                 </>
               )}
 
@@ -158,6 +162,9 @@ function TourRow({ tour }) {
               )}
             </Menus.List>
           </Menus.Menu>
+          <Modal.Window name={`date-${id}`}>
+            <ReArrangeDateTour tour={tour} />
+          </Modal.Window>
           <Modal.Window name={`edit-${id}`}>
             <CreateTourForm editTour={tour} />
           </Modal.Window>

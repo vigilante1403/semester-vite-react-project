@@ -21,7 +21,7 @@ export function useGetAllSchedulesOfATour({tourId=null}){
     const {data:schedules,isLoading}=useQuery({
         queryKey:['schedules','tour',tourId],
         queryFn: ()=>getAllSchedulesOfATour({tourId:tourId}),
-        enabled:!!tourId
+       
     })
     return {schedules,isLoading}
 }

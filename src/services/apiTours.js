@@ -92,5 +92,10 @@ export const getAllStartDates = async()=>{
   if(error) throw new Error(error.message)
     return data;
 }
+export const cancelAStartDate = async(form)=>{
+  const {data,error}=await axios.post('/tours/cancel/startDate',form)
+  if(error) throw new Error(error.message)
+    return data;
+}
 
 

@@ -19,6 +19,9 @@ export const formatDistanceFromNow = (dateStr) =>{
   }).replace('about ', '')
   .replace('in', 'In');
 }
+// const format1 = (dateStr)=>{
+// const parsedDate = parse(dateStr)
+// }
 export const formatDateToCalendar= (dateStr,formatDesire='')=>{
   if(dateStr==null) return '--/--/----'
   const cleanedDateString = dateStr.replace(/ ICT/, '');
@@ -42,6 +45,22 @@ export const isBeforeOrAfter = (dateStr)=>{
     return "before"
   }
   
+}
+export const compareTwoDates = (dateStr1,dateStr2)=>{
+  const date1 = new Date(dateStr1).getTime();
+ const date2 = new Date(dateStr2).getTime()
+//  const formattedDate = date.getFullYear() + '-' +
+//   ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+//   ('0' + date.getDate()).slice(-2);
+//  const date2 = new Date(formattedDate).getTime()
+  if(date1>date2){
+    return "after"
+  }
+  else if(date1===date2){
+    return "equal"
+  } else{
+    return "before"
+  }
 }
 export const convertToReadableDateTimeFromISOTimestamp = (dateObj)=>{
   const formattedDate = dateObj.toLocaleString('en-GB', {
@@ -101,5 +120,12 @@ export const geocodeAddress = async (address, index) => {
     }
     return { error: error.message };
   }
+};
+export const getTodayDate = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
