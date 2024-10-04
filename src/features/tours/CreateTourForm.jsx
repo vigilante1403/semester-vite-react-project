@@ -461,6 +461,10 @@ function CreateTourForm({ onClose, editTour }) {
               value: 1,
               message: 'Capacity should be at least 1',
             },
+            max: {
+              value: 100,
+              message: 'Capacity should be less than or equal to 100',
+            },
           })}
         />
       </FormRow>
@@ -474,6 +478,10 @@ function CreateTourForm({ onClose, editTour }) {
             min: {
               value: 1,
               message: 'Price should be at least 1',
+            },
+            max: {
+              value: 10000,
+              message: 'Price should be less than or equal to 10,000',
             },
           })}
         />
@@ -751,9 +759,9 @@ function CreateTourForm({ onClose, editTour }) {
         </FormRow>
       ))}
       <FormRow>
-        <Button type="button" onClick={handleAddDates}>
-          + Add Dates
-        </Button>
+      {dates && dates.length < 5 &&  <Button type="button" onClick={handleAddDates}>
+          Add Dates
+        </Button>}
       </FormRow>
       <FormRow label="Country">
         <Controller
@@ -855,9 +863,10 @@ function CreateTourForm({ onClose, editTour }) {
             </FormRow>
           ))}
           <FormRow>
-            <Button type="button" onClick={() => { handleAddSubDescription(index) }}>
-              + Add Sub
-            </Button>
+           {subDescriptions[index] && subDescriptions[index].length < 5 && <Button type="button" onClick={() => { handleAddSubDescription(index) }}>
+              Add Schedule
+            
+            </Button>}
           </FormRow>
 
 
@@ -871,9 +880,9 @@ function CreateTourForm({ onClose, editTour }) {
 
 
       <FormRow>
-        <Button type="button" onClick={handleAddInput}>
-          + Add Input
-        </Button>
+       {inputs && inputs.length < 5 && <Button type="button" onClick={handleAddInput}>
+          Add Location
+        </Button>}
       </FormRow>
       {/* <div>
         <h4>Descriptions:</h4>

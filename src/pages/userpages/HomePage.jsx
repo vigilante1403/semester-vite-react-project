@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-import { Menu as MenuIcon, ArrowBackIos, ArrowForwardIos, AccountCircle } from '@mui/icons-material';
+import { ArrowBackIos, ArrowForwardIos,Close as CloseIcon } from '@mui/icons-material';
 import {
-  AppBar,
-  Toolbar,
+
   Typography,
   Button,
   Container,
@@ -15,33 +14,20 @@ import {
   CardMedia,
   CssBaseline,
   IconButton,
-  Drawer,
-  List,
-  ListItem,
-  ListItemText,
   Box,
-  Slider, Modal
+  Modal
 } from '@mui/material';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { color } from 'framer-motion';
-import { Close as CloseIcon } from '@mui/icons-material';
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#00CC33',
-    },
-  },
-});
+import OutPartner from '../../ui/userLayout/OutPartner';
+
 const images = [
   'https://cdn.wallpapersafari.com/49/46/RafD82.jpg',
   'https://royalstockphoto.s3.amazonaws.com/wp-content/uploads/2014/03/12185906/A306-Magical-Sunset-at-Green-Cay-Wetlands-Preserve-Delray-Beach-Florida-original.jpg',
   'https://captainkimo.com/wp-content/uploads/2014/01/Sunset-at-Swamp-Palm-Beach-Gardens-Wetlands.jpg',
   'https://th.bing.com/th/id/R.bfd17a95cc65c95e2d30e31d7c9ec560?rik=VutVLwdVnlmFiA&pid=ImgRaw&r=0',
   'https://s1.1zoom.me/prev/490/489039.jpg',
-
 ];
+
 export default function HomePage() {
   return (
     <>
@@ -53,86 +39,11 @@ export default function HomePage() {
       <ToursSection />
       <IntroSection />
       <ImageGallery />
+      <OutPartner/>
+      <Box margin={5}></Box>
     </>
   );
 }
-
-// function Header() {
-//     const [drawerOpen, setDrawerOpen] = useState(false);
-
-//     const toggleDrawer = (open) => () => {
-//       setDrawerOpen(open);
-//     };
-
-//     return (
-//         <>
-//           <AppBar position="static" sx={{ boxShadow: '0px 3px 6px rgba(0,0,0,0.1)' }}>
-//         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-//           <Typography variant="h6" sx={{ flexGrow: 1, fontSize: '2rem', fontWeight: 'bold', textAlign: 'left' }}>
-//             <Link to="/" style={{ textDecoration: 'none', color: '#00CC33' }}>Tour Booking</Link>
-//           </Typography>
-//           <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', justifyContent: 'center', flexGrow: 1 }}>
-//             <Button color="inherit" sx={{ fontSize: '2rem', marginRight: 2 }}>
-//               <Link to="/home" style={{ textDecoration: 'none', color: '#00CC33' }}>Home</Link>
-//             </Button>
-//             <Button color="inherit" sx={{ fontSize: '2rem', marginRight: 2 }}>
-//               <Link to="/tours" style={{ textDecoration: 'none', color: '#00CC33' }}>Tours</Link>
-//             </Button>
-//             <Button color="inherit" sx={{ fontSize: '2rem', marginRight: 2 }}>
-//               <Link to="/contact" style={{ textDecoration: 'none', color: '#00CC33' }}>Contact</Link>
-//             </Button>
-//             <Button color="inherit" sx={{ fontSize: '2rem', marginRight: 2 }}>
-//               <Link to="/about" style={{ textDecoration: 'none', color: '#00CC33' }}>About</Link>
-//             </Button>
-//           </Box>
-//           <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
-//             <Button color="inherit" sx={{ fontSize: '2rem', marginRight: 2, display: 'flex', alignItems: 'center' }}>
-//               <AccountCircle sx={{ marginRight: 1 }} />
-//               Login
-//             </Button>
-//             <Button variant="outlined" sx={{ fontSize: '2rem', marginRight: 2 }}>
-//               Sign Up
-//             </Button>
-//           </Box>
-//           <Box sx={{ display: { xs: 'block', md: 'none' } }}>
-//             <IconButton color="inherit" onClick={toggleDrawer(true)}>
-//               <MenuIcon />
-//             </IconButton>
-//           </Box>
-//         </Toolbar>
-//       </AppBar>
-//           <Drawer anchor="right" open={drawerOpen} onClose={toggleDrawer(false)}>
-//             <Box
-//               sx={{ width: 250 }}
-//               role="presentation"
-//               onClick={toggleDrawer(false)}
-//               onKeyDown={toggleDrawer(false)}
-//             >
-//               <List>
-//                 <ListItem button>
-//                   <ListItemText primary="Home" />
-//                 </ListItem>
-//                 <ListItem button>
-//                   <ListItemText primary="Tours" />
-//                 </ListItem>
-//                 <ListItem button>
-//                   <ListItemText primary="Contact" />
-//                 </ListItem>
-//                 <ListItem button>
-//                   <ListItemText primary="About" />
-//                 </ListItem>
-//                 <ListItem button>
-//                   <ListItemText primary="Login" />
-//                 </ListItem>
-//                 <ListItem button>
-//                   <ListItemText primary="Sign Up" />
-//                 </ListItem>
-//               </List>
-//             </Box>
-//           </Drawer>
-//         </>
-//       );
-//   }
 
 function HeroSection() {
   return (
@@ -164,7 +75,6 @@ function HeroSection() {
     </section>
   );
 }
-
 
 function ImageSlider({ images }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -323,8 +233,6 @@ function ImageSlider({ images }) {
   );
 }
 
-
-
 function IntroductionSection() {
   return (
     <section style={{ height: '600px', boxShadow: '2px 2px 2px 4px var(--color-grey-400)', padding: '50px 0', backgroundColor: 'var(--color-grey-200)' }}>
@@ -350,6 +258,7 @@ function IntroductionSection() {
     </section>
   );
 }
+
 function IntroSection() {
   return (
     <section style={{ height: '700px', boxShadow: '2px 2px 2px 4px var(--color-grey-400)', padding: '50px 0', backgroundColor: 'var(--color-grey-200)' }}>
@@ -432,8 +341,6 @@ function ToursSection() {
     </section>
   );
 }
-
-
 
 const ImageGallery = () => {
   const travelImages = [

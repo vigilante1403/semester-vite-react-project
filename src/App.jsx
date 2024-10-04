@@ -36,6 +36,7 @@ import VerifySuccess from './pages/userpages/VerifySuccess';
 import TourDetailPage from './pages/userpages/TourDetailPage';
 import ResetPasswordPage from './pages/userpages/ResetPasswordPage';
 import ResetPasswordSuccess from './pages/userpages/ResetPasswordSuccess';
+import BookingDetailUser from './features-user/bookings/BookingDetailUser';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -56,39 +57,43 @@ function App() {
               <Route element={<AppLayout />}>
                 <Route index element={<Navigate replace to="home" />} />
                 <Route path="" element={<UserLayout />}>
-                {/* for all */}
+                  {/* for all */}
                   <Route index element={<Navigate replace to="home" />} />
                   <Route path="home" element={<HomePage />} />
                   <Route path="tours" element={<TourPage />} />
                   <Route path="contact" element={<ContactPage />} />
-                  <Route path="signup/signUpVerificationRequired" element={<Verification/>} />
-                  <Route path="/verifyAccount/:email/:token" element={<VerifySuccess/>} />
+                  <Route path="signup/signUpVerificationRequired" element={<Verification />} />
+                  <Route path="/verifyAccount/:email/:token" element={<VerifySuccess />} />
                   {/* user part */}
-                  <Route path="/tours/tour-detail/:id" element={<TourDetailPage/>} />
+                  <Route path="/tours/tour-detail/:id" element={<TourDetailPage />} />
                   <Route path="*" element={<PageNotFound />} />
 
-                  <Route path="user" element={<ProtectedRouteUser><AuthenticatedUserLayout/></ProtectedRouteUser>}>
-                    <Route index element={<Navigate replace to="dashboard"/>} />
-                    <Route path="dashboard" element={<MyDashboard/>} />
-                    <Route path="me" element={<AboutMe/>} />
-                    <Route path="bookings" element={<MyBookings/>} />
-                    <Route path="reviews" element={<MyReviews/>} />
+                  <Route path="user" element={<ProtectedRouteUser><AuthenticatedUserLayout /></ProtectedRouteUser>}>
+                    <Route index element={<Navigate replace to="dashboard" />} />
+                    <Route path="dashboard" element={<MyDashboard />} />
+                    <Route path="me" element={<AboutMe />} />
+                    <Route path="bookings" element={<MyBookings />} />
+                    <Route
+                      path="bookings/:bookingId"
+                      element={<BookingDetailUser bookingFromComponent={null} />}
+                    />
+                    <Route path="reviews" element={<MyReviews />} />
                     {/* <Route path="statistics" element={<MyStatistics/>} /> */}
-                    <Route path="settings" element={<MySettings/>} />
+                    <Route path="settings" element={<MySettings />} />
                     <Route path="*" element={<PageNotFound />} />
                   </Route>
 
                 </Route>
-               
-              {/* for admin */}
+
+                {/* for admin */}
                 <Route path="admin" element={<ProtectedRouteAdmin><AdminLayout /></ProtectedRouteAdmin>}>
                   <Route index element={<Navigate replace to="dashboard" />} />
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="tours" element={<Tours />} />
-                  <Route path='tours/:id' element={<TourDetail/>} />
+                  <Route path='tours/:id' element={<TourDetail />} />
                   <Route path="geo" element={<GeocodeComponent />} />
                   <Route path="accounts" element={<Accounts />} />
-                  <Route path="accounts/:id" element={<AccountDetail/>} />
+                  <Route path="accounts/:id" element={<AccountDetail />} />
                   <Route path="users" element={<Users />} />
                   <Route path="bookings" element={<Bookings />} />
                   <Route
@@ -101,8 +106,8 @@ function App() {
                 <Route path="*" element={<PageNotFound />} />
               </Route>
               <Route path="admin/login" element={<Login />} />
-              <Route path="/reset-password/:email/:token" element={<ResetPasswordPage/>} />
-              <Route path="/reset-password/success" element={<ResetPasswordSuccess/>} />
+              <Route path="/reset-password/:email/:token" element={<ResetPasswordPage />} />
+              <Route path="/reset-password/success" element={<ResetPasswordSuccess />} />
               <Route path="*" element={<PageNotFound />} />
             </Routes>
           </BrowserRouter>

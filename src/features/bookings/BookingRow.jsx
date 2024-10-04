@@ -56,7 +56,7 @@ const Amount = styled.div`
   font-weight: 500;
 `;
 
-function BookingRow({
+function  BookingRow({
   booking: {
     id: bookingId,
     // created_at,
@@ -96,6 +96,7 @@ function BookingRow({
   var isLeadGuide;
   var canEdit;
   var canDelete;
+  var isGuide;
   if(valueAuthenticated!=null){
   
    
@@ -103,7 +104,7 @@ function BookingRow({
     isLeadGuide = valueAuthenticated.user.authorities.some(role => role.authority === 'LEADGUIDE')
     canEdit = isAdmin||isLeadGuide
     canDelete = isAdmin
-   
+   isGuide =valueAuthenticated.user.authorities.some(role => role.authority === 'GUIDE')
   }
   
   const tour = {
@@ -185,7 +186,7 @@ function BookingRow({
           <Menus.List id={bookingId}>
             <Menus.Button
               icon={<HiEye />}
-              onClick={() => navigate(`/admin/bookings/${bookingId}`)}
+              onClick={() => (isAdmin||isLeadGuide||isGuide) ? navigate(`/admin/bookings/${bookingId}`) : navigate(`/user/bookings/${bookingId}`)}
             >
               See details
             </Menus.Button>
