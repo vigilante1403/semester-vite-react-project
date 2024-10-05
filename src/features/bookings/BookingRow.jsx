@@ -56,7 +56,7 @@ const Amount = styled.div`
   font-weight: 500;
 `;
 
-function  BookingRow({
+function BookingRow({
   booking: {
     id: bookingId,
     // created_at,
@@ -72,7 +72,8 @@ function  BookingRow({
     user: { name: guestName, email, id: userid },
     tour: { name: tourName, id: tourId,summary },
     status,
-    sessionId,creationTime
+    sessionId,creationTime,
+    keysOfStartDate
   },
   require = null,
   review=false
@@ -89,7 +90,8 @@ function  BookingRow({
     tour: { name: tourName, id: tourId,summary },
     numJoin,
     status,
-    sessionId,creationTime
+    sessionId,creationTime,
+    keysOfStartDate
   };
 
   var isAdmin;
@@ -104,7 +106,7 @@ function  BookingRow({
     isLeadGuide = valueAuthenticated.user.authorities.some(role => role.authority === 'LEADGUIDE')
     canEdit = isAdmin||isLeadGuide
     canDelete = isAdmin
-   isGuide =valueAuthenticated.user.authorities.some(role => role.authority === 'GUIDE')
+    isGuide =valueAuthenticated.user.authorities.some(role => role.authority === 'GUIDE')
   }
   
   const tour = {

@@ -23,17 +23,15 @@ const Tour = ({ tour, bookings }) => {
   const bookingsCount = bookings.filter(
     (booking) => booking.tour.id === tour.id && booking.status === true
   );
-  let participantCount = 0;
+  var participantCount = 0;
   Array.from(bookingsCount).forEach((booking) => {
     participantCount += booking.numJoin;
   });
 
- 
   const discountPercentage = tour.priceDiscount
-    ? ((tour.priceDiscount) / tour.price) * 100
+    ? (tour.priceDiscount / tour.price) * 100
     : 0;
-    console.table(tour)
-
+  console.table(tour);
   return (
     <Grid item xs={12} sm={6} md={6} lg={4}>
       <Card
@@ -59,8 +57,8 @@ const Tour = ({ tour, bookings }) => {
               borderRadius: '12px',
               fontSize: '2rem',
               fontWeight: 'bold',
-              
-              zIndex:1
+
+              zIndex: 1,
             }}
           >
             -{Math.round(discountPercentage)}%
@@ -104,37 +102,39 @@ const Tour = ({ tour, bookings }) => {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-  <HiOutlineCurrencyDollar size={24} style={{ marginRight: 8 }} />
-  {tour.priceDiscount > 0 ? (
-    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      <Typography
-        variant="body1"
-        sx={{
-          fontSize: '1.2rem',
-          color: 'red',
-          textDecoration: 'line-through', 
-          mr: 1,
-        }}
-      >
-        {tour.price} USD
-      </Typography>
-      <Typography
-        variant="body1"
-        sx={{
-          fontSize: '1.2rem',
-          color: 'text.secondary', 
-        }}
-      >
-        {tour.price - (tour.price * discountPercentage)/100 } USD
-      </Typography>
-    </Box>
-  ) : (
-    <Typography variant="body1" sx={{ fontSize: '1.2rem', color: 'text.secondary' }}>
-      {tour.price} USD
-    </Typography>
-  )}
-</Box>
-
+              <HiOutlineCurrencyDollar size={24} style={{ marginRight: 8 }} />
+              {tour.priceDiscount > 0 ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontSize: '1.2rem',
+                      color: 'red',
+                      textDecoration: 'line-through',
+                      mr: 1,
+                    }}
+                  >
+                    {tour.price} USD
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontSize: '1.2rem',
+                      color: 'text.secondary',
+                    }}
+                  >
+                    {tour.price - (tour.price * discountPercentage) / 100} USD
+                  </Typography>
+                </Box>
+              ) : (
+                <Typography
+                  variant="body1"
+                  sx={{ fontSize: '1.2rem', color: 'text.secondary' }}
+                >
+                  {tour.price} USD
+                </Typography>
+              )}
+            </Box>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <HiCalendar size={24} style={{ marginRight: 8 }} />
               <Typography
@@ -170,7 +170,7 @@ const Tour = ({ tour, bookings }) => {
                   <Star
                     key={i}
                     full={Math.floor(tour.ratingsAverage) >= i + 1}
-                    color='#fcc419'
+                    color="#fcc419"
                     size={18}
                   />
                 ))}

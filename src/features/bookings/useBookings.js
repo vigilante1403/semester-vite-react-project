@@ -5,6 +5,7 @@ import {
   getBookingById,
   getBookingsByTourId,
   getBookingsOfUser,
+  updateAllBookingsAfterUpdateTour,
 } from '../../services/apiBookings';
 import { useParams, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -16,7 +17,6 @@ export function useBookingsTotal() {
   const searchStatusValue = searchParams.get('status') || 'all';
   const sortBy = searchParams.get('sortBy') || 'name-asc';
   const currentPage = !searchParams.get('page')?1:Number(searchParams.get('page'))
-
   const { data: bookings, isLoading } = useQuery({
     queryKey: ['bookings',currentPage],
     retry: false,
@@ -74,4 +74,11 @@ export function useCancelBookingById() {
     },
   });
   return { cancelBooking, isCanceling };
+}
+export function useUpdateAllRelatedBookings(){
+  const{mutate:updateAllBookingsRelated,isLoading}=useMutation({
+    mutationFn:updateAllBookingsAfterUpdateTour,
+    onError:(err)=>toast.error(err)
+  })
+  return {updateAllBookingsRelated,isLoading}
 }

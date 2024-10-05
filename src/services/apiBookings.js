@@ -44,3 +44,8 @@ export const cancelBooking = async({bookingId})=>{
   const {  error } = await axios.put(`/bookings/cancel-booking?bookingId=${bookingId}`);
   if (error) throw new Error(error.message);
 }
+export const updateAllBookingsAfterUpdateTour=async({tourId})=>{
+  const {data,error}=await axios.post(`/bookings/changing-related-booking-after-update-tour?tourId=${tourId}`);
+  if(error) throw new Error(error.message)
+    return data
+}

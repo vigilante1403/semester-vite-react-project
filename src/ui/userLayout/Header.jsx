@@ -161,7 +161,7 @@
 //     );
 //   }
 import { Link, useNavigate } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import logo from '../../../public/logo_light.png';
 import {
   AppBar,
@@ -187,6 +187,7 @@ import LoginSignupPage from '../../pages/userpages/LoginSignupPage';
 import { useAuthenticate } from '../../features-user/security/useAuthenticate';
 import Logo from '../Logo';
 import UserHeader from './UserHeader';
+import { LoginContext } from '../../context/LoginContext';
 const LogoWrapper = styled.div`
   cursor: pointer; 
 `;
@@ -194,27 +195,30 @@ const StyledHeader = styled.header`
   background-color: var(--color-grey-100);
 `;
 export default function Header() {
-  const [openLoginSignup, setOpenLoginSignup] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
-  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const {openLoginSignup,isLogin,isForgotPassword,drawerOpen,handleLoginSignupOpen,handleLoginSignupClose,setIsLogin,setDrawerOpen,setIsForgotPassword}=useContext(LoginContext)
+  // const [openLoginSignup, setOpenLoginSignup] = useState(false);
+  // const [drawerOpen, setDrawerOpen] = useState(false);
+  // const [isLogin, setIsLogin] = useState(true);
+  // const [isForgotPassword, setIsForgotPassword] = useState(false);
 
   const { user, isAuthenticated, isLoading } = useAuthenticate();
   const navigate = useNavigate();
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
   };
-
-  const handleLoginSignupOpen = (login) => {
-    setIsLogin(login);
-    setIsForgotPassword(false);
-    setOpenLoginSignup(true);
+  const handleLogoClick = () => {
+    navigate("/");
   };
+  // const handleLoginSignupOpen = (login) => {
+  //   setIsLogin(login);
+  //   setIsForgotPassword(false);
+  //   setOpenLoginSignup(true);
+  // };
 
-  const handleLoginSignupClose = () => {
-    setOpenLoginSignup(false);
+  // const handleLoginSignupClose = () => {
+  //   setOpenLoginSignup(false);
 
-  };
+  // };
 
   const handleSwitch = () => {
     setIsLogin(!isLogin);
@@ -223,9 +227,6 @@ export default function Header() {
     setIsLogin(!isLogin);
   };
 
-  const handleLogoClick = () => {
-    navigate("/");
-  };
   return (
     <StyledHeader>
       <AppBar
@@ -262,6 +263,14 @@ export default function Header() {
                 style={{ textDecoration: 'none', color: 'inherit' }}
               >
                 Tours
+              </Link>
+            </Button>
+            <Button color="inherit" sx={{ fontSize: '2rem', marginRight: 2 }}>
+              <Link
+                to="/map"
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                Map
               </Link>
             </Button>
             <Button color="inherit" sx={{ fontSize: '2rem', marginRight: 2 }}>
@@ -307,19 +316,20 @@ export default function Header() {
                 Sign Up
               </Button>
             </Box>
-          ) : (
-            // <Box>
-            //   <Button
-            //     variant="contained"
-            //     color="primary"
-            //     sx={{ fontSize: '1.2rem' }}
-            //     onClick={() => navigate(`/user/dashboard`)}
-            //   >
-            //     Dash board
-            //   </Button>
-            // </Box>
-            <UserHeader/>
-          )}
+          ) : (<UserHeader/>)
+        
+              /* <Box>
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ fontSize: '1.2rem' }}
+                onClick={() => navigate(`/user/dashboard`)}
+              >
+                Dash board
+              </Button>
+            </Box> */
+            
+          }
           <Box sx={{ display: { xs: 'block', md: 'none' } }}>
             <IconButton color="inherit" onClick={toggleDrawer(true)}>
               <MenuIcon />

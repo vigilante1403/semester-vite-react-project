@@ -70,9 +70,7 @@ const MyBookings = () => {
   const [select,setSelect]=useState('all');
   const [searchParams,setSearchParams]= useSearchParams();
   const [searchTour,setSearchTour]=useState(searchParams.get('tour') ?? '');
-
    
-
   const handleSearch = (data) => {
     if(data.trim()===''){
       searchParams.delete('tour')
@@ -80,7 +78,6 @@ const MyBookings = () => {
       setSearchParams(searchParams)
      
       return;
-
     }
     const newData = data.toLowerCase();
     setSearchTour(newData);
@@ -130,7 +127,7 @@ const MyBookings = () => {
       </Tabs>
       <Searchbar placeholder={"Search bookings by Booking name"}  text={searchTour} onChangeText={handleSearch}/>
       <TabPanel value={value} index={value} >
-        {bookings&&bookings.length>0&&<BookingTable searchTour={searchTour} require={bookings} select={select}  />}
+      {bookings&&bookings.length>0&&<BookingTable searchTour={searchTour} require={bookings} select={select}  />}
         {(!bookings||bookings.length===0)&& <p>No booking to show</p>}
       </TabPanel>
       

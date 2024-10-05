@@ -19,7 +19,6 @@ function BookingTableOperations() {
         options={[
           { value: "name-asc", label: "Sort by tour name (asc)" },
           { value: "name-desc", label: "Sort by tour name (desc)" },
-         
           { value: "startDate-desc", label: "Sort by date (recent first)" },
           { value: "startDate-asc", label: "Sort by date (earlier first)" },
           {

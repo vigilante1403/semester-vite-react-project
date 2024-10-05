@@ -98,6 +98,7 @@ export default function MyDashboard() {
             sx={{
                 height: '100%',
                 display: 'grid',
+                width:'100%',
                 gridTemplateRows: 'auto 1fr',
                 backgroundImage: dashboardBackground,
                 backgroundSize: 'cover',
@@ -114,15 +115,15 @@ export default function MyDashboard() {
             </Typography>
 
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
-                <Grid container spacing={0} justifyContent="center">
+            <Box  sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start',maxWidth:'70vw' }}>
+                <Grid container spacing={0} xs={12} justifyContent="center">
 
                     <Grid item xs={3}>
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                             <Box sx={{ width: '100px', height: '100px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', zIndex: 1 }}>
                                 <Typography variant="h2" sx={{ color: '#1976d2', paddingBottom: '30px' }}><strong>{bookedTours}</strong></Typography>
                             </Box>
-                            <Avatar sx={{ width: 130, height: 130, backgroundColor: 'transparent', border: '2px solid black' }}>
+                            <Avatar sx={{ width: 100, height: 100, backgroundColor: 'transparent', border: '2px solid black' }}>
                                 <Event sx={{ color: '#fff' }} />
                             </Avatar>
                             <Typography variant="h4" sx={{ color: 'black', mt: 1, cursor: 'pointer', '&:hover': { color: '#1976d2' } }} onClick={() => navigate('/user/bookings')}>Booked</Typography>
@@ -135,7 +136,7 @@ export default function MyDashboard() {
                             <Box sx={{ width: '100px', height: '100px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', zIndex: 1 }}>
                                 <Typography variant="h2" sx={{ color: '#4caf50', paddingBottom: '30px' }}><strong>{upcomingTours}</strong></Typography>
                             </Box>
-                            <Avatar sx={{ width: 130, height: 130, backgroundColor: 'transparent', border: '2px solid black' }}>
+                            <Avatar sx={{ width: 100, height: 100, backgroundColor: 'transparent', border: '2px solid black' }}>
                                 <Event sx={{ color: '#fff' }} />
                             </Avatar>
                             <Typography variant="h4" sx={{ color: 'black', mt: 1 }}>Upcoming</Typography>
@@ -148,7 +149,7 @@ export default function MyDashboard() {
                             <Box sx={{ width: '100px', height: '100px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute', zIndex: 1 }}>
                                 <Typography variant="h2" sx={{ color: '#ff9800', paddingBottom: '30px' }}><strong>{transaction}</strong></Typography>
                             </Box>
-                            <Avatar sx={{ width: 130, height: 130, background: 'transparent', border: '2px solid black' }}>
+                            <Avatar sx={{ width: 100, height: 100, background: 'transparent', border: '2px solid black' }}>
                                 <AttachMoney sx={{ color: '#fff' }} />
                             </Avatar>
                             <Typography variant="h4" sx={{ color: 'black', mt: 1 }}>Transaction</Typography>
@@ -156,7 +157,7 @@ export default function MyDashboard() {
                     </Grid>
                 </Grid>
 
-                <Grid container spacing={2} sx={{ mt: 4 }}>
+                <Grid container xs={12} spacing={2} sx={{ mt: 4 }}>
                     <Grid item xs={6}>
                         <Box sx={{ background: 'rgba(73, 101, 183, 0.9)', borderRadius: '8px', p: 2 }}>
                             <Typography variant="h3" sx={{ mb: 2, color: 'var(--color-grey-100)' }}><strong>Upcoming Tours</strong></Typography>

@@ -15,12 +15,14 @@ import { useUsers } from '../authentication/useUsers';
 import { useUpdateBooking } from './useUpdateBooking';
 import Spinner from '../../ui/Spinner';
 import { useState } from 'react';
+import { useGetAllStartDates } from '../../features-user/tours/useBookTour';
 
 function CreateBookingForm({ onClose, editBooking }) {
   const { createBooking, isCreating } = useCreateBooking();
   const { tours, isLoading } = useTours();
   const { users, isLoading: isLoading2 } = useUsers();
   const { updateBooking, isUpdating } = useUpdateBooking();
+  const { startDates, isLoading: isLoading3 } = useGetAllStartDates();
 
   const formatDate = (dateInput) => {
     const cleanedDateString = dateInput.replace(/ ICT/, '');
@@ -58,11 +60,17 @@ function CreateBookingForm({ onClose, editBooking }) {
   const [dateChose, setDateChose] = useState(
     editBooking ? formatDate(editBooking.startDate) : ''
   );
+
   const [tourChose, setTourChose] = useState(
     editBooking ? editBooking.tour.id : ''
   );
   const [userChose, setUserChose] = useState(
     editBooking ? editBooking.user.id : ''
+  );
+  const [keyChose, setKeyChose] = useState(
+    editBooking && editBooking.startDateId != null
+      ? editBooking.startDateId
+      : ''
   );
   const [change, setChange] = useState(false);
   const [price, setPrice] = useState(editBooking ? editBooking.priceOrigin : 0);
@@ -71,7 +79,8 @@ function CreateBookingForm({ onClose, editBooking }) {
   );
   const [isPaid, setIsPaid] = useState(editBooking ? editBooking.paid : true); // Added state for "paid"
   const [datesSelected, setDatesSelected] = useState([]);
-  const [numJoin, setNumJoin] = useState(editBooking?editBooking.numJoin:1);
+  const [keys, setKeys] = useState([]);
+  const [numJoin, setNumJoin] = useState(editBooking ? editBooking.numJoin : 1);
   const onError = (errors) => {
     toast.error('Form submit fail');
   };
@@ -94,13 +103,22 @@ function CreateBookingForm({ onClose, editBooking }) {
     if (editBooking !== undefined) {
       formData.append('id', editBooking.id);
     }
+    // handle key
+    if (keyChose === '') {
+      toast.error('Please choose valid date of tour');
+      return;
+    } else {
+      formData.append('startDateId',keyChose)
+    }
+
+    console.log(keys);
     formData.append('tour', tourChose);
     formData.append('user', userChose);
     formData.append('date', dateChose);
     formData.append('paid', isPaid);
     formData.append('priceOrigin', price);
     formData.append('priceDiscount', priceDiscount);
-    formData.append('numJoin',numJoin)
+    formData.append('numJoin', numJoin);
     // console.log(formData.get('paid'));
     // console.log(formData.get('user'));
     // console.log(formData.get('tour'));
@@ -141,15 +159,16 @@ function CreateBookingForm({ onClose, editBooking }) {
     if (tourChose !== '') {
       const tour = tours.filter((el) => el.id === tourChose)[0] || null;
       if (tour != null) {
-        setPrice(tour.price );
-        setPriceDiscount(tour.priceDiscount );
+        setPrice(tour.price);
+        setPriceDiscount(tour.priceDiscount);
       }
     }
     setPrice((price) => price * p);
     setPriceDiscount((discount) => discount * p);
   };
-  if (isCreating || isUpdating || isLoading || isLoading2) return <Spinner />;
-
+  if (isCreating || isUpdating || isLoading || isLoading2 || isLoading3)
+    return <Spinner />;
+  let optionsStartDates = startDates;
   return (
     <Form
       onSubmit={handleSubmit(onSubmit, onError)}
@@ -175,11 +194,19 @@ function CreateBookingForm({ onClose, editBooking }) {
               onChange={(e) => {
                 const selectedTour = e.target.value;
                 field.onChange(selectedTour);
-                const filteredDates = tours
-                  .filter((tour) => tour.id === selectedTour)[0]
-                  .startDates.map((date) => ({ label: date, value: date }));
-
-                setDatesSelected(filteredDates);
+                const filteredDates = [...startDates]
+                  .filter((startDate) => startDate.tourId === e.target.value)
+                  .map((date) => ({ label: date.startDate, value: date.id }));
+                //  tours
+                //   .filter((tour) => tour.id === selectedTour)[0]
+                //   .startDates.map((date) => ({ label: date, value: date }));
+                setKeys((prev) => filteredDates);
+                setKeyChose(filteredDates[0].value);
+                setDatesSelected((prev) =>
+                  [...startDates]
+                    .filter((startDate) => startDate.tourId === e.target.value)
+                    .map((date) => ({ label: date.startDate, value: date.id }))
+                );
                 setTourChose(selectedTour);
                 const tour =
                   tours.filter((el) => el.id === selectedTour)[0] || null;
@@ -187,8 +214,8 @@ function CreateBookingForm({ onClose, editBooking }) {
                   setPrice(tour.price * numJoin);
                   setPriceDiscount(tour.priceDiscount * numJoin);
                 }
-                setDateChose(filteredDates[0].value);
-                setValue('date', filteredDates[0].value);
+                setDateChose(filteredDates[0].label);
+                setValue('date', filteredDates[0].label);
                 setChange(true);
               }}
             />
@@ -250,16 +277,26 @@ function CreateBookingForm({ onClose, editBooking }) {
               {...field}
               options={
                 editBooking && !change
-                  ? tours
-                      .filter((tour) => tour.id === tourChose)[0]
-                      .startDates.map((date) => ({ label: date, value: date }))
-                  : datesSelected
+                  ? [...startDates]
+                      .filter((start) => start.tourId === editBooking.tour.id)
+                      .map((date) => ({
+                        label: date.startDate,
+                        value: date.id,
+                      }))
+                  : // tours
+                    //     .filter((tour) => tour.id === tourChose)[0]
+                    //     .startDates.map((date) => ({ label: date, value: date }))
+                    datesSelected
               }
               value={dateChose !== '' ? dateChose : datesSelected[0]?.value}
               onChange={(e) => {
                 const selectedDate = e.target.value;
                 field.onChange(selectedDate);
-                setDateChose(selectedDate);
+                const selected = keys.filter(
+                  (key) => key.value === e.target.value
+                )[0];
+                setDateChose(selected.label);
+                setKeyChose(selected.value);
               }}
             />
           )}

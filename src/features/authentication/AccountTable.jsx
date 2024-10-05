@@ -31,7 +31,9 @@ function AccountTable() {
   const [searchParams] = useSearchParams();
   const searchRoleValue = searchParams.get('role') || 'all';
   // const { users, isLoading } = useUsers();
-const {filteredUsers:users}=useContext(AccountContext);
+
+  // if (isLoading) return <Spinner />;
+  const {filteredUsers:users}=useContext(AccountContext);
   if(!users) return <Empty resourceName="users"/>;
 
   // Filter by role

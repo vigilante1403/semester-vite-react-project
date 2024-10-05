@@ -8,19 +8,13 @@ import { useTours } from '../features/tours/useTours';
 import { createContext, useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Spinner from '../ui/Spinner';
-
-
 export const TourContext=createContext();
-
 function Tours() {
   const { tours, isLoading } = useTours();
-
   let [filteredTours,setFilteredTours]= useState([]);
   const [searchParams,setSearchParams]= useSearchParams();
   const [searchTour,setSearchTour]=useState(searchParams.get('tour') ?? '');
   const [showTours, setShowTours] = useState(true);
-
-
   
   const handleReload = () => {
     // Unmount and remount the component by toggling the state
@@ -29,11 +23,9 @@ function Tours() {
   };
   if (isLoading ) return <Spinner />;
   if (!tours) return <Spinner />;
-
   if (searchParams.get('tour') !== 'all' && searchParams.get('tour') !== '' && searchParams.get('tour')!==null) {
     filteredTours = [];
     var temptours = tours;
-
     filteredTours = temptours.filter((tour) => {
       const name = tour.name.toLowerCase();
       console.log(tour);
@@ -52,7 +44,6 @@ function Tours() {
     }
     // console.log('filter tours',filteredTours)
   }
-
   const handleSearch = (data) => {
     if(data.trim()===''){
       searchParams.delete('tour')
@@ -60,7 +51,6 @@ function Tours() {
       setSearchParams(searchParams)
       filteredTours=tours;
       return;
-
     }
     const newData = data.toLowerCase();
     setSearchTour(newData);
@@ -68,7 +58,7 @@ function Tours() {
     setSearchParams(searchParams);
   };
     return (
-        <TourContext.Provider value={{filteredTours,handleReload}}>
+      <TourContext.Provider value={{filteredTours,handleReload}}>
       <Row type="horizontal">
         <Heading as="h1">All tours</Heading>
         <TourTableOperations/>
@@ -79,7 +69,7 @@ function Tours() {
        <AddTour/>
         
       </Row>
-    </TourContext.Provider>
+      </TourContext.Provider>
     )
 }
 

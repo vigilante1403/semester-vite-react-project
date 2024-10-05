@@ -18,9 +18,10 @@ import { useEffect, useState } from 'react';
 import FormRowVertical from '../../ui/FormRowVertical';
 import { geocodeAddress } from '../../utils/helpers';
 import useCountries from './useCountries';
-import { Box, Typography } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 import fetchFileFromUrl from '../../services/useFetchFileFromUrl';
 import { json } from 'react-router-dom';
+import { useUpdateAllRelatedBookings } from '../bookings/useBookings';
 
 function CreateTourForm({ onClose, editTour }) {
   const { createTour, isCreating } = useCreateTour();
@@ -28,28 +29,26 @@ function CreateTourForm({ onClose, editTour }) {
   const { guides, isLoading } = useTourGuides();
   const { countries, isLoading: isCountriesLoading } = useCountries();
   const [selectedCountry, setSelectedCountry] = useState(null);
-
+  const{updateAllBookingsRelated}=useUpdateAllRelatedBookings()
   const [currentPhoto, setCurrentPhoto] = useState(null);
   const [currentImages, setCurrentImages] = useState([]);
 
-
-  const [selectedGuideName1, setSelectedGuideName1] = useState("chooseValue");
+  const [selectedGuideName1, setSelectedGuideName1] = useState('chooseValue');
   const [selectedGuideName2, setSelectedGuideName2] = useState('');
   const [isGuide2Added, setIsGuide2Added] = useState(false);
-  const [selectedGuideTag, setSelectedGuideTag] = useState("guide1"); 
-  const [selectedGuides, setSelectedGuides] = useState(["chooseValue", null]);
-
+  const [selectedGuideTag, setSelectedGuideTag] = useState('guide1'); // Track which guide is selected
+  const [selectedGuides, setSelectedGuides] = useState(['chooseValue', null]);
 
   useEffect(() => {
     if (editTour && editTour.imageCover) {
       fetchFileFromUrl('tour', editTour.imageCover).then((file) =>
-        setCurrentPhoto(file),
+        setCurrentPhoto(file)
       );
     }
     if (editTour?.images && editTour.images.length > 0) {
       const fetchAllPhotos = async () => {
         const photoPromises = editTour.images.map((url) =>
-          fetchFileFromUrl('tour', url),
+          fetchFileFromUrl('tour', url)
         );
         const photos = await Promise.all(photoPromises);
         setCurrentImages(photos);
@@ -61,58 +60,61 @@ function CreateTourForm({ onClose, editTour }) {
       setSelectedCountry(editTour.countryNameCommon || null);
     }
     if (editTour && editTour.guides) {
-
-      const idArrays = editTour.guides.map(item => item.id);
-      const guideName = editTour.guides ? editTour.guides.map(item => item.name) : 'chooseValue';
+      const idArrays = editTour.guides.map((item) => item.id);
+      const guideName = editTour.guides
+        ? editTour.guides.map((item) => item.name)
+        : 'chooseValue';
       setSelectedGuides(idArrays);
-      setSelectedGuideName1(guideName[0])
+      setSelectedGuideName1(guideName[0]);
       if (idArrays.length > 1) {
         setIsGuide2Added(true);
         setSelectedGuideName2(guideName[1] || 'chooseValue');
-      }  // set guides từ editTour vào state
+      } // set guides từ editTour vào state
     }
     fetchAndSetTourLocations(editTour);
   }, [editTour]);
-  
+
   editTour ? console.log(editTour) : console.log('no editTour');
   const handleGuideSelectChange = (event) => {
-    const selectedGuide = guides.find((guide) => guide.value === event.target.value);
-    const guideName = selectedGuide ? selectedGuide.label.split('-')[0] : 'chooseValue';
-    const newSelectedGuides = [...selectedGuides]; 
+    const selectedGuide = guides.find(
+      (guide) => guide.value === event.target.value
+    );
+    const guideName = selectedGuide
+      ? selectedGuide.label.split('-')[0]
+      : 'chooseValue';
 
-    if (selectedGuideTag === "guide2") {
+    const newSelectedGuides = [...selectedGuides]; // Clone the array
+
+    if (selectedGuideTag === 'guide2') {
       newSelectedGuides[1] = event.target.value;
-      setSelectedGuideName2(guideName);  // Update guide2
+      setSelectedGuideName2(guideName); // Update guide2
     } else {
       newSelectedGuides[0] = event.target.value;
-      setSelectedGuideName1(guideName);  // Update guide1
+      setSelectedGuideName1(guideName); // Update guide1
     }
 
-    setSelectedGuides(newSelectedGuides);  // Update state
+    setSelectedGuides(newSelectedGuides); // Update state
   };
 
   const handleAddGuide2 = () => {
     setIsGuide2Added(true);
 
     setSelectedGuides([selectedGuides[0], 'chooseValue']);
-    setSelectedGuideName2('chooseValue')// Initialize guide2
-
+    setSelectedGuideName2('chooseValue'); // Initialize guide2
   };
 
   const handleRemoveGuide1 = () => {
-
     setSelectedGuides(['chooseValue', selectedGuides[1]]);
-    setSelectedGuideName1("chooseValue");  // Reset guide1
+    setSelectedGuideName1('chooseValue'); // Reset guide1
   };
 
   const handleRemoveGuide2 = () => {
     setIsGuide2Added(false);
-    setSelectedGuides([selectedGuides[0], null]);  // Reset guide2
+    setSelectedGuides([selectedGuides[0], null]); // Reset guide2
     setSelectedGuideName2('');
   };
 
   ///
-
 
   const {
     register,
@@ -132,50 +134,73 @@ function CreateTourForm({ onClose, editTour }) {
       description: editTour?.description || '',
       guide: editTour?.guides[0].id || '',
       imageCover: null,
-      images: [],
+      images: [], // No default file input, handled separately
       countryNameCommon: editTour?.countryNameCommon || '',
     },
   });
   const { errors } = formState;
 
   const onError = (errors) => {
-
     toast.error('Form submit fail');
     console.log(errors);
   };
 
   const [inputs, setInputs] = useState(['']);
   const [dates, setDates] = useState(editTour ? editTour?.startDates : ['']);
-  const [descriptions, setDescriptions] = useState([]);
-  const [subDescriptions, setSubDescriptions] = useState([[""]]);
+  const [keys,setKeys]=useState(editTour?[editTour.keyOfDatesRelation]:[])
+  const [descriptions, setDescriptions] = useState(['']);
+  const [subDescriptions, setSubDescriptions] = useState([['']]);
   const [coordinates, setCoordinates] = useState([]);
   const [showFormatted, setShowFormatted] = useState([]);
-
+  const [dateApplyGuide,setDateApplyGuide]=useState('')
+  const [dateApplyLocation,setDateApplyLocation]=useState('')
+console.log(keys[0])
   const fetchAndSetTourLocations = async (editTour) => {
     if (editTour && editTour.locations) {
+      // Lấy tất cả các giá trị `address` và `description` từ `locations`
+      const locationAddresses = editTour.locations
+        .slice()
+        .reverse()
+        .map((location) => location.address);
+      const locationDescriptions = editTour.locations
+        .slice()
+        .reverse()
+        .map((location) => location.description);
+      const newSubDescriptions = editTour.locations
+        .slice()
+        .reverse()
+        .map((location) =>
+          location.description.split(', ').map((desc) => desc.trim())
+        );
 
-      const locationAddresses = editTour.locations.slice().reverse().map((location) => location.address);
-      const locationDescriptions = editTour.locations.slice().reverse().map((location) => location.description);
-      const newSubDescriptions = editTour.locations.slice().reverse().map((location) =>
-        location.description.split(", ").map((desc) => desc.trim())
-      );
-    
       setSubDescriptions(newSubDescriptions);
+
+      // Cập nhật vào state `inputs` và `descriptions`
       setInputs(locationAddresses);
       setDescriptions(locationDescriptions);
 
+      console.log(locationAddresses);
+
+      // Sử dụng for...of để đảm bảo async/await hoạt động đúng
       for (let index = 0; index < locationAddresses.length; index++) {
         const address = locationAddresses[index];
         try {
           const { place, index1 } = await geocodeAddress(address, index);
+          console.log('index ' + index);
+          console.log(address);
 
           if (place) {
+            console.log(coordinates);
 
             // Cập nhật `coordinates` dựa trên giá trị trước đó
             setCoordinates((prevCoordinates) => {
-              const newCoordinates = prevCoordinates ? [...prevCoordinates] : [];
+              const newCoordinates = prevCoordinates
+                ? [...prevCoordinates]
+                : [];
               const coor = [place.geometry.lat, place.geometry.lng];
               newCoordinates[index] = { index1, coor };
+              console.log('newCoordinates');
+              console.log(newCoordinates);
               return newCoordinates;
             });
 
@@ -184,27 +209,46 @@ function CreateTourForm({ onClose, editTour }) {
               const newFormatted = prevFormatted ? [...prevFormatted] : [];
               const formatted = place.formatted;
               newFormatted[index] = { index1, formatted };
+              console.log(newFormatted);
+              console.log('after');
               return newFormatted;
             });
           }
         } catch (error) {
-          console.error("Error fetching geocode:", error);
+          console.error('Error fetching geocode:', error);
         }
       }
     } else {
+      // Nếu không phải edit hoặc không có locations, để input trống
       setInputs(['']);
       setDescriptions(['']);
-      setSubDescriptions([[""]]);
+      setSubDescriptions([['']]);
       setCoordinates([]);
       setShowFormatted([]);
     }
   };
 
-
-
   const handleInputDateChange = (index, event) => {
     const newInputs = dates.slice();
     newInputs[index] = event.target.value;
+    if(!keys[index]||keys[index]===undefined){
+      let r = (Math.random() + 1).toString(36).substring(7);
+      console.log(r)
+      var temp = keys
+      var newObject={}
+      newObject[r]=event.target.value
+      setKeys(prev=>[...prev,newObject])
+    }else{
+      var temp = keys;
+      var k = Object.keys(temp[index])[0]
+      var newObject = {};
+      newObject[k]=event.target.value;
+      temp[index]=newObject
+      console.log(temp)
+      console.log('json string',JSON.stringify(newObject).replace('{','').replace('}',''))
+     setKeys(temp)
+
+    }
     setDates(newInputs);
   };
   const handleInputChange = (index, event) => {
@@ -212,11 +256,6 @@ function CreateTourForm({ onClose, editTour }) {
     newInputs[index] = event.target.value;
     setInputs(newInputs);
   };
-  // const handleInputDescriptionsChange = (index, event) => {
-  //   const newInputs = descriptions.slice();
-  //   newInputs[index] = event.target.value;
-  //   setDescriptions(newInputs);
-  // };
   const handleSubDescriptionChange = (locationIndex, subIndex, value) => {
     const updatedSubDescriptions = [...subDescriptions];
     updatedSubDescriptions[locationIndex][subIndex] = value;
@@ -224,13 +263,16 @@ function CreateTourForm({ onClose, editTour }) {
   };
 
   const handleAddInput = () => {
+    console.log(inputs);
+
+    console.log(descriptions);
     setInputs([...inputs, '']);
-    setSubDescriptions([...subDescriptions, [""]]);
+    setSubDescriptions([...subDescriptions, ['']]);
     setCoordinates([...coordinates, '']);
   };
   const handleAddSubDescription = (locationIndex) => {
     const updatedSubDescriptions = [...subDescriptions];
-    updatedSubDescriptions[locationIndex].push("");
+    updatedSubDescriptions[locationIndex].push('');
     setSubDescriptions(updatedSubDescriptions);
   };
   const handleAddDates = () => {
@@ -238,19 +280,30 @@ function CreateTourForm({ onClose, editTour }) {
   };
   useEffect(() => {
     const timer = setTimeout(() => {
-      const newDescriptions = subDescriptions.map((subDesc) => subDesc.join(", "));
+      const newDescriptions = subDescriptions.map((subDesc) =>
+        subDesc.join(', ')
+      );
       setDescriptions(newDescriptions);
-    }, 500); 
-  
+    }, 500);
+
     return () => clearTimeout(timer);
   }, [subDescriptions]);
-  
   const onSubmit = (data) => {
-
+    console.log(selectedGuides);
+    if (selectedGuides == null || selectedGuides.length <= 0) {
+      toast.error('Choose a guide');
+      return;
+    }
     const imagesElement = document.getElementById('images');
     const formData = new FormData();
     if (editTour !== undefined) {
       formData.append('id', editTour.id);
+      if(dateApplyGuide===''||dateApplyLocation===''){
+        toast.error('Please choose date apply for guides and locations')
+        return;
+      }
+      formData.append('dateOfLocationAfter',dateApplyLocation)
+      formData.append('dateOfGuideAfter',dateApplyGuide)
     }
     console.log(data);
     console.log('-------------------');
@@ -293,7 +346,7 @@ function CreateTourForm({ onClose, editTour }) {
       toast.error('Please set valid address to fetch coordinates');
       return;
     }
-  
+    // append each descriptions
     if (descriptions && descriptions.length > 0) {
       Array.from(descriptions).forEach((desc) => {
         formData.append('descriptions', desc);
@@ -302,7 +355,7 @@ function CreateTourForm({ onClose, editTour }) {
       toast.error('Please set descriptions to all locations');
       return;
     }
-    
+    // append each address
     if (inputs && inputs.length > 0) {
       Array.from(inputs).forEach((addr, index) => {
         formData.append('addresses', addr);
@@ -320,21 +373,24 @@ function CreateTourForm({ onClose, editTour }) {
       toast.error('Please add startDate for tour');
       return;
     }
+    if(editTour){
+      //submit mapofkey
+      Array.from(keys).forEach((key)=>{
+        var obj = JSON.stringify(key).replace('{','').replace('}','').trim();
+        formData.append('mapOfKeysAndStartDates',obj)
+      
+      })
+    }
     formData.append('description', data.description);
     formData.append('summary', data.summary);
     formData.append('price', data.price);
     formData.append('priceDiscount', data.priceDiscount);
 
-
     // data.guide = data.guide !== undefined ? data.guide : guides[0].value;
     // formData.append('guides', data.guide);
-    console.log(selectedGuides);
-    if (selectedGuides == null || selectedGuides.length <= 0) {
-      toast.error('Choose a guide');
-      return;
-    }
+
     selectedGuides.forEach((guide) => {
-      if ((guide !== "chooseValue" || guide !== '#') && guide) {
+      if ((guide !== 'chooseValue' || guide !== '#') && guide) {
         formData.append('guides', guide);
       }
     });
@@ -359,10 +415,11 @@ function CreateTourForm({ onClose, editTour }) {
     }
     formData.append('status', 'active');
     formData.append('startTime', time);
-    
+
     if (editTour !== undefined) {
       updateTour(formData, {
         onSettled: () => {
+          updateAllBookingsRelated({tourId:editTour.id})
           reset();
           onClose?.();
         },
@@ -375,7 +432,6 @@ function CreateTourForm({ onClose, editTour }) {
         },
       });
     }
-
   };
   const getTodayDate = () => {
     const today = new Date();
@@ -394,24 +450,25 @@ function CreateTourForm({ onClose, editTour }) {
     const c = Object.values(place.annotations.UN_M49.regions);
     const country = countries.find((c) => c.name.common === selectedCountry);
 
-    if (!Object.values(place.annotations.UN_M49.regions).includes(country.ccn3)) {
+    if (
+      !Object.values(place.annotations.UN_M49.regions).includes(country.ccn3)
+    ) {
       toast.error('Please input locations in selected country');
       return;
-
     }
     toast('Locations valid');
-  }
+  };
   const handleFetchCoordinates = async (index) => {
-   
+    console.log(inputs[index]);
     if (inputs[index].trim() === '') {
       toast.error('Please put valid address');
       return;
     }
-
+    console.log('index fect ' + index);
     const { place, index1 } = await geocodeAddress(inputs[index], index);
 
-    handleCheckLocation(place)
-
+    handleCheckLocation(place);
+    console.log(place);
     if (place) {
       const newInputs = coordinates ? [...coordinates] : []; // Use spread operator to clone the array
       const coor = [place.geometry.lat, place.geometry.lng];
@@ -426,13 +483,10 @@ function CreateTourForm({ onClose, editTour }) {
       setShowFormatted(newFormatted);
     }
   };
-
   const [time, setTime] = useState(editTour ? editTour?.startTime : '05:00'); 
-
   const handleTimeChange = (event) => {
     setTime(event.target.value); 
   };
-
   if (isLoading || isCreating || isUpdating || isCountriesLoading)
     return <Spinner />;
 
@@ -554,30 +608,37 @@ function CreateTourForm({ onClose, editTour }) {
         />
       </FormRow> */}
       <FormRow label="Available Guide">
-
         {/* <select
-          style={{ color: 'inherit', backgroundColor: 'inherit' }}
-          value={selectedGuideTag === "guide2" ? selectedGuides[1] : selectedGuides[0]}
-          onChange={handleGuideSelectChange}
-        >
-          <option style={{ color: 'inherit', background: ' var(--color-grey-0)' }} value="chooseValue">Choose a guide</option>
-          {guides
-            .filter(
-              (guide) => guide.value !== (selectedGuideTag === "guide1" ? selectedGuides[1] : selectedGuides[0]) // Exclude the other guide's selected value
-            )
-            .map((guide) => (
-              <option style={{ color: 'inherit', backgroundColor: ' var(--color-grey-0)' }} key={guide.value} value={guide.value}>
-                <span >{guide.label}</span>
-              </option>
-            ))}
-        </select> */}
+          style={{color:'inherit', backgroundColor:'inherit'}}
+            value={selectedGuideTag === "guide2" ? selectedGuides[1] : selectedGuides[0]}
+            onChange={handleGuideSelectChange}
+          >
+            <option style={{color:'inherit', background:' var(--color-grey-0)'}} value="chooseValue">Choose a guide</option>
+            {guides
+              .filter(
+                (guide) => guide.value !== (selectedGuideTag === "guide1" ? selectedGuides[1] : selectedGuides[0]) // Exclude the other guide's selected value
+              )
+              .map((guide) => (
+                <option style={{color:'inherit', backgroundColor:' var(--color-grey-0)'}} key={guide.value} value={guide.value}>
+                  <span >{guide.label}</span>
+                </option>
+              ))}
+          </select> */}
 
         <Select
           options={guides.filter(
             (guide) =>
-              guide.value !== (selectedGuideTag === 'guide1' ? selectedGuides[1] : selectedGuides[0])
+              guide.value !==
+              (selectedGuideTag === 'guide1'
+                ? selectedGuides[1]
+                : selectedGuides[0])
           )}
-          value={selectedGuideTag === 'guide2' ? selectedGuides[1] : selectedGuides[0]}
+          value={
+            selectedGuideTag === 'guide2'
+              ? selectedGuides[1]
+              : selectedGuides[0]
+          }
+          // onChange={handleGuideSelectChange}
           text="Choose a guide"
           {...register('guide', {
             required: 'required',
@@ -585,28 +646,30 @@ function CreateTourForm({ onClose, editTour }) {
               String(value).length > 0 || 'This field is required',
             onChange: (e) => {
             
-              handleGuideSelectChange(e);
-            }
-          })}// useForm hook register
+            handleGuideSelectChange(e);
+          }
+          })} // useForm hook register
         />
-
-
       </FormRow>
 
-      {selectedGuides[0] !== "chooseValue" && !isGuide2Added && (
+      {selectedGuides[0] !== 'chooseValue' && !isGuide2Added && (
         <FormRow>
           <Button type="button" onClick={handleAddGuide2}>
             Add Guide2
           </Button>
         </FormRow>
-
       )}
       {/* Display Selected Guides */}
 
       {editTour?.guides && selectedGuides[0].email}
-      <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'flex-start' }}>
+      <div
+        style={{
+          marginTop: '10px',
+          display: 'flex',
+          justifyContent: 'flex-start',
+        }}
+      >
         {/* Guide 1 with Remove Option */}
-
 
         <div
           style={{
@@ -637,7 +700,7 @@ function CreateTourForm({ onClose, editTour }) {
             <span
               style={{
                 position: 'absolute',
-                top: '-5px',  // Di chuyển dấu 'x' lên góc trên
+                top: '-5px', // Di chuyển dấu 'x' lên góc trên
                 right: '-5px', // Di chuyển dấu 'x' sang phải
                 color: 'var(--color-grey-400)', // Màu xám nhạt cho chữ 'x'
                 fontSize: '16px',
@@ -679,7 +742,7 @@ function CreateTourForm({ onClose, editTour }) {
               <span
                 style={{
                   position: 'absolute',
-                  top: '-5px',  // Di chuyển dấu 'x' lên góc trên
+                  top: '-5px', // Di chuyển dấu 'x' lên góc trên
                   right: '-5px', // Di chuyển dấu 'x' sang phải
                   color: 'var(--color-grey-400)', // Màu xám nhạt cho chữ 'x'
                   fontSize: '16px',
@@ -692,8 +755,14 @@ function CreateTourForm({ onClose, editTour }) {
           </div>
         )}
       </div>
-
-
+        {editTour&&<FormRow label="Apply changes of guide after selected date">
+        <Input
+              type="date"
+              min={getTodayDate()}
+              onChange={(event) => setDateApplyGuide(event.target.value)}
+              placeholder={`Guide date`}
+            />
+        </FormRow>}
       <FormRow label="Tour Photo">
         <FileInput
           id="imageCover"
@@ -742,27 +811,26 @@ function CreateTourForm({ onClose, editTour }) {
        value={time}
        onChange={handleTimeChange}
      />
-
     
    </FormRow>
-      {dates.slice().reverse().map((input, index) => (
+      {!editTour&&dates.slice().reverse().map((input, index) => (
         <FormRow label={`Date ${index + 1}`}>
           <>
             <Input
               type="date"
-              min={getTodayDate()}
+              // min={getTodayDate()}
               value={input}
               onChange={(event) => handleInputDateChange(index, event)}
               placeholder={`Date ${index + 1}`}
             />
           </>
         </FormRow>
-      ))}
+      )) &&
       <FormRow>
       {dates && dates.length < 5 &&  <Button type="button" onClick={handleAddDates}>
           Add Dates
         </Button>}
-      </FormRow>
+      </FormRow>}
       <FormRow label="Country">
         <Controller
           name="countryNameCommon"
@@ -816,20 +884,29 @@ function CreateTourForm({ onClose, editTour }) {
 
       {inputs.map((input, index) => (
         <>
-          {/* <FormRow label={`Location ${index + 1}`}  flex="flex-start"> */}
-          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
             <label style={{ marginRight: '1rem' }}>
               {`Location ${index + 1}`}
             </label>
             <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
               <Input
                 type="text"
-
                 value={input}
                 onChange={(event) => handleInputChange(index, event)}
                 placeholder={`Address ${index + 1}`}
-                style={{ marginLeft: '19rem', marginRight: '5rem', flexGrow: 1 }} // Để input có thể mở rộng
+                style={{ marginLeft: '19rem', marginRight: '5rem', flexGrow: 1 }}
               />
+              {/* <Input
+                type="text"
+                value={descriptions[index]}
+                onChange={(event) =>
+                  handleInputDescriptionsChange(index, event)
+                }
+                placeholder={`Description ${index + 1}`}
+                //     {...register('descriptions', {
+                //   required:  'This field is required',
+                // })}
+              /> */}
               <Button
                 type="button"
                 variation="secondary"
@@ -837,59 +914,52 @@ function CreateTourForm({ onClose, editTour }) {
               >
                 Fetch loc
               </Button>
-            </div>
-          </div>
-
-
-
-          {/* </FormRow> */}
-
-          {showFormatted[index] &&
+              {/* {coordinates[index] && (
+              <Input
+                type="text"
+                value={`[${coordinates[index].coor[0]},${coordinates[index].coor[1]}]`}
+                disabled
+                style={{ marginLeft: '1rem' }}
+              />
+            )} */}
+           
+           </div>
+           </div>
+           {showFormatted[index] &&
             showFormatted[index].formatted
           }
-
           {subDescriptions[index].map((subDesc, subIndex) => (
-
             <FormRow label={`Schedule ${subIndex + 1}`}>
-
-              <Input
+                          <Input
                 type="text"
                 value={subDesc}
                 onChange={(event) => handleSubDescriptionChange(index, subIndex, event.target.value)}
                 placeholder={`Schedule ${subIndex + 1}`}
               />
-
-
-            </FormRow>
+                          </FormRow>
           ))}
           <FormRow>
-           {subDescriptions[index] && subDescriptions[index].length < 5 && <Button type="button" onClick={() => { handleAddSubDescription(index) }}>
+          {subDescriptions[index] && subDescriptions[index].length < 5 && <Button type="button" onClick={() => { handleAddSubDescription(index) }}>
               Add Schedule
             
             </Button>}
+          {/* {showFormatted[index] && showFormatted[index].formatted} */}
           </FormRow>
-
-
-
         </>
-
-
-
-
       ))}
-
-
       <FormRow>
-       {inputs && inputs.length < 5 && <Button type="button" onClick={handleAddInput}>
+      {inputs && inputs.length < 5 && <Button type="button" onClick={handleAddInput}>
           Add Location
         </Button>}
       </FormRow>
-      {/* <div>
-        <h4>Descriptions:</h4>
-        <pre>{JSON.stringify(descriptions, null, 2)}</pre>
-      </div> */}
-
-
+      {editTour&&<FormRow label="Apply changes of location after selected date">
+        <Input
+              type="date"
+              min={getTodayDate()}
+              onChange={(event) => setDateApplyLocation(event.target.value)}
+              placeholder={`Location date`}
+            />
+        </FormRow>}
       <FormRow>
         {/* type is an HTML attribute! */}
         <Button variation="secondary" type="reset">

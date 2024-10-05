@@ -11,7 +11,7 @@ import { PAGE_SIZES } from '../../utils/constants';
 import SearchIcon from '@mui/icons-material/Search';
 import Slider from 'react-slick';
 import { Typography } from '@mui/material';
-import OutPartner from '../../ui/userLayout/OutPartner';
+import OurPartner from '../../ui/userLayout/OurPartner';
 
 const TourPage = () => {
   const theme = useTheme();
@@ -155,13 +155,12 @@ const TourPage = () => {
           </Box>
         </Grid>
       </Grid>
-      <OutPartner/>
+      <OurPartner/>
     </Box>
   );
 };
 
 export default TourPage;
-
 
 
 

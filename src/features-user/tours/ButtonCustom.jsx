@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-
 const Button36 = ({label,disabled}) => {
   const [isHovered, setIsHovered] = useState(false);
-
   const buttonStyle = {
     backgroundImage: 'linear-gradient(92.88deg, #455EB5 9.16%, #5643CC 43.89%, #673FD7 64.72%)',
     borderRadius: '8px',
@@ -26,7 +24,6 @@ const Button36 = ({label,disabled}) => {
     transitionDuration: isHovered ? '.1s' : '.5s',
         margin:'0.5rem'
   };
-
   return (
     <button
       style={buttonStyle}
@@ -38,13 +35,10 @@ const Button36 = ({label,disabled}) => {
     </button>
   );
 };
-
 export default Button36;
-
 export const Button75 = ({label,onClick,disabled}) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isActive, setIsActive] = useState(false);
-
   const buttonStyle = {
     alignItems: 'center',
     backgroundImage: 'linear-gradient(135deg, #f34079 40%, #fc894d)',
@@ -75,13 +69,11 @@ export const Button75 = ({label,onClick,disabled}) => {
     transition: 'all 200ms',
     margin:'0.5rem'
   };
-
   const textStyle = {
     transform: isHovered ? 'scale(0.9)' : 'scale(1)',
     opacity: isHovered ? 0.75 : 1,
     transition: 'all 200ms',
   };
-
   return (
     <button
       style={buttonStyle}

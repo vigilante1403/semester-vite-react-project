@@ -13,6 +13,8 @@
     "@date-io/date-fns": "^3.0.0",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
+    "@geoapify/geocoder-autocomplete": "^2.0.3",
+    "@geoapify/react-geocoder-autocomplete": "^2.0.1",
     "@mui/icons-material": "^5.16.6",
     "@mui/lab": "^5.0.0-alpha.173",
     "@mui/material": "^5.16.6",

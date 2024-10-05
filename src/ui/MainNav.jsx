@@ -1,14 +1,20 @@
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import {
+  HiOutlineBriefcase,
   HiOutlineCalendarDays,
   HiOutlineCog6Tooth,
+  HiOutlineDocumentCheck,
+  HiOutlineDocumentText,
   HiOutlineHome,
   HiOutlineHomeModern,
   HiOutlinePaperAirplane,
   HiOutlineUser,
   HiOutlineUsers,
 } from "react-icons/hi2";
+import { useAuthenticate } from "../features/authentication/useAuthenticate";
+import { useContext } from "react";
+import { AdminContext } from "./ProtectedRouteAdmin";
 
 const NavList = styled.ul`
   display: flex;
@@ -56,6 +62,7 @@ const StyledNavLink = styled(NavLink)`
 `;
 
 function MainNav() {
+  const {user}=useContext(AdminContext)
   return (
     <nav>
       <NavList>
@@ -67,7 +74,7 @@ function MainNav() {
         </li>
         <li>
           <StyledNavLink to="/admin/bookings">
-            <HiOutlineCalendarDays />
+            <HiOutlineBriefcase />
             <span>Bookings</span>
           </StyledNavLink>
         </li>
@@ -78,13 +85,25 @@ function MainNav() {
           </StyledNavLink>
         </li>
         <li>
+          <StyledNavLink to="/admin/bills">
+            <HiOutlineDocumentText />
+            <span>Bills</span>
+          </StyledNavLink>
+        </li>
+        <li>
+          <StyledNavLink to="/admin/schedules">
+            <HiOutlineCalendarDays />
+            <span>Schedules</span>
+          </StyledNavLink>
+        </li>
+        <li>
           <StyledNavLink to="/admin/accounts">
             <HiOutlineUsers />
             <span>Accounts</span>
           </StyledNavLink>
         </li>
         <li>
-          <StyledNavLink to="/admin/users">
+          <StyledNavLink to="/admin/user">
             <HiOutlineUser />
             <span>Profile</span>
           </StyledNavLink>

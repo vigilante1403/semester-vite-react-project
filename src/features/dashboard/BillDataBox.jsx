@@ -46,14 +46,13 @@ export default function BillDataBox() {
   return (
     <BillBox>
       <Heading as="h2">Bill History</Heading>
-      <ResponsiveContainer width="100%" height={240}>
+      <ResponsiveContainer width="100%" height={'auto'}>
       <Row>
-     <Menus>
+     
      <Table columns="2.5fr 1fr 0.8fr">
           <Table.Header>
             <div>email</div>
             <div>booking</div>
-
             <div>paid at</div>
           </Table.Header>
          
@@ -67,7 +66,7 @@ export default function BillDataBox() {
             <PaginationCustom count={bills.length} pageSize={3} />
           </Table.Footer>
         </Table>
-     </Menus>
+     
       </Row>
      
       </ResponsiveContainer>

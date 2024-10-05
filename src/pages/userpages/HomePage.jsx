@@ -18,7 +18,7 @@ import {
   Modal
 } from '@mui/material';
 
-import OutPartner from '../../ui/userLayout/OutPartner';
+import OurPartner from '../../ui/userLayout/OurPartner';
 
 const images = [
   'https://cdn.wallpapersafari.com/49/46/RafD82.jpg',
@@ -39,7 +39,7 @@ export default function HomePage() {
       <ToursSection />
       <IntroSection />
       <ImageGallery />
-      <OutPartner/>
+      <OurPartner/>
       <Box margin={5}></Box>
     </>
   );
@@ -474,7 +474,6 @@ const ImageGallery = () => {
     </div>
   );
 };
-
 
 
 

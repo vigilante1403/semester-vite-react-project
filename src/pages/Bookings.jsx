@@ -5,17 +5,12 @@ import BookingTable from '../features/bookings/BookingTable';
 import BookingTableOperations from '../features/bookings/BookingTableOperations';
 import AddBooking from '../features/bookings/AddBooking';
 import Searchbar from '../ui/Searchbar';
-import { createContext, useState } from 'react';
-import { useBookingsTotal } from '../features/bookings/useBookings';
 import { useSearchParams } from 'react-router-dom';
-import Spinner from '../ui/Spinner';
-
-export const BookingContext=createContext();
-
+import {  useState } from 'react';
 function Bookings() {
   const [searchParams,setSearchParams]= useSearchParams();
   const [searchTour,setSearchTour]=useState(searchParams.get('tour') ?? '');
-
+   
   const handleSearch = (data) => {
     if(data.trim()===''){
       searchParams.delete('tour')
@@ -23,7 +18,6 @@ function Bookings() {
       setSearchParams(searchParams)
      
       return;
-
     }
     const newData = data.toLowerCase();
     setSearchTour(newData);
@@ -31,7 +25,7 @@ function Bookings() {
     setSearchParams(searchParams);
   };
   
-  return (
+    return (
         <>
         <Row type="horizontal">
           <Heading as="h1">All bookings</Heading>
@@ -39,7 +33,7 @@ function Bookings() {
         </Row>
         <Row>
         <Searchbar placeholder={"Search bookings by Booking name"} text={searchTour} onChangeText={handleSearch}/>
-         <BookingTable searchTour={searchTour}/>
+        <BookingTable searchTour={searchTour}/>
          <AddBooking/>
           
         </Row>
