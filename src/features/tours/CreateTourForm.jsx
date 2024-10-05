@@ -515,6 +515,10 @@ console.log(keys[0])
               value: 1,
               message: 'Capacity should be at least 1',
             },
+            max: {
+              value: 100,
+              message: 'Capacity should be less than or equal to 100',
+            },
           })}
         />
       </FormRow>
@@ -528,6 +532,10 @@ console.log(keys[0])
             min: {
               value: 1,
               message: 'Price should be at least 1',
+            },
+            max: {
+              value: 10000,
+              message: 'Price should be less than or equal to 10,000',
             },
           })}
         />
@@ -819,9 +827,9 @@ console.log(keys[0])
         </FormRow>
       )) &&
       <FormRow>
-        <Button type="button" onClick={handleAddDates}>
-          + Add Dates
-        </Button>
+      {dates && dates.length < 5 &&  <Button type="button" onClick={handleAddDates}>
+          Add Dates
+        </Button>}
       </FormRow>}
       <FormRow label="Country">
         <Controller
@@ -931,17 +939,18 @@ console.log(keys[0])
                           </FormRow>
           ))}
           <FormRow>
-            <Button type="button" onClick={() => { handleAddSubDescription(index) }}>
-              + Add Sub
-            </Button>
+          {subDescriptions[index] && subDescriptions[index].length < 5 && <Button type="button" onClick={() => { handleAddSubDescription(index) }}>
+              Add Schedule
+            
+            </Button>}
           {/* {showFormatted[index] && showFormatted[index].formatted} */}
           </FormRow>
         </>
       ))}
       <FormRow>
-        <Button type="button" onClick={handleAddInput}>
-          + Add Input
-        </Button>
+      {inputs && inputs.length < 5 && <Button type="button" onClick={handleAddInput}>
+          Add Location
+        </Button>}
       </FormRow>
       {editTour&&<FormRow label="Apply changes of location after selected date">
         <Input

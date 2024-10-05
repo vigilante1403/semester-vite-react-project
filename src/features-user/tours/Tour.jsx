@@ -25,30 +25,45 @@ const Tour = ({ tour, bookings }) => {
   );
   var participantCount = 0;
   Array.from(bookingsCount).forEach((booking) => {
-    participantCount = participantCount + booking.numJoin;
+    participantCount += booking.numJoin;
   });
-  const tour1 = {
-    id: 1,
-    name: 'Amazing Tour',
-    summary: 'An amazing tour you won’t forget!',
-    price: 5000, // price in cents
-    imageCover: 'cover-image.jpg',
-    slug: 'amazing-tour',
-    tourID: '12345',
-    email: 'vytruong1999@mailsac.com',
-    userID: '123456789',
-  };
+
+  const discountPercentage = tour.priceDiscount
+    ? (tour.priceDiscount / tour.price) * 100
+    : 0;
+  console.table(tour);
   return (
-    <Grid item xs={12} sm={6} md={4} lg={3}>
+    <Grid item xs={12} sm={6} md={6} lg={4}>
       <Card
         sx={{
-          transition: 'transform 0.3s ease-in-out', // Thay đổi khi hover
+          transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
           '&:hover': {
-            transform: 'scale(1.05)', // Phóng to khi hover
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', // Thêm bóng khi hover
+            transform: 'scale(1.05)',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+            backgroundColor: '#f0f0f0',
           },
+          position: 'relative',
         }}
       >
+        {discountPercentage > 0 && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '16px',
+              left: '16px',
+              backgroundColor: 'red',
+              color: 'white',
+              padding: '4px 8px',
+              borderRadius: '12px',
+              fontSize: '2rem',
+              fontWeight: 'bold',
+
+              zIndex: 1,
+            }}
+          >
+            -{Math.round(discountPercentage)}%
+          </Box>
+        )}
         <CardMedia
           component="img"
           height="200"
@@ -88,13 +103,37 @@ const Tour = ({ tour, bookings }) => {
           >
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <HiOutlineCurrencyDollar size={24} style={{ marginRight: 8 }} />
-              <Typography
-                variant="body1"
-                color="textSecondary"
-                sx={{ fontSize: '1.2rem' }}
-              >
-                {tour.price} USD
-              </Typography>
+              {tour.priceDiscount > 0 ? (
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontSize: '1.2rem',
+                      color: 'red',
+                      textDecoration: 'line-through',
+                      mr: 1,
+                    }}
+                  >
+                    {tour.price} USD
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      fontSize: '1.2rem',
+                      color: 'text.secondary',
+                    }}
+                  >
+                    {tour.price - (tour.price * discountPercentage) / 100} USD
+                  </Typography>
+                </Box>
+              ) : (
+                <Typography
+                  variant="body1"
+                  sx={{ fontSize: '1.2rem', color: 'text.secondary' }}
+                >
+                  {tour.price} USD
+                </Typography>
+              )}
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <HiCalendar size={24} style={{ marginRight: 8 }} />
@@ -126,12 +165,12 @@ const Tour = ({ tour, bookings }) => {
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <div style={{ display: 'flex',alignItems:'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 {Array.from({ length: 5 }, (_, i) => (
                   <Star
                     key={i}
                     full={Math.floor(tour.ratingsAverage) >= i + 1}
-                    color='#fcc419'
+                    color="#fcc419"
                     size={18}
                   />
                 ))}

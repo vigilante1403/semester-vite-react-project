@@ -42,6 +42,7 @@ import '@geoapify/geocoder-autocomplete/styles/minimal.css'
 import LoginContextProvider from './context/LoginContext';
 import Bills from './pages/Bills';
 import Schedules from './pages/Schedules'
+import BookingDetailUser from './features-user/bookings/BookingDetailUser';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -88,6 +89,10 @@ function App() {
                     <Route path="dashboard" element={<MyDashboard/>} />
                     <Route path="me" element={<AboutMe/>} />
                     <Route path="bookings" element={<MyBookings/>} />
+                    <Route
+                      path="bookings/:bookingId"
+                      element={<BookingDetailUser bookingFromComponent={null} />}
+                    />
                     <Route path="reviews" element={<MyReviews/>} />
                     {/* <Route path="statistics" element={<MyStatistics/>} /> */}
                     <Route path="settings" element={<MySettings/>} />
