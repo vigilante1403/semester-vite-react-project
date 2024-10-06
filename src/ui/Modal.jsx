@@ -78,6 +78,11 @@ export function Open({ children, opens: opensWindowName }) {
   const { open } = useContext(ModalContext)
   return cloneElement(children, { onClick: () => open(opensWindowName) }) // parsing open to children by clone in react
 }
+export function AutoOpen({name}){
+  const {open}=useContext(ModalContext)
+  open(name)
+  return null;
+}
 export function Window({ children, name }) {
   const { openName, close } = useContext(ModalContext)
   const {ref} = useOutsideClick(close);
@@ -96,3 +101,4 @@ export function Window({ children, name }) {
 }
 Modal.Open = Open
 Modal.Window = Window
+Modal.AutoOpen=AutoOpen

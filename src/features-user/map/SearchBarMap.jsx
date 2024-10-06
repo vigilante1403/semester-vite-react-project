@@ -5,6 +5,8 @@ import { NavLink, useSearchParams } from "react-router-dom"
 import { HiMiniClock, HiOutlineClock } from "react-icons/hi2"
 import { useState } from "react"
 import { GeoapifyGeocoderAutocomplete } from "@geoapify/react-geocoder-autocomplete"
+import { useTours } from "../../features/tours/useTours"
+import Spinner from "../../ui/Spinner"
 const StyledBarMap = styled.div`
 display: flex;
 flex-direction: column;
@@ -88,7 +90,9 @@ const Display = styled.div`
 `;
 
 function SearchBarMap({onSetCenter,onSetCenterDisplay}) {
-    const [searchPlace,setSearchPlace]=useState('')
+    const [searchPlace,setSearchPlace]=useState('');
+   
+   
    
     const [listSearch,setListSearch]=useState([])
     const handleSearch = (e)=>{
@@ -96,9 +100,10 @@ function SearchBarMap({onSetCenter,onSetCenterDisplay}) {
       console.log(e)
       onSetCenterDisplay(e.properties.formatted)
           onSetCenter(prev=>[e.properties.lat,e.properties.lon])
-          setListSearch(prev=>[...prev,searchPlace])
+          setListSearch(prev=>[...prev,e.properties.formatted])
         
     }
+   
     
     return (
         <StyledBarMap>
@@ -129,3 +134,6 @@ function SearchBarMap({onSetCenter,onSetCenterDisplay}) {
 }
 
 export default SearchBarMap
+
+
+

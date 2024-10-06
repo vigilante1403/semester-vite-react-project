@@ -19,9 +19,14 @@ export const formatDistanceFromNow = (dateStr) =>{
   }).replace('about ', '')
   .replace('in', 'In');
 }
-// const format1 = (dateStr)=>{
-// const parsedDate = parse(dateStr)
-// }
+export const formatDateArrayAscOrDesc = (dateArr,modifier=1)=>{
+  dateArr=Array.from(dateArr).sort((a,b)=>{
+    const dateA = new Date(a)
+    const dateB = new Date(b)
+    return modifier*(dateA-dateB)
+  })
+  console.log(dateArr)
+}
 export const formatDateToCalendar= (dateStr,formatDesire='')=>{
   if(dateStr==null) return '--/--/----'
   const cleanedDateString = dateStr.replace(/ ICT/, '');
