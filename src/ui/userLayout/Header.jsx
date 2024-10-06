@@ -222,7 +222,9 @@ export default function Header() {
 
   const handleSwitch = () => {
     setIsLogin(!isLogin);
-  }; const handleSwitchForgotPassword = () => {
+  }; 
+  
+  const handleSwitchForgotPassword = () => {
     setIsForgotPassword(!isForgotPassword);
     setIsLogin(!isLogin);
   };

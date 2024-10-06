@@ -418,7 +418,7 @@ const CalendarContainer = styled.div`
 `;
 
 const TourDetail = ({ tour, otherTours }) => {
-  const [selectedDate, setSelectedDate] = useState(new Date(tour.startDates[0]));
+  const [selectedDate, setSelectedDate] = useState(new Date(tour?.startDates[0]));
   const [isDateLocked, setIsDateLocked] = useState(true);
   const [showMoreReviews, setShowMoreReviews] = useState(false); // State to toggle See More reviews
   const [fakeReviews, setFakeReviews] = useState([]);
@@ -518,7 +518,7 @@ const TourDetail = ({ tour, otherTours }) => {
 
   const handleSelectAnotherDate = () => {
     setIsDateLocked(false);
-    setSelectedDate(new Date());
+    setSelectedDate('');
   };
 
   const handleSeeAllTours = () => {
@@ -611,7 +611,7 @@ const TourDetail = ({ tour, otherTours }) => {
               Information tour
             </Typography>
             <Typography variant="h4">
-              <strong>Start Date:</strong> {selectedDate.toLocaleDateString()}
+              <strong>Start Date:</strong> {selectedDate!=='' ? selectedDate.toLocaleDateString(): selectedDate}
             </Typography>
             <Typography variant="h4">
               <strong>Price:</strong> {tour.price - tour.priceDiscount} $
@@ -629,12 +629,7 @@ const TourDetail = ({ tour, otherTours }) => {
 
             {/* {isDateLocked ? ( */}
             <Box sx={{ margin: '20px', }} display={'flex'}>
-              {/* <Button variant="outlined" color="secondary" onClick={handleSelectAnotherDate} style={{ marginTop: '16px' }}>
-                  Choose another
-                </Button> */}
-              {/* <Button variant="contained" color="primary" style={{ marginTop: '16px' }}>
-                  Book now
-                </Button> */}
+            
               <Button75 onClick={handleSelectAnotherDate} disabled={!isDateLocked} label={"Another Day"} />
               {isAuthenticated ? 
               <Modal>
@@ -677,21 +672,55 @@ const TourDetail = ({ tour, otherTours }) => {
       </section>
 
       <section>
-        <Box>
-          <Grid container justifyContent={'space-evenly'} spacing={4} padding={3}>
-            <Grid item size={4} sx={{ margin: 'auto' }}>
-              <Box display={'flex'} flexDirection={'column'}>
-                {tour.images && tour.images.map((image) => (
-                  <ListItem key={image}>
-                    <img src={`http://localhost:8080/api/v1/file/image/tour/${image}`} alt={image} height={'200px'} onClick={(e) => { handleChangeImage(image) }} />
-                  </ListItem>
-                ))}
-              </Box>
-            </Grid>
-            <Grid item size={8} > <img src={`http://localhost:8080/api/v1/file/image/tour/${selectedImage}`} alt={selectedImage} height={'700px'} /></Grid>
-          </Grid>
+  <Box padding={1} margin={1}>
+    <Grid container justifyContent={'space-evenly'} spacing={4} padding={3}>
+      <Grid item xs={12} sm={6} md={4} display="flex" flexDirection="column" sx={{padding:'5px'}}>
+        <Box 
+          display="flex" 
+          flexDirection="column" 
+         
+          overflow={tour.images && tour.images.length > 3 ? "auto" : "visible"} 
+          maxHeight="420px" 
+        >
+          {tour.images && tour.images.length > 0 ? (
+            tour.images.map((image) => ( 
+              <ListItem key={image} sx={{ justifyContent:'center', cursor: 'pointer', padding: '0' }}>
+                <img 
+                  src={`http://localhost:8080/api/v1/file/image/tour/${image}`} 
+                  alt={image} 
+                  height={'120px'} 
+                  width={'200px'} 
+                  onClick={() => handleChangeImage(image)} 
+                  style={{ margin: '10px', objectFit: 'cover' }}
+                />
+              </ListItem>
+            ))
+          ) : (
+            <img 
+              src="default-image-url.jpg" 
+              alt="Default" 
+              height={'100px'} 
+              width={'200px'}
+              style={{ marginBottom: '10px', objectFit: 'cover' }} 
+            />
+          )}
         </Box>
-      </section>
+      </Grid>
+      <Grid item xs={12} sm={6} md={8}>
+        <img 
+          src={`http://localhost:8080/api/v1/file/image/tour/${selectedImage}`} 
+          alt={selectedImage} 
+          height={'420px'} 
+          style={{ width: '100%', objectFit: 'cover' }} 
+        />
+      </Grid>
+    </Grid>
+  </Box>
+</section>
+
+
+
+
       <SimpleTreeView>
         {address && address.map((address, index) => (
           <TreeItem
@@ -805,7 +834,7 @@ const TourDetail = ({ tour, otherTours }) => {
         </Typography>
         <hr></hr>
         <Box sx={{ margin: '50px' }}>
-          {tour.locations.length > 0 && <MapComponent locations={tour.locations} />}
+          {tour.locations.length > 0 && <MapComponent styleDefault="mapbox://styles/vytruong1812/cm1c6ma7h02hc01o3azvg0h6e" locations={tour.locations} />}
 
 
         </Box>
@@ -868,78 +897,8 @@ const TourDetail = ({ tour, otherTours }) => {
             </Button>
           </Box>
         )}
-      </section>
-      {/* 
-      <section style={{ marginTop: '80px' }}>
-      
-    
-        <hr />
-
-        <Grid container spacing={3}>
-          
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="h4" gutterBottom>
-                  Các Tour Quốc Tế
-                </Typography>
-                <ul style={{ listStyleType: 'none', padding: 0 }}>
-                  <li><Typography variant="h6">Tour Nhật Bản</Typography></li>
-                  <li><Typography variant="h6">Tour Hàn Quốc</Typography></li>
-                  <li><Typography variant="h6">Tour Pháp</Typography></li>
-                  <li><Typography variant="h6">Tour Úc</Typography></li>
-                  <li><Typography variant="h6">Tour Mỹ</Typography></li>
-                  <li><Typography variant="h6">Tour Canada</Typography></li>
-                 
-                </ul>
-              </CardContent>
-            </Card>
-          </Grid>
-
-        
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="h4" gutterBottom>
-                  Các Tour Nội Địa
-                </Typography>
-                <ul style={{ listStyleType: 'none', padding: 0 }}>
-                  <li><Typography variant="h6">Tour Hà Nội</Typography></li>
-                  <li><Typography variant="h6">Tour TP Hồ Chí Minh</Typography></li>
-                  <li><Typography variant="h6">Tour Đà Nẵng</Typography></li>
-                  <li><Typography variant="h6">Tour Huế</Typography></li>
-                  <li><Typography variant="h6">Tour Phú Quốc</Typography></li>
-                 
-                </ul>
-              </CardContent>
-            </Card>
-          </Grid>
-
-       
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="h4" gutterBottom>
-                  Thông Tin Liên Hệ
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                  Hotline: +123 456 7890
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                  Email: support@example.com
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                  Địa chỉ: 123 Main St, City, State, ZIP
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                  Website: www.example.com
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </section> */}
-
+      </section> 
+     
 
     </Container>
   );
