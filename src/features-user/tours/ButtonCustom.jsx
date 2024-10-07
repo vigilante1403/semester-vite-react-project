@@ -27,7 +27,7 @@ const Button36 = ({label,disabled}) => {
   return (
     <button
       style={buttonStyle}
-      disabled={disabled}
+      // disabled={disabled}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

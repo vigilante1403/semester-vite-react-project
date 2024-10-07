@@ -668,16 +668,16 @@ const TourDetail = ({ tour, otherTours }) => {
               />
               {isAuthenticated ? (
                 <Modal>
-                  <Modal.Open opens={'book-tour'}>
-                    {/* <Button
+                  <Modal.Open opens={`book-tour-${tour.id}`}>
+                    <Button
       variant="contained"
       color="primary"
       sx={{ marginTop: '1rem', fontSize: '1.2rem' }}
      
-    >Book now</Button> */}
-                    <Button36 label={'Book now'} disabled={!isDateLocked} />
+    >Book now</Button>
+                    {/* <Button36 label={'Book now'}/> */}
                   </Modal.Open>
-                  <Modal.Window name="book-tour">
+                  <Modal.Window name={`book-tour-${tour.id}`}>
                     <StepConfirmBookingTour tour={tour} user={user} />
                   </Modal.Window>
                 </Modal>

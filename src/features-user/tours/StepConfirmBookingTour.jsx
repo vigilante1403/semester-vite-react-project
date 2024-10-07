@@ -13,6 +13,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import Spinner from "../../ui/Spinner"
 import { useCreateBooking } from "../../features/bookings/useCreateBooking";
 import toast from "react-hot-toast";
+import { compareTwoDates } from "../../utils/helpers";
 const stripePromise = loadStripe(
   'pk_test_51PoLUhJTj4obgyzzmX3gZQzIeD4CxRuGPoRYRrtGmlBZ5Svj62DpbjITJeTneTJBBuEqJOKHz7NCvhUJDFq0bN2B005BINmu7i'
 );
@@ -54,6 +55,7 @@ function StepConfirmBookingTour({tour,user,onClose}) {
           user,
           bill
         });
+        //after created sessionId
         // tao booking with paid =false
         var sessionId = data.sessionId;
         var creationTime = data.creationTime;
@@ -61,13 +63,14 @@ function StepConfirmBookingTour({tour,user,onClose}) {
           const formData = new FormData();
           formData.append('tour', tour.id);
           formData.append('user', user.id);
-          formData.append('date', format(new Date(), 'yyyy-MM-dd'));
+          formData.append('date', dateChosen);
           formData.append('paid', false);
           formData.append('priceOrigin', tour.price*joining);
           formData.append('priceDiscount', tour.priceDiscount*joining);
           formData.append('numJoin', joining);
           formData.append('sessionId', sessionId);
           formData.append('creationTime', Number(creationTime));
+          formData.append('startDateId',keyChosen)
           console.log(formData);
           createBooking(formData, {
             onSuccess: () => stripeRedirect(sessionId, stripe),
@@ -81,7 +84,12 @@ function StepConfirmBookingTour({tour,user,onClose}) {
       }
     }
     if(isLoading) return <Spinner/>
-    const options = startDates.map((date)=>({label:date.startDate,value:date.id}))
+    const options = startDates.filter(start=>start.status&&compareTwoDates(start.startDate.toString(),new Date().toString())==='after').sort((a,b)=>{
+      const dateA = new Date(a.startDate);
+
+      const dateB = new Date(b.startDate);
+      return 1 * (dateA - dateB);
+    }).map((date)=>({label:date.startDate,value:date.id}))
     return (
         <Form type='modal' onSubmit={handleSubmit(handleSubmitTour)}>
         <Typography fontSize={24} color={"ActiveCaption"}>Please complete this form in order to book tour</Typography>
@@ -105,7 +113,9 @@ function StepConfirmBookingTour({tour,user,onClose}) {
                 onChange={(e) => {
                   field.onChange(e.target.value);
                   const date = options.filter(op=>op.value===e.target.value)[0]
-                  setDateChosen(prev=>date)
+                  console.log(date)
+                  setDateChosen(prev=>Object.values(date)[0])
+                  console.log(Object.values(date)[0])
                   setKeyChosen(e.target.value);
                 }}
               />

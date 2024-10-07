@@ -44,7 +44,10 @@ export default function MyDashboard() {
     const [upcomingTours, setUpcomingTours] = useState(0);
     const { data: paymentHistory, isLoading: isPaymentLoading, error } = usePaymentHistory(user.email);
     const navigate = useNavigate();
-
+    const filterBookingsAfterToday = (bookings) => {
+        const todayString = new Date().toISOString().split('T')[0];
+        return bookings.filter(booking => convertToValidDate(booking.startDate) > todayString);
+    };
     useEffect(() => {
         if (bookings) {
             const upcoming = filterBookingsAfterToday(bookings);
@@ -58,10 +61,7 @@ export default function MyDashboard() {
     if (!bookings) return <Empty resourceName="bookings" />;
     if (error) return toast.error(`Error: ${error.message}`);
 
-    const filterBookingsAfterToday = (bookings) => {
-        const todayString = new Date().toISOString().split('T')[0];
-        return bookings.filter(booking => convertToValidDate(booking.startDate) > todayString);
-    };
+    
 
     const calculateTotalTransaction = (paymentHistory) => {
         return paymentHistory.reduce((total, payment) => {

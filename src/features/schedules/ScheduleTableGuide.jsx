@@ -10,7 +10,6 @@ import { useContext } from 'react';
 import { AdminContext } from '../../ui/ProtectedRouteAdmin';
 import ScheduleRowGuide from './ScheduleRowGuide';
 
-
 function ScheduleTableGuide() {
   const { user } = useContext(AdminContext);
   const { schedules, isLoading } = useGetAllSchedulesOfAGuide({
@@ -20,7 +19,10 @@ function ScheduleTableGuide() {
   if (isLoading) return <Spinner />;
   const geo = searchParams.get('geo') || 'all';
   const status = searchParams.get('status') || 'all';
-  const sortBy = searchParams.get('sortBy')&&searchParams.get('sortBy')!==''?searchParams.get('sortBy') : 'startDate-asc';
+  const sortBy =
+    searchParams.get('sortBy') && searchParams.get('sortBy') !== ''
+      ? searchParams.get('sortBy')
+      : 'startDate-asc';
   const [field, direction] = sortBy.split('-');
   let filteredSchedules = schedules;
   if (geo !== 'all') {
@@ -39,8 +41,8 @@ function ScheduleTableGuide() {
       (schedule) => schedule.tourStatus === status
     );
   }
-  
-  console.log(field)
+
+  console.log(field);
   const modifier = direction === 'asc' ? 1 : -1;
   filteredSchedules = filteredSchedules.sort((a, b) => {
     if (field === 'startDate') {
