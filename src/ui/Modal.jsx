@@ -84,7 +84,7 @@ export function AutoOpen({name}){
   return null;
 }
 export function Window({ children, name }) {
-  const { openName, close } = useContext(ModalContext)
+  const { openName, close,open } = useContext(ModalContext)
   const {ref} = useOutsideClick(close);
   if (name !== openName) return null;
   return createPortal(
@@ -93,7 +93,7 @@ export function Window({ children, name }) {
         <Button onClick={close}>
           <HiXMark />
         </Button>
-        <div>{cloneElement(children,{onClose:close})}</div>
+        <div>{cloneElement(children,{onClose:close,onOpen:open},)}</div>
       </StyledModal>
     </Overlay>,
     document.body, // can render this component in any where of dom

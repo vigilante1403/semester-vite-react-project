@@ -344,6 +344,8 @@ import { useAuthenticate } from '../security/useAuthenticate';
 import Modal from '../../ui/Modal';
 import StepConfirmBookingTour from './StepConfirmBookingTour';
 import { formatDateArrayAscOrDesc } from '../../utils/helpers';
+import { useGetAllUpcomingBookingsOfSameTour } from './useBookTour';
+import NotifBookingExisted from './NotifBookingExisted';
 const CalendarContainer = styled.div`
   /* ~~~ container styles ~~~ */
   max-width: 600px;
@@ -432,12 +434,18 @@ const TourDetail = ({ tour, otherTours }) => {
   const [selectedDate, setSelectedDate] = useState(
     new Date(tour.startDates[0])
   );
+
   const [isDateLocked, setIsDateLocked] = useState(true);
   const [showMoreReviews, setShowMoreReviews] = useState(false); // State to toggle See More reviews
   const [fakeReviews, setFakeReviews] = useState([]);
   const { handleLoginSignupOpen } = useContext(LoginContext);
   const { user, isAuthenticated, isLoading } = useAuthenticate();
+  const { bookings, isGetting } = useGetAllUpcomingBookingsOfSameTour({
+    tourId: tour.id,
+    userId: isAuthenticated ? user.id : null,
+  });
   const navigate = useNavigate();
+  const [isAgree, setIsAgree] = useState(false);
   const fetchAndSetTourLocations = async (tour) => {
     if (tour?.locations) {
       const locationAddresses = tour.locations.map(
@@ -666,15 +674,29 @@ const TourDetail = ({ tour, otherTours }) => {
                 onClick={handleSelectAnotherDate}
                 label={'Another Day'}
               />
-              {isAuthenticated ? (
+              {isAuthenticated ? !isAgree&&bookings!==undefined? (<Modal>
+                <Modal.Open opens={"agreement"}>
+                <Button
+                      variant="contained"
+                      color="primary"
+                      sx={{ marginTop: '1rem', fontSize: '1.2rem' }}
+                    >
+                      Book now
+                    </Button>
+                </Modal.Open>
+                <Modal.Window name={"agreement"}>
+                  <NotifBookingExisted onSetAgreement={setIsAgree} bookings={bookings} />
+                </Modal.Window>
+              </Modal>): (
                 <Modal>
                   <Modal.Open opens={`book-tour-${tour.id}`}>
                     <Button
-      variant="contained"
-      color="primary"
-      sx={{ marginTop: '1rem', fontSize: '1.2rem' }}
-     
-    >Book now</Button>
+                      variant="contained"
+                      color="primary"
+                      sx={{ marginTop: '1rem', fontSize: '1.2rem' }}
+                    >
+                      Book now
+                    </Button>
                     {/* <Button36 label={'Book now'}/> */}
                   </Modal.Open>
                   <Modal.Window name={`book-tour-${tour.id}`}>

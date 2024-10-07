@@ -9,7 +9,7 @@ export function useLogin(){
         mutationFn:loginApi,
         onError:()=>toast.error('Provided email or password are incorrect'),
         onSuccess:(data)=>{
-            queryClient.setQueryData(['user-isSignedIn'],data.email)
+            queryClient.setQueryData(['user-expires'],data.tokenExpiresInMs)
             navigate('/admin/dashboard')
         }
     })

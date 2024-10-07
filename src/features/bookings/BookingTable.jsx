@@ -14,6 +14,8 @@ function BookingTable({
   require = null,
   select = null,
   review = false,
+  sort=false,
+  mod=1
 }) {
   const [searchParams] = useSearchParams();
   var { bookings, isLoading } = useBookingsTotal();
@@ -88,10 +90,17 @@ function BookingTable({
       return (a.priceFinal - b.priceFinal) * modifier;
     }
     // Sort by date for startDate
-    if (field === 'startDate') {
-      const dateA = new Date(convertToValidDate(a.startDate));
+    if (field === 'startDate'||sort) {
+      if(sort){
+        const dateA = new Date(convertToValidDate(a.startDate));
+      const dateB = new Date(convertToValidDate(b.startDate));
+      return mod * (dateA - dateB);
+      }else{
+        const dateA = new Date(convertToValidDate(a.startDate));
       const dateB = new Date(convertToValidDate(b.startDate));
       return modifier * (dateA - dateB);
+      }
+      
     }
 
     if (field === 'name') {

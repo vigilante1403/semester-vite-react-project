@@ -44,6 +44,8 @@ function ProtectedRouteAdmin({children}) {
        
     },[isAuthenticated])
     if(isLoading) return <FullPage><Spinner/></FullPage>
+    
+    if(isAuthenticated) return<AdminContext.Provider value={{isAuthenticated,isLoading,user}}>{children}</AdminContext.Provider> 
     if(!isAuthenticated) return (
         <Modal>
             <Modal.AutoOpen name={'token-expired'} />
@@ -52,8 +54,6 @@ function ProtectedRouteAdmin({children}) {
             </Modal.Window>
         </Modal>
     )
-    if(isAuthenticated) return<AdminContext.Provider value={{isAuthenticated,isLoading,user}}>{children}</AdminContext.Provider> 
-    
 }
 
 export default ProtectedRouteAdmin

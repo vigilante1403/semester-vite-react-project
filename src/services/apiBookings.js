@@ -49,3 +49,9 @@ export const updateAllBookingsAfterUpdateTour=async({tourId})=>{
   if(error) throw new Error(error.message)
     return data
 }
+export const getAllUpcomingBookingOfSameTour = async({userId,tourId})=>{
+  const {data,error}=await axios.get(`/bookings/user/booking-upcoming-related?userId=${userId}&tourId=${tourId}`);
+  if(error) throw new Error(error.message)
+    return data;
+
+}
