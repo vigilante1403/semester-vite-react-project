@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllStartDates, getAllStartDatesOfATour } from "../../services/apiTours";
+import { getAllUpcomingBookingOfSameTour } from "../../services/apiBookings";
 
 export function useGetAllStartDatesOfTour({tourId}){
     const {data:startDates,isLoading}=useQuery({
@@ -16,4 +17,12 @@ export function useGetAllStartDates(){
         queryFn:getAllStartDates
     })
     return {startDates,isLoading}
+}
+export function useGetAllUpcomingBookingsOfSameTour({userId,tourId}){
+    const {data:bookings,isLoading:isGetting}=useQuery({
+        queryKey:['bookings',userId,tourId,'upcoming'],
+        queryFn:()=>getAllUpcomingBookingOfSameTour({tourId:tourId,userId:userId}),
+        enabled:!!userId&&!!tourId
+    })
+    return {bookings,isGetting}
 }

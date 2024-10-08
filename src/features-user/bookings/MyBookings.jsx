@@ -127,7 +127,7 @@ const MyBookings = () => {
       </Tabs>
       <Searchbar placeholder={"Search bookings by Booking name"}  text={searchTour} onChangeText={handleSearch}/>
       <TabPanel value={value} index={value} >
-      {bookings&&bookings.length>0&&<BookingTable searchTour={searchTour} require={bookings} select={select}  />}
+      {bookings&&bookings.length>0&&<BookingTable sort={true} mod={-1} searchTour={searchTour} require={bookings} select={select}  />}
         {(!bookings||bookings.length===0)&& <p>No booking to show</p>}
       </TabPanel>
       

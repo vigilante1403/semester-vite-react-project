@@ -142,7 +142,8 @@ function ReArrangeDateTour({ tour,onClose }) {
         return;
     }
     var existed = schedules.filter(schedule=>compareTwoDates(startDate,schedule.from.toString())==='equal'&&schedule.tourId===tour.id);
-    if(existed!=null||existed.length>0) {
+    console.log(existed)
+    if(existed!=null&&existed.length>0&&existed.status) {
       toast.error('Cannot reopen same date')
       return;
     }

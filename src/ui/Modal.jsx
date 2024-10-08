@@ -78,8 +78,13 @@ export function Open({ children, opens: opensWindowName }) {
   const { open } = useContext(ModalContext)
   return cloneElement(children, { onClick: () => open(opensWindowName) }) // parsing open to children by clone in react
 }
+export function AutoOpen({name}){
+  const {open}=useContext(ModalContext)
+  open(name)
+  return null;
+}
 export function Window({ children, name }) {
-  const { openName, close } = useContext(ModalContext)
+  const { openName, close,open } = useContext(ModalContext)
   const {ref} = useOutsideClick(close);
   if (name !== openName) return null;
   return createPortal(
@@ -88,7 +93,7 @@ export function Window({ children, name }) {
         <Button onClick={close}>
           <HiXMark />
         </Button>
-        <div>{cloneElement(children,{onClose:close})}</div>
+        <div>{cloneElement(children,{onClose:close,onOpen:open},)}</div>
       </StyledModal>
     </Overlay>,
     document.body, // can render this component in any where of dom
@@ -96,3 +101,4 @@ export function Window({ children, name }) {
 }
 Modal.Open = Open
 Modal.Window = Window
+Modal.AutoOpen=AutoOpen

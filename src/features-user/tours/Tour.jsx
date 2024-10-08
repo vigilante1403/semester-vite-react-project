@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Card,
@@ -14,10 +14,9 @@ import {
   HiCalendar,
   HiUserGroup,
 } from 'react-icons/hi2';
-import CheckoutButton from './CheckoutButton';
-import toast from 'react-hot-toast';
 import ShowDetailButton from './ShowDetailButton';
 import Star from '../../ui/Star';
+import { compareTwoDates } from '../../utils/helpers';
 
 const Tour = ({ tour, bookings }) => {
   const bookingsCount = bookings.filter(
@@ -27,7 +26,17 @@ const Tour = ({ tour, bookings }) => {
   Array.from(bookingsCount).forEach((booking) => {
     participantCount += booking.numJoin;
   });
-
+  const [dateShowing,setDateShowing]=useState('')
+  if(tour.startDates!=null&&tour.startDates.length>0){
+    Array.from(tour.startDates).forEach(date=>{
+        var today = new Date().toLocaleDateString('en-CA')
+        var compare =compareTwoDates(today,date.toString())
+        if(compare==='before'&&dateShowing===''){
+          setDateShowing(prev=>date);
+          
+        }
+    });
+  }
   const discountPercentage = tour.priceDiscount
     ? (tour.priceDiscount / tour.price) * 100
     : 0;
@@ -142,7 +151,7 @@ const Tour = ({ tour, bookings }) => {
                 color="textSecondary"
                 sx={{ fontSize: '1.2rem' }}
               >
-                {tour.startDates}
+                {dateShowing!==''?dateShowing:'Contact Admin'}
               </Typography>
             </Box>
           </Box>
