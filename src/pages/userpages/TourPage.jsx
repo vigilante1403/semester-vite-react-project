@@ -82,7 +82,7 @@ const TourPage = () => {
         <Grid item xs={12} md={2} >
           <Box sx={{ padding: 2, border: '1px solid gray', borderRadius: 2,  backgroundColor:'inherit' }}>
             <Box sx={{ marginBottom: 2 }}>
-              <h3 style={{ fontSize: '2.3rem' }}>Lọc</h3>
+              <h3 style={{ fontSize: '2.3rem' }}>Filter</h3>
 
               <TextField
                 label="Lowest"
@@ -114,12 +114,12 @@ const TourPage = () => {
               />
             </Box>
             <Box>
-              <h3 style={{ fontSize: '2.3rem' }}>Sắp xếp</h3>
+              <h3 style={{ fontSize: '2.3rem' }}>Sort</h3>
 
-              <Button variant="outlined" fullWidth sx={{ margin: 1, fontSize: '1.2rem' }} onClick={() => setSortOrder('name')}>Theo tên</Button>
-              <Button variant="outlined" fullWidth sx={{ margin: 1, fontSize: '1.2rem' }} onClick={() => setSortOrder('date')}>Theo ngày</Button>
-              <Button variant="outlined" fullWidth sx={{ margin: 1, fontSize: '1.2rem' }} onClick={() => setSortOrder('low')}>Thấp nhất</Button>
-              <Button variant="outlined" fullWidth sx={{ margin: 1, fontSize: '1.2rem' }} onClick={() => setSortOrder('high')}>Cao nhất</Button>
+              <Button variant="outlined" fullWidth sx={{ margin: 1, fontSize: '1.2rem' }} onClick={() => setSortOrder('name')}>By Name</Button>
+              <Button variant="outlined" fullWidth sx={{ margin: 1, fontSize: '1.2rem' }} onClick={() => setSortOrder('date')}>By Date</Button>
+              <Button variant="outlined" fullWidth sx={{ margin: 1, fontSize: '1.2rem' }} onClick={() => setSortOrder('low')}>Lowest First</Button>
+              <Button variant="outlined" fullWidth sx={{ margin: 1, fontSize: '1.2rem' }} onClick={() => setSortOrder('high')}>Highest First</Button>
               <Button variant="outlined" fullWidth sx={{ margin: 1, fontSize: '1.2rem' }} onClick={handleDefault}>Default</Button>
             </Box>
           </Box>

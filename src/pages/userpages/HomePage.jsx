@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Spinner from '../../ui/Spinner';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
@@ -19,6 +20,7 @@ import {
 } from '@mui/material';
 
 import OurPartner from '../../ui/userLayout/OurPartner';
+import { useTours } from '../../features/tours/useTours';
 
 const images = [
   'https://cdn.wallpapersafari.com/49/46/RafD82.jpg',
@@ -29,6 +31,9 @@ const images = [
 ];
 
 export default function HomePage() {
+
+
+
   return (
     <>
       <CssBaseline />
@@ -284,23 +289,30 @@ function IntroSection() {
 }
 
 function ToursSection() {
-  const tours = [
-    {
-      title: 'Paris City Tour',
-      description: 'Experience the City of Light with our guided tour.',
-      imageUrl: 'https://cdn.wallpapersafari.com/49/46/RafD82.jpg',
-    },
-    {
-      title: 'Safari Adventure',
-      description: 'Explore the wild and see exotic animals up close.',
-      imageUrl: 'https://cdn.wallpapersafari.com/49/46/RafD82.jpg',
-    },
-    {
-      title: 'Beach Getaway',
-      description: 'Relax on the world’s most beautiful beaches.',
-      imageUrl: 'https://cdn.wallpapersafari.com/49/46/RafD82.jpg',
-    },
-  ];
+  const { tours, isLoading } = useTours();
+  const [currentPage, setCurrentPage] = useState(1);
+  const toursPerPage = 3; // Số lượng tour hiển thị mỗi trang
+
+  if(isLoading) return <Spinner/>
+  // Xử lý các trang
+  const indexOfLastTour = currentPage * toursPerPage; // Chỉ số tour cuối cùng
+  const indexOfFirstTour = indexOfLastTour - toursPerPage; // Chỉ số tour đầu tiên
+  const currentTours = tours.slice(indexOfFirstTour, indexOfLastTour); // Các tour hiện tại
+
+  // Tính toán số trang
+  const totalPages = Math.ceil(tours.length / toursPerPage);
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
 
   return (
     <section style={{ padding: '50px 0', boxShadow: '2px 2px 2px 4px var(--color-grey-400)' }}>
@@ -309,18 +321,18 @@ function ToursSection() {
           Popular Tours
         </Typography>
         <Grid container spacing={3}>
-          {tours.map((tour, index) => (
+          {currentTours.map((tour, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <Card>
                 <CardMedia
                   component="img"
                   height="450"
-                  image={tour.imageUrl}
-                  alt={tour.title}
+                  image={`http://localhost:8080/api/v1/file/image/tour/${tour.imageCover}`}
+                  alt={tour.name}
                 />
                 <CardContent sx={{ backgroundColor: 'var(--color-grey-900)', color: "var(--color-grey-200)" }}>
                   <Typography variant="h5" component="div">
-                    {tour.title}
+                    {tour.name}
                   </Typography>
                   <Typography variant="body2" color="inherit">
                     {tour.description}
@@ -337,6 +349,18 @@ function ToursSection() {
             </Grid>
           ))}
         </Grid>
+
+        <Box display="flex" justifyContent="space-between" mt={3}>
+          <Button variant="outlined" onClick={handlePrev} disabled={currentPage === 1}>
+            Previous
+          </Button>
+          <Typography variant="h6">
+            Page {currentPage} of {totalPages}
+          </Typography>
+          <Button variant="outlined" onClick={handleNext} disabled={currentPage === totalPages}>
+            Next
+          </Button>
+        </Box>
       </Container>
     </section>
   );

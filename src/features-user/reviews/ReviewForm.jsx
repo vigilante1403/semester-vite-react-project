@@ -88,7 +88,7 @@ function ReviewForm({
 }) {
   const {handleReload,filteredReviews}=useContext(ReviewContext);
   const [rating, setRating] = useState(review ? review.rating : 0);
-  const [content, setContent] = useState(review ? review.content : '');
+  const [content, setContent] = useState(review ? review.content || review.review : '');
   const { writeReview, isWriting } = useWriteNewReview();
   const { updateReview, isUpdating } = useUpdateReview(onClose);
   const navigate=useNavigate()

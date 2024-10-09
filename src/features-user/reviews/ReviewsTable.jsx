@@ -42,7 +42,7 @@ function ReviewsTable() {
         </Table.Header>
         <Table.Body
           data={paginatedReviews}
-          render={(review) => <ReviewsRow review={review} key={review.id}  />}
+          render={(review) => <ReviewsRow review={review} key={review.id}/>}
         />
         <Table.Footer>
           <Pagination count={filteredReviews.length} />

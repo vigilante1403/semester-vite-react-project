@@ -1,6 +1,7 @@
 // 
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { fetchAddress } from '../../services/apiTours';
 
 
 mapboxgl.accessToken =
@@ -40,19 +41,22 @@ const MapComponent = ({ locations, centerDisplay = null, centerDefault = [10.762
       });
 
       map.current.addControl(geolocateControl, 'top-right');
-      geolocateControl.on('geolocate', (e) => {
-        const { latitude, longitude } = e.coords;
+      
+      geolocateControl.on('geolocate', async (e) => {
+     
+        try {
+          const { position, address } = await fetchAddress();
 
-        if (typeof onSetCenter === 'function') {
-          onSetCenter([latitude, longitude]);
-        } else {
-          console.error('onSetCenter is not a function');
-        }
+          if (typeof onSetCenter === 'function') {
+            onSetCenter([position.latitude, position.longitude]);
+          }
 
-        if (typeof onSetCenterDisplay === 'function') {
-          onSetCenterDisplay('Your Location');
-        } else {
-          console.error('onSetCenterDisplay is not a function');
+          if (typeof onSetCenterDisplay === 'function') {
+            onSetCenterDisplay(address);
+          }
+
+        } catch (error) {
+          console.error('Error fetching address:', error);
         }
       });
     }
@@ -65,29 +69,30 @@ const MapComponent = ({ locations, centerDisplay = null, centerDefault = [10.762
         .setPopup(new mapboxgl.Popup({ closeButton: true, closeOnClick: true }).setText(centerDisplay))
         .addTo(map.current);
     }
+   
+    
     if (locations) {
-      locations.map((location) =>
+     
+      locations.forEach((location, index) => {
+        const offset = 0.0001 * index; 
+        const lng = location.coordinates[0];
+        const lat = location.coordinates[1];
+
         new mapboxgl.Marker()
-          .setLngLat([location.coordinates[0], location.coordinates[1]])
+          .setLngLat([lng + offset, lat + offset])
           .setPopup(new mapboxgl.Popup()
             .setText(location.name ? `${location.name} - Day ${location.day}` : `Day ${location.day}`)
             .on('open', location.name ? () => {
-           
               const popupElement = document.querySelector('.mapboxgl-popup');
               if (popupElement) {
                 popupElement.addEventListener('click', () => {
-                  
                   console.log(`Navigating to details for ${location.name}`);
                   window.location.href = `/tours/tour-detail/${location.id}`;
                 });
               }
-            } : () => { }))
-          .addTo(map.current)
-
-
-
-      );
-
+            } : () => {}))
+          .addTo(map.current);
+      });
     }
   }, [locations, centerDisplay, centerDefault, styleDefault, onSetCenter,onSetCenterDisplay]);
 

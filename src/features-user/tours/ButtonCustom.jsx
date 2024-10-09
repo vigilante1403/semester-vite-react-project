@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-const Button36 = ({label,disabled}) => {
+const Button36 = ({label,disabled,onClick}) => {
   const [isHovered, setIsHovered] = useState(false);
   const buttonStyle = {
     backgroundImage: 'linear-gradient(92.88deg, #455EB5 9.16%, #5643CC 43.89%, #673FD7 64.72%)',
@@ -30,6 +30,7 @@ const Button36 = ({label,disabled}) => {
       // disabled={disabled}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={onClick}
     >
       {label}
     </button>
