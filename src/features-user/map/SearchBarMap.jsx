@@ -1,12 +1,11 @@
 import styled from "styled-components"
 import Input from "../../ui/Input"
-import { Typography } from "@mui/material"
-import { NavLink, useSearchParams } from "react-router-dom"
+import { Button, Typography } from "@mui/material"
+import { NavLink, useNavigate, useSearchParams } from "react-router-dom"
 import { HiMiniClock, HiOutlineClock } from "react-icons/hi2"
 import { useState } from "react"
 import { GeoapifyGeocoderAutocomplete } from "@geoapify/react-geocoder-autocomplete"
-import { useTours } from "../../features/tours/useTours"
-import Spinner from "../../ui/Spinner"
+import { SimpleTreeView, TreeItem } from "@mui/x-tree-view"
 const StyledBarMap = styled.div`
 display: flex;
 flex-direction: column;
@@ -89,10 +88,9 @@ const Display = styled.div`
   /* overflow-x: hidden; */
 `;
 
-function SearchBarMap({onSetCenter,onSetCenterDisplay}) {
+function SearchBarMap({onSetCenter,onSetCenterDisplay,centerDisplay,nearbyData}) {
     const [searchPlace,setSearchPlace]=useState('');
-   
-   
+    const navigate = useNavigate();
    
     const [listSearch,setListSearch]=useState([])
     const handleSearch = (e)=>{
@@ -104,7 +102,6 @@ function SearchBarMap({onSetCenter,onSetCenterDisplay}) {
         
     }
    
-    
     return (
         <StyledBarMap>
             <GeoapifyGeocoderAutocomplete placeholder="Enter address here"
@@ -112,12 +109,35 @@ function SearchBarMap({onSetCenter,onSetCenterDisplay}) {
         lang={"vi"}
         
         limit={15}
-        // value={displayValue}
+        value={centerDisplay}
         placeSelect={(e)=>handleSearch(e)}
         // suggestionsChange={(e)=>console.log("suggestionsChange: ",e)}
         onUserInput={setSearchPlace}
         />
-            
+            {nearbyData != null && (
+        <SimpleTreeView>
+          <TreeItem itemId="1" label={<span style={{ fontSize: '2rem' }}>Tours near you</span>}>
+            {nearbyData?.locations.map((tour) => (
+              <TreeItem
+                key={tour.id}
+                itemId={tour.id.toString()}
+                label={
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '1.5rem' }}>{tour.name}</span>
+                    <Button
+                      variant="outlined"
+                      onClick={() => navigate(`/tours/tour-detail/${tour.id}`)}
+                      style={{ marginLeft: '5px' }}
+                    >
+                      See Detail
+                    </Button>
+                  </div>
+                }
+              />
+            ))}
+          </TreeItem>
+        </SimpleTreeView>
+      )}
               <HorizontalLine/>
                 <StyledHistoryBox>
                    <Typography fontSize={20} color>Search Recently</Typography>
@@ -134,6 +154,5 @@ function SearchBarMap({onSetCenter,onSetCenterDisplay}) {
 }
 
 export default SearchBarMap
-
 
 

@@ -26,6 +26,7 @@ export const formatDateArrayAscOrDesc = (dateArr,modifier=1)=>{
     return modifier*(dateA-dateB)
   })
   console.log(dateArr)
+  return dateArr
 }
 export const formatDateToCalendar= (dateStr,formatDesire='')=>{
   if(dateStr==null) return '--/--/----'

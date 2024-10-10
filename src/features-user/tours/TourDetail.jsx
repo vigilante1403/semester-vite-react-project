@@ -347,6 +347,11 @@ import { formatDateArrayAscOrDesc } from '../../utils/helpers';
 import { useGetAllUpcomingBookingsOfSameTour } from './useBookTour';
 import NotifBookingExisted from './NotifBookingExisted';
 import Spinner from '../../ui/Spinner';
+import { useBookingsOfUser } from '../bookings/useBookings';
+import { useReviewsOfUser } from '../reviews/useReviews';
+import ReviewForm from '../reviews/ReviewForm';
+import { ReviewContext } from '../reviews/Reviews';
+import { UserContext } from '../../ui/userLayout/ProtectedRouteUser';
 const CalendarContainer = styled.div`
   /* ~~~ container styles ~~~ */
   max-width: 600px;
@@ -438,7 +443,9 @@ const TourDetail = ({ tour, otherTours }) => {
 
   const [isDateLocked, setIsDateLocked] = useState(true);
   const [showMoreReviews, setShowMoreReviews] = useState(false); // State to toggle See More reviews
-  const [fakeReviews, setFakeReviews] = useState([]);
+
+  const [schedule, setSchedule] = useState(['']);
+  const [address, setAddress] = useState('');
   const { handleLoginSignupOpen } = useContext(LoginContext);
   const { user, isAuthenticated, isLoading } = useAuthenticate();
   const { bookings, isGetting } = useGetAllUpcomingBookingsOfSameTour({
@@ -447,6 +454,12 @@ const TourDetail = ({ tour, otherTours }) => {
   });
   const navigate = useNavigate();
   const [isAgree, setIsAgree] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(
+    tour.images !== null ? tour.images[0] : ''
+  );
+  const userId = user?.id;
+  const { bookings: bookingsOfUser, isLoading1 } = useBookingsOfUser(userId);
+  const { reviews, isLoading: isLoading2, refetch } = useReviewsOfUser(userId);
   const fetchAndSetTourLocations = async (tour) => {
     if (tour?.locations) {
       const locationAddresses = tour.locations.map(
@@ -467,19 +480,6 @@ const TourDetail = ({ tour, otherTours }) => {
     window.scrollTo(0, 0);
 
     setSelectedDate(new Date(tour.startDates[0]));
-
-    const generatedFakeReviews = Array.from({ length: 10 }, (_, index) => ({
-      id: index + 1,
-      userName: `User ${index + 1}`,
-      userPhoto: '',
-      createdAt: `2024-10-${(index % 31) + 1}`,
-      rating: (index % 5) + 1,
-      review: `This is review number ${
-        index + 1
-      }. The experience was amazing, and I would recommend this tour!`,
-    }));
-
-    setFakeReviews(generatedFakeReviews);
     fetchAndSetTourLocations(tour);
   }, [tour, tour.startDates]);
   const handleToggleShowMore = () => {
@@ -520,9 +520,7 @@ const TourDetail = ({ tour, otherTours }) => {
         return false;
     }
   };
-  const [selectedImage, setSelectedImage] = useState(
-    tour.images !== null ? tour.images[0] : ''
-  );
+  
 
   const handleChangeImage = (image) => {
     setSelectedImage(image);
@@ -558,9 +556,26 @@ const TourDetail = ({ tour, otherTours }) => {
     navigate(`/tours/tour-detail/${id}`);
   };
 
-  const [schedule, setSchedule] = useState(['']);
-  const [address, setAddress] = useState('');
-  if(isAuthenticated&&isGetting) return <Spinner />
+  if(isAuthenticated&&(isGetting || isLoading || isLoading1 || isLoading2)) return <Spinner />
+  
+  let filteredBooking = [];
+  if (bookings !== undefined && reviews !== undefined) {
+    const reviewsToursId = reviews.map((review) => review.tourId);
+    filteredBooking = bookingsOfUser.filter((booking) => {
+      const isSameTour = booking.tour.id === tour.id;
+      const hasNoReview = !reviewsToursId.includes(booking.tour.id);
+      return isSameTour && hasNoReview;
+    });
+  }
+  const handleReload = () => {
+  }
+  const nearestBooking = filteredBooking.length
+    ? filteredBooking.reduce((nearest, current) => {
+      const nearestDate = new Date(nearest.startDate);
+      const currentDate = new Date(current.startDate);
+      return currentDate > nearestDate ? current : nearest;
+    })
+    : null;
   return (
     <Container>
       <section>
@@ -672,18 +687,19 @@ const TourDetail = ({ tour, otherTours }) => {
                   Book now
                 </Button> */}
               <Button75
-                onClick={handleSelectAnotherDate}
+                onClick={() => { handleSelectAnotherDate() }}
                 label={'Another Day'}
               />
               {isAuthenticated ? !isAgree&&bookings!==null&&bookings.length>0? (<Modal>
                 <Modal.Open opens={"agreement"}>
-                <Button
+                {/* <Button
                       variant="contained"
                       color="primary"
                       sx={{ marginTop: '1rem', fontSize: '1.2rem' }}
                     >
                       Book now
-                    </Button>
+                    </Button> */}
+                    <Button36 label={'Book now'} onClick={() => { }} />
                 </Modal.Open>
                 <Modal.Window name={"agreement"}>
                   <NotifBookingExisted onSetAgreement={setIsAgree} bookings={bookings} />
@@ -691,14 +707,14 @@ const TourDetail = ({ tour, otherTours }) => {
               </Modal>): (
                 <Modal>
                   <Modal.Open opens={`book-tour-${tour.id}`}>
-                    <Button
+                    {/* <Button
                       variant="contained"
                       color="primary"
                       sx={{ marginTop: '1rem', fontSize: '1.2rem' }}
                     >
                       Book now
-                    </Button>
-                    {/* <Button36 label={'Book now'}/> */}
+                    </Button> */}
+                    <Button36 label={'Book now'} onClick={() => { }} />
                   </Modal.Open>
                   <Modal.Window name={`book-tour-${tour.id}`}>
                     <StepConfirmBookingTour tour={tour} user={user} />
@@ -937,85 +953,168 @@ const TourDetail = ({ tour, otherTours }) => {
           )}
         </Box>
       </section>
-      <section style={{ marginTop: '80px' }}>
-        <Typography variant="h2">Reviews</Typography>
-        <hr />
-        <Box
-          sx={{
-            display: 'flex',
-            overflowX: showMoreReviews ? 'scroll' : 'hidden',
-            padding: '10px',
-            gap: '10px',
-            maxHeight: '800px',
-            margin: '20px',
-            backgroundColor: '#ADCB8B',
-          }}
-        >
-          {fakeReviews && fakeReviews.length > 0 ? (
-            fakeReviews
-              .slice(0, showMoreReviews ? fakeReviews.length : 3)
-              .map((review, index) => (
-                <Card
-                  key={index}
-                  sx={{
-                    minWidth: '300px',
-                    height: '400px',
-                    maxWidth: '358px',
-                    backgroundColor: '#e0f7fa',
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                    margin: '10px 0px',
-                    flexShrink: 0,
-                    // padding:'10px'
-                  }}
+      <UserContext.Provider
+        value={{ isAuthenticated, user, isLoading }}
+      >
+        <ReviewContext.Provider value={{ reviews, handleReload }}>
+          <section style={{ marginTop: '80px' }}>
+            {nearestBooking && (
+              <Box
+                sx={{
+                  backgroundColor: '#FFEBEE',
+                  color: '#D32F2F',
+                  padding: '20px',
+                  marginBottom: '20px',
+                  borderRadius: '10px',
+                  textAlign: 'center',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px',
+                }}
+              >
+                {/* Thêm icon để thu hút sự chú ý */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  style={{ width: '30px', height: '30px', color: '#D32F2F' }}
                 >
-                  <CardContent>
-                    <Box display="flex" alignItems="center">
-                      <Avatar
-                        src={review.userPhoto || ''}
-                        alt="User Photo"
-                        sx={{ width: 40, height: 40, marginRight: '10px' }}
-                      />
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {review.userName || 'User Name'}
-                        </Typography>
-                        <Typography variant="caption" sx={{ color: 'gray' }}>
-                          {review.createdAt || 'Date'}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Rating
-                      name="read-only"
-                      value={review.rating || 0}
-                      readOnly
-                      sx={{ marginTop: '10px' }}
-                    />
-                    <Typography variant="h4" sx={{ marginTop: '10px' }}>
-                      {review.review || 'This is the review content.'}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              ))
-          ) : (
-            <Typography variant="h4" sx={{ color: 'gray' }}>
-              No reviews yet.
-            </Typography>
-          )}
-        </Box>
+                                    <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12.5A9.5 9.5 0 1112.5 3 9.5 9.5 0 0121 12.5z"
+                  />
+                </svg>
+                <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '18px' }}>
+                  Bạn có booking của tour "{nearestBooking.tour.name}" chưa review!{" "}
+                  <span style={{ textDecoration: 'underline', cursor: 'pointer' }}>
+                    <Modal>
+                      <Modal.Open opens="review-form">
+                        <Button
+                          variant="contained"
+                          color="info"
+                          size="large"
+                          sx={{ borderRadius: '20px', px: 4 }}
+                        >
+                          Review
+                        </Button>
+                      </Modal.Open>
+                      <Modal.Window name="review-form">
+                        <ReviewForm booking={nearestBooking} />
+                      </Modal.Window>
+                    </Modal>
+                  </span>
+                </Typography>
+              </Box>
 
-        {/* Nút See More / See Less */}
-        {fakeReviews.length > 3 && (
-          <Box textAlign="center" mt={2}>
-            <Button
-              onClick={handleToggleShowMore}
-              variant="outlined"
-              color="primary"
+            )}
+            <Typography variant="h2">Reviews</Typography>
+            <hr />
+            <Box
+              sx={{
+                display: 'flex',
+                overflowX: showMoreReviews ? 'scroll' : 'hidden',
+                padding: '10px',
+                gap: '10px',
+                maxHeight: '800px',
+                margin: '20px',
+                backgroundColor: '#ADCB8B',
+              }}
             >
-              {showMoreReviews ? 'See Less' : 'See More'}
-            </Button>
-          </Box>
-        )}
-      </section>
+                           {tour?.reviews && tour?.reviews.length > 0 ? (
+                tour?.reviews
+                  .slice(0, showMoreReviews ? tour.reviews.length : 3)
+                  .map((review, index) => (
+                    <Card
+                      key={index}
+                      sx={{
+                        minWidth: '300px',
+                        height: '400px',
+                        maxWidth: '358px',
+                        backgroundColor: '#e0f7fa',
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                        margin: '10px 0px',
+                        flexShrink: 0,
+                        position: 'relative', // Thêm thuộc tính này để định vị nút
+                      }}
+                    >
+                      <CardContent>
+                        <Box display="flex" alignItems="center">
+                          <Avatar
+                            src={''}
+                            alt="User Photo"
+                            sx={{ width: 40, height: 40, marginRight: '10px' }}
+                          />
+                          <Box>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {review.userName || 'User Name'}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'gray' }}>
+                              {review.createdAt || 'Date'}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        <Rating
+                          name="read-only"
+                          value={review.rating || 0}
+                          readOnly
+                          sx={{ marginTop: '10px' }}
+                        />
+                        <Typography variant="h4" sx={{ marginTop: '10px' }}>
+                          {review.review || 'This is the review content.'}
+                        </Typography>
+                        {/* Nút Review nằm ở góc dưới bên phải */}
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            bottom: '10px',
+                            right: '10px',
+                          }}
+                        >
+                          {isAuthenticated && user.id === review.userId && <Modal>
+                            <Modal.Open opens="review-form">
+                              <Button
+                                variant="contained"
+                                color="info"
+                                size="small" // Chỉnh sửa kích thước nút
+                                sx={{ borderRadius: '20px', px: 2 }}
+                              >
+                                Change Review
+                              </Button>
+                            </Modal.Open>
+                            <Modal.Window name="review-form">
+                              <ReviewForm review={review} />
+                            </Modal.Window>
+                          </Modal>}
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  ))
+              ) : (
+                <Typography variant="h4" sx={{ color: 'gray' }}>
+                  No reviews yet.
+                </Typography>
+              )}
+            </Box>
+            {/* Nút See More / See Less */}
+            {tour.reviews&& tour.reviews.length > 3 && (
+              <Box textAlign="center" mt={2}>
+                <Button
+                  onClick={handleToggleShowMore}
+                  variant="outlined"
+                  color="primary"
+                >
+                  {showMoreReviews ? 'See Less' : 'See More'}
+                </Button>
+              </Box>
+            )}
+          </section>
+        </ReviewContext.Provider>
+      </UserContext.Provider>
       {/* 
       <section style={{ marginTop: '80px' }}>
       

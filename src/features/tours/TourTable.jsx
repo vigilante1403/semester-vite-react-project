@@ -37,9 +37,6 @@ const TableHeader = styled.header`
 `;
 function TourTable() {
   const [searchParams] = useSearchParams();
-
-  
-
   const searchDiscountValue = searchParams.get('discount') || 'all';
   const {filteredTours:tours} = useContext(TourContext);
 

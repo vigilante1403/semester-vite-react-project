@@ -97,7 +97,7 @@ function UserNav() {
         <li>
           <StyledNavLink to="/user/settings">
             <HiOutlineCog6Tooth />
-            <span>My Settings</span>
+            <span>My Favorites</span>
           </StyledNavLink>
         </li>
       </NavList>

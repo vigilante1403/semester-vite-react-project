@@ -16,19 +16,9 @@ export function useTours(){
     })
     const pageCount = tours? Math.ceil(tours.length/PAGE_SIZE):1
     if(currentPage<pageCount){
-        // queryClient.prefetchQuery({
-        //     queryKey:['tours',currentPage+1],
-        //     retry:false,
-        //     queryFn: getAllTours
-        // })
         queryClient.setQueryData(['tours',currentPage+1],tours)
     }
     if(currentPage>1){
-        // queryClient.prefetchQuery({
-        //     queryKey:['tours',currentPage-1],
-        //     retry:false,
-        //     queryFn: getAllTours
-        // })
         queryClient.setQueryData(['tours',currentPage-1],tours)
     }
     return {tours,isLoading}
