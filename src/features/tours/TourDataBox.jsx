@@ -9,6 +9,7 @@ import {
   HiOutlineCheckCircle,
   HiOutlineCurrencyDollar,
   HiOutlineHomeModern,
+  HiOutlineMusicalNote,
   HiOutlinePhoto,
   HiPaintBrush,
   HiPencil,
@@ -29,6 +30,10 @@ import ReviewsData from './ReviewsData';
 
 import toast from 'react-hot-toast';
 import MapComponent from './Map';
+import Select from '../../ui/Select';
+import { useEffect, useState } from 'react';
+import FormRow from '../../ui/FormRow';
+import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 
 const StyledBookingDataBox = styled.section`
   /* Box */
@@ -122,14 +127,17 @@ const Footer = styled.footer`
 `;
 const Guides = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
+
+  flex-direction: column;
+  overflow: hidden;
+  justify-content: flex-start;
+  
 `;
 const Guide = styled.div`
-  padding: 1rem;
+  /* padding: 0.4rem; */
   font-size: 1.6rem;
   display: flex;
+  
   align-items: center;
 `;
 const Img = styled.img`
@@ -142,7 +150,7 @@ const Img = styled.img`
   transform: scale(0.6);
 `;
 // A purely presentational component
-function TourDataBox({ tour }) {
+function TourDataBox({ tour,schedules,starts,guideList }) {
   const {
     id,
     name,
@@ -162,14 +170,46 @@ function TourDataBox({ tour }) {
     reviews,
     locations,
   } = tour;
+  const [schedule, setSchedule] = useState(['']);
+  const [address, setAddress] = useState('');
+  const fetchAndSetTourLocations = async (tour) => {
+    if (tour?.locations) {
+      const locationAddresses = tour.locations.map(
+        (location) => location.address
+      );
+      const newSubDescriptions = tour.locations.map((location) =>
+        location.description.split(', ').map((desc) => desc.trim())
+      );
 
+      setSchedule(newSubDescriptions);
+      setAddress(locationAddresses);
+    } else {
+      setAddress('');
+      setSchedule(['']);
+    }
+  };
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchAndSetTourLocations(tour);
+  }, [tour, tour.startDates]);
+  const [guideChosenList,setGuideChosenList]=useState([])
+  const handleSwitchGuidesAfterChoseDate = (event)=>{
+    setGuideChosenList(prev=>[])
+    var startId = event.target.value
+    var scheduleWorkingList = schedules.filter(sc=>sc.startDateId===startId).map(sc=>sc.guideId)
+    console.log(scheduleWorkingList)
+    console.log(guideList)
+    var guidesWork = guideList.filter(g=>scheduleWorkingList.includes(g.value));
+    console.log(guidesWork)
+    setGuideChosenList(prev=>[...guidesWork])
+  }
   return (
     <StyledBookingDataBox>
       <Header>
         <div>
           <HiOutlineHomeModern />
           <p>
-            {startDates.length} day trip <span>{name}</span>
+            {tour.locations.length>0?tour.locations.length:1}{' '}&mdash;{' '}day trip <span>{name}</span>
           </p>
         </div>
 
@@ -192,7 +232,7 @@ function TourDataBox({ tour }) {
             {/* {guestName} {numGuests > 1 ? `+ ${numGuests - 1} guests` : ""} */}
           </p>
           <span>&bull;</span>
-          <p>{startDates.length}-day trip</p>
+          <p>{tour.locations.length>0?tour.locations.length:1}-day trip</p>
           <span>&bull;</span>
           <p>Country Name: {countryNameCommon}</p>
         </Guest>
@@ -246,27 +286,23 @@ function TourDataBox({ tour }) {
           <p>{summary}</p>
         </DataItem>
         <DataItem icon={<HiRectangleStack />} label="Start dates">
-          {startDates &&
-            startDates.length > 0 &&
-            startDates.map((start) => <div>{start}</div>)}
+        <Select options={starts.filter(start=>start.status).map(start=>({label:start.startDate,value:start.id}))}
+             onChange={(e)=>handleSwitchGuidesAfterChoseDate(e)}  />
         </DataItem>
-        <DataItem label="Guides" icon={<HiUserGroup />}>
-          <Guides>
-            {guides &&
-              guides.length > 0 &&
-              guides.map((guide) => (
-                <Guide>
+        <div>
+        <Guides>
+            {
+              guideChosenList.length > 0 &&
+              guideChosenList.map((guide,index) => (
+                <DataItem label={`Guide ${index+1}`}  icon={<HiUserGroup />}>
+                <Guide >
                   <Img src={'/default-user.jpg'} circle={true} />
-                  <span>{guide.fullName}</span>
+                  <span>{guide.label.substring(0,20)}...</span>
                 </Guide>
+                </DataItem>
               ))}
           </Guides>
-        </DataItem>
-        {locations.length > 0 && <MapComponent locations={locations} />}
-        <DataItem icon={<HiMapPin />} label="Locations">
-          No location to show
-        </DataItem>
-        <DataItem icon={<HiBookOpen />} label="Reviews">
+          <DataItem icon={<HiBookOpen />} label="Reviews">
           {reviews && reviews.length > 0 && (
             <Modal>
               <Modal.Open opens="reviews">
@@ -279,6 +315,41 @@ function TourDataBox({ tour }) {
           )}
           {(!reviews || reviews.length === 0) && <p>No review to show</p>}
         </DataItem>
+        <DataItem label="Locations" icon={<HiOutlineMusicalNote/>}></DataItem>
+        <SimpleTreeView>
+        {address &&
+          address.map((address, index) => (
+            <TreeItem
+              itemId={index.toString()}
+              label={
+                <span style={{ fontSize: '2.2rem' }}>
+                  Day {index + 1}: {address}
+                </span>
+              }
+              key={index}
+            >
+              {schedule &&
+                schedule[index].map((schedule, idx) => (
+                  <TreeItem
+                    itemId={`${index}-${idx}`}
+                    label={
+                      <span style={{ fontSize: '1.8rem' }}>{schedule}</span>
+                    }
+                    key={`${index}-${idx}`}
+                    style={{ fontSize: '1.2rem' }}
+                  />
+                ))}
+            </TreeItem>
+          ))}
+      </SimpleTreeView>
+          </div>
+          
+        
+        {locations.length > 0 && <MapComponent locations={locations} />}
+        {(!locations.length||locations.length===0)&&<DataItem icon={<HiMapPin />} label="Locations">
+          No location to show
+        </DataItem>}
+        
       </Section>
 
       <Footer>

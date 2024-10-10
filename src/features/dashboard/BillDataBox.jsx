@@ -31,21 +31,21 @@ const StyledBody = styled.section`
   margin: 0.4rem 0;
   min-height: 20vh;
 `
-export default function BillDataBox() {
-  const { bills, isLoading } = useBills();
+export default function BillDataBox({bills}) {
+ 
   const [searchParams] = useSearchParams();
-  if (isLoading) return <Spinner />;
+
   const currentPage = !searchParams.get('page')
     ? 1
     : Number(searchParams.get('page'));
   const startIndex = (currentPage - 1) * 3;
   const endIndex = currentPage * 3;
-  const paginatedBills = bills.slice(startIndex, endIndex);
+  const paginatedBills = bills.sort((a,b)=>-1*(new Date(a.paidAt)-new Date(b.paidAt))).slice(startIndex, endIndex);
 
   if (!bills.length) return <Empty resourceName="bills" />;
   return (
     <BillBox>
-      <Heading as="h2">Bill History</Heading>
+      <Heading as="h2">Bills History</Heading>
       <ResponsiveContainer width="100%" height={'auto'}>
       <Row>
      

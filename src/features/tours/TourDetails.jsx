@@ -12,12 +12,15 @@ import Spinner from '../../ui/Spinner'
 
 import { useMoveBack } from "../../hooks/useMoveBack";
 import { useTour } from "./useTour";
-import {useDeleteTour} from './useDeleteTour'
-import { useNavigate } from "react-router-dom";
+import {useDeleteTour, useDeleteTourTemp} from './useDeleteTour'
+import { useNavigate, useParams } from "react-router-dom";
 
 import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Empty from "../../ui/Empty";
+import { useGetAllSchedulesOfATour } from "../schedules/useSchedules";
+import { useGetAllStartDatesOfTour } from "../../features-user/tours/useBookTour";
+import { useTourGuides } from "./useTourGuides";
 
 const HeadingGroup = styled.div`
   display: flex;
@@ -28,8 +31,11 @@ const HeadingGroup = styled.div`
 function TourDetail() {
   const navigate=useNavigate()
   const {tour,isLoading} = useTour();
-  const {deleteTour,isDeleting}=useDeleteTour()
- 
+  const {deleteTourTemp,isDeleting}=useDeleteTourTemp()
+  const {guides,isLoading:isLoading3}=useTourGuides()
+  const { id:tourId } = useParams()
+  const {schedules,isLoading:isLoading1}=useGetAllSchedulesOfATour({tourId:tourId})
+  const {startDates:starts,isLoading:isLoading2}=useGetAllStartDatesOfTour({tourId:tourId})
   const moveBack = useMoveBack();
 
   const statusToTagName = {
@@ -37,7 +43,7 @@ function TourDetail() {
     active: "green",
     inactive: "silver",
   };
-  if(isLoading) return <Spinner />
+  if(isLoading||isLoading1||isLoading2||isLoading3) return <Spinner />
   // if(!tour||tour==null) return <Empty resourceName="tour"/>
   const {status,id,name}=tour;
   return (
@@ -50,7 +56,7 @@ function TourDetail() {
         <ButtonText onClick={moveBack}>&larr; Back</ButtonText>
       </Row>
 
-      <TourDataBox tour={tour} />
+      <TourDataBox guideList={guides} schedules={schedules} starts={starts} tour={tour} />
 
       <ButtonGroup>
       <Modal>
@@ -58,7 +64,7 @@ function TourDetail() {
       <Button variation='danger'>Delete</Button>
       </Modal.Open>
       <Modal.Window name='delete'>
-        <ConfirmDelete onConfirm={()=>deleteTour(id,{onSettled:navigate('/admin/tours')})} resourceName={id}/>
+        <ConfirmDelete onConfirm={()=>deleteTourTemp(id,{onSettled:navigate('/admin/tours')})} resourceName={id}/>
       </Modal.Window>
       
       </Modal>
