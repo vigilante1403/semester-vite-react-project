@@ -64,15 +64,11 @@ function BillRow({ bill }) {
               <Menus.Button onClick={() => {}} icon={<HiEye />}>
                 See details
               </Menus.Button>
-              {isAdmin && (
-                <Modal.Open opens={`delete-${id}`}>
-                  <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
-                </Modal.Open>
-              )}
+              
             </Menus.List>
           </Menus.Menu>
           <Modal.Window name={`edit-${id}`}></Modal.Window>
-          <Modal.Window name={`delete-${id}`}></Modal.Window>
+       
         </Modal>
       </div>
     </Table.Row>

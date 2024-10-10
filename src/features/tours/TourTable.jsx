@@ -52,6 +52,7 @@ function TourTable() {
   } else {
     filteredTours = tours;
   }
+  filteredTours=filteredTours.filter(tour=>tour.status==='active')
   const sortBy = searchParams.get('sortBy') || 'name-asc';
   const [field, direction] = sortBy.split('-');
   console.log(field, direction);

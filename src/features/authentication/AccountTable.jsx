@@ -37,7 +37,7 @@ function AccountTable() {
   if(!users) return <Empty resourceName="users"/>;
 
   // Filter by role
-  let filteredUsers = users;
+  let filteredUsers = users.filter(user=>user.role!=='ADMIN');
   if (searchRoleValue !== 'all') {
     filteredUsers = filteredUsers.filter((user) => user.role === searchRoleValue);
   }

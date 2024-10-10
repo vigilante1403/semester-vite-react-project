@@ -352,6 +352,7 @@ import { useReviewsOfUser } from '../reviews/useReviews';
 import ReviewForm from '../reviews/ReviewForm';
 import { ReviewContext } from '../reviews/Reviews';
 import { UserContext } from '../../ui/userLayout/ProtectedRouteUser';
+import Empty from '../../ui/Empty';
 const CalendarContainer = styled.div`
   /* ~~~ container styles ~~~ */
   max-width: 600px;
@@ -944,14 +945,17 @@ const TourDetail = ({ tour, otherTours }) => {
           Map
         </Typography>
         <hr></hr>
-        <Box sx={{ margin: '50px' }}>
+        {tour.locations&&<Box sx={{ margin: '50px' }}>
           {tour.locations.length > 0 && (
             <MapComponent
               styleDefault="mapbox://styles/vytruong1812/cm1c6ma7h02hc01o3azvg0h6e"
               locations={tour.locations}
             />
           )}
-        </Box>
+          
+        </Box>}
+        {!tour.locations.length&&<Empty resourceName={'map'} />}
+
       </section>
       <UserContext.Provider
         value={{ isAuthenticated, user, isLoading }}
@@ -1026,14 +1030,16 @@ const TourDetail = ({ tour, otherTours }) => {
               }}
             >
                            {tour?.reviews && tour?.reviews.length > 0 ? (
-                tour?.reviews
+                tour?.reviews.sort((a,b)=>{
+                  return -1*(new Date(a.updatedAt||a.createdAt)-new Date(b.updatedAt||b.createdAt))
+                })
                   .slice(0, showMoreReviews ? tour.reviews.length : 3)
                   .map((review, index) => (
                     <Card
                       key={index}
                       sx={{
                         minWidth: '300px',
-                        height: '400px',
+                        height: '300px',
                         maxWidth: '358px',
                         backgroundColor: '#e0f7fa',
                         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',

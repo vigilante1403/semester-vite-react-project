@@ -79,7 +79,7 @@ const currentPage = searchParams.get('page')||1
         <Table.Row>
       <ScheduleId>{id.substring(0,7)}...</ScheduleId>
       <Guide>{guideName}</Guide>
-      <span>{guideEmail}</span>
+      <span>{guideEmail.substring(0,15)}....</span>
       <Stacked>
         <Guide>{tourName}</Guide>
         <span>{format(new Date(from), 'MMM dd yyyy')}{' '}&mdash;{' '}{format(new Date(to), 'MMM dd yyyy')}</span>

@@ -258,7 +258,7 @@ const Tour = ({ tour, bookings  }) => {
               marginBottom: '0.5rem',
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <HiUserGroup size={24} style={{ marginRight: 8 }} />
               <Typography
                 variant="body1"
@@ -267,7 +267,7 @@ const Tour = ({ tour, bookings  }) => {
               >
                 {participantCount}/{tour.maxGroupSize}
               </Typography>
-            </Box>
+            </Box> */}
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {Array.from({ length: 5 }, (_, i) => (

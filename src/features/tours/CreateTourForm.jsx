@@ -110,11 +110,11 @@ const handleAddErrorWhenGuideBusy=()=>{
     Array.from(dates).forEach(date=>{
       var from = new Date(date);
       var to = new Date(date);
-    to.setDate(to.getDate() + duration);
+    to.setDate(to.getDate() + duration-1);
     if(!editTour){
       if(!(compareTwoDates(to.toLocaleDateString('en-CA'),schedule.from.toString())==="before"||compareTwoDates(from.toLocaleDateString('en-CA'),schedule.to.toString())==='after')){
         if(selectedGuides.includes(schedule.guideId)){
-          setGuideError(prev=>[`${schedule.guideName}-${schedule.guideEmail} has tour from ${schedule.from} to ${schedule.to}`])
+          setGuideError(prev=>[...`${schedule.guideName}-${schedule.guideEmail} has tour from ${schedule.from} to ${schedule.to}`])
         }
       }
     }else{
@@ -614,7 +614,7 @@ console.log(keys[0])
           id="priceDiscount"
           {...register('priceDiscount', {
             validate: (value) =>
-              Math.abs(value) <= getValues().price ||
+              Math.abs(value) < getValues().price ||
               'Discount should be less than regular price',
           })}
           defaultValue={0}

@@ -64,7 +64,8 @@ const TourPage = () => {
       : false;
     const matchesMinPrice = minPrice ? price >= Number(minPrice) : true;
     const matchesMaxPrice = maxPrice ? price <= Number(maxPrice) : true;
-    return matchesSearch && matchesMinPrice && matchesMaxPrice;
+    const active = tour.status==='active'
+    return matchesSearch && matchesMinPrice && matchesMaxPrice&&active;
   });
 
   let sortedTours = filteredTours.sort((a, b) => {
@@ -85,7 +86,7 @@ const TourPage = () => {
   const startIndex = (currentPage - 1) * PAGE_SIZE;
   const endIndex = currentPage * PAGE_SIZE;
   const paginatedTours = [...sortedTours].slice(startIndex, endIndex);
-  if (!paginatedTours.length) return <Empty resourceName="tours" />;
+  // if (!paginatedTours.length) return <Empty resourceName="tours" />;
 
   return (
     <Box padding={5}>

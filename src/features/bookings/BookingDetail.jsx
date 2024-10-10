@@ -29,7 +29,7 @@ const HeadingGroup = styled.div`
 
 function BookingDetail() {
   const navigate=useNavigate()
-  const {booking,isLoading} = useBookingById();
+  const {booking,isLoading} = useBookingById({bookIdIni:null});
   const {deleteBooking,isDeleting}=useDeleteBooking()
   const moveBack = useMoveBack();
 

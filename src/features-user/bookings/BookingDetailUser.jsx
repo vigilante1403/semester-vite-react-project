@@ -23,15 +23,15 @@ import { useUsers } from '../../features/authentication/useUsers';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
 import { useGetAllSchedulesFromASingleBookingId } from './useBookings';
 
-export default function BookingDetailUser({bookingFromComponent}) {
+export default function BookingDetailUser({bookingFromComponent=null}) {
   const { bookingId } = useParams()
   const [searchParams]=useSearchParams()
   const [schedule, setSchedule] = useState(['']);
   const [address, setAddress] = useState('');
   const navigate = useNavigate();
-  let { booking, isLoading } = useBookingById();
+  let { booking, isLoading } = useBookingById({bookIdIni:bookingFromComponent?bookingFromComponent.id:null});
   const { users, isLoading: isLoadingUser } = useUsers();
-  const {schedules,isLoading1}=useGetAllSchedulesFromASingleBookingId({bookingId:bookingId})
+  const {schedules,isLoading1}=useGetAllSchedulesFromASingleBookingId({bookingId:bookingFromComponent?bookingFromComponent.id:bookingId})
   const moveBack = useMoveBack();
   const fetchAndSetTourLocations = async (tour) => {
     if (tour?.locations) {

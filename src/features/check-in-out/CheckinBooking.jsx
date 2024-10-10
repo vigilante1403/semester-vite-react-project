@@ -28,7 +28,7 @@ const Box = styled.div`
 
 function CheckinBooking() {
   const [confirmPaid,setConfirmPaid]=useState(false);
-  const {booking,isLoading} = useBookingById();
+  const {booking,isLoading} = useBookingById({bookIdIni:null});
   useEffect(()=>{
     setConfirmPaid(booking?.paid||false)
   },[booking])
@@ -50,17 +50,17 @@ function CheckinBooking() {
 
       <BookingDataBox booking={booking} />
 
-      <Box>
+      {isCheckingIn&&<Box>
         <Checkbox disabled={confirmPaid||isCheckingIn} checked={confirmPaid} onChange={()=>setConfirmPaid(confirm=>!confirm)}>I confirm that {user.name} has paid the total amount of you privacy </Checkbox>
-      </Box>
+      </Box>}
 
       <ButtonGroup>
       <Modal>
-      <Modal.Open opens={`edit-${booking.id}`}>
-      <Button disabled={!confirmPaid||isCheckingIn} >Check in booking #{id}</Button>
-            </Modal.Open>
+      {isCheckingIn&&<Modal.Open opens={`edit-${booking.id}`}>
+      <Button disabled={!confirmPaid||isCheckingIn} >Paid by cash booking #{id}</Button>
+            </Modal.Open>}
       <Modal.Window name={`edit-${booking.id}`}>
-          <CreateBookingForm editBooking={booking} />
+          <CreateBookingForm editBooking={booking} fixedStart={booking.startDate} fixed={true} />
         </Modal.Window>
       
       </Modal>

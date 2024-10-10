@@ -57,11 +57,17 @@ export function useBookingsByTour() {
   });
   return { bookings, isLoading };
 }
-export function useBookingById() {
+export function useBookingById({bookIdIni=null}) {
   const { bookingId } = useParams();
+  let bookId;
+  if(bookingId){
+    bookId=bookingId
+  }else{
+    bookId=bookIdIni
+  }
   const { isLoading, data: booking } = useQuery({
-    queryKey: ['booking', bookingId], // arr
-    queryFn: () => getBookingById(bookingId), // func for fetch data from api returns a promise
+    queryKey: ['booking', bookId], // arr
+    queryFn: () => getBookingById(bookId), // func for fetch data from api returns a promise
     retry: false, // will try 3 times if fail
   });
   return { isLoading, booking };
