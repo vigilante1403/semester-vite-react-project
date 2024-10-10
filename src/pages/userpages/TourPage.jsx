@@ -21,8 +21,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import Slider from 'react-slick';
 import { Typography } from '@mui/material';
 import OurPartner from '../../ui/userLayout/OurPartner';
+import { useAuthenticate } from '../../features-user/security/useAuthenticate';
+import { UserContext } from '../../ui/userLayout/ProtectedRouteUser';
 
 const TourPage = () => {
+  const { user, isAuthenticated, isLoading:isLoadingUser } = useAuthenticate()
   const theme = useTheme();
   const isExtraSmall = useMediaQuery(theme.breakpoints.down('xs'));
   const isLarge = useMediaQuery(theme.breakpoints.up('lg'));
@@ -48,7 +51,7 @@ const TourPage = () => {
   const [maxPrice, setMaxPrice] = useState('');
   const [sortOrder, setSortOrder] = useState('name');
 
-  if (isLoading || isBookingLoading) return <Spinner />;
+  if (isLoading || isBookingLoading|| isLoadingUser) return <Spinner />;
   if (!tours) return <Empty resourceName="tours" />;
   const handleDefault = () => {
     setSearchTerm('');
@@ -209,8 +212,10 @@ const TourPage = () => {
               borderRadius: 2,
               padding: 2,
             }}
-          >
-            <TourShowing tours={paginatedTours} bookings={bookings} />
+          > <UserContext.Provider value={{ isAuthenticated,user,isLoading }}>
+             {paginatedTours && paginatedTours.length > 0 ? <TourShowing tours={paginatedTours} bookings={bookings} /> : <Spinner/>}
+          </UserContext.Provider>
+          
           </Box>
 
           <Box

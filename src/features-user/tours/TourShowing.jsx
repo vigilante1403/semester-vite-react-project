@@ -3,7 +3,9 @@ import { Typography, Container, Grid } from '@mui/material';
 import Tour from './Tour';
 import Empty from '../../ui/Empty';
 const TourShowing = ({ tours,bookings }) => {
-  if (!tours||!tours.length) return <Empty resourceName="tours" />;
+  console.log(tours);
+  
+  if (!tours||tours.length <= 0 ) return <Empty resourceName="tours" />;
   
 
   return (

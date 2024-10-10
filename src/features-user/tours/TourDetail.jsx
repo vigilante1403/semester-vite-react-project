@@ -343,8 +343,8 @@ import { LoginContext } from '../../context/LoginContext';
 import { useAuthenticate } from '../security/useAuthenticate';
 import Modal from '../../ui/Modal';
 import StepConfirmBookingTour from './StepConfirmBookingTour';
-import { formatDateArrayAscOrDesc } from '../../utils/helpers';
-import { useGetAllUpcomingBookingsOfSameTour } from './useBookTour';
+import { compareTwoDates, formatDateArrayAscOrDesc } from '../../utils/helpers';
+import { useGetAllSchedules, useGetAllStartDatesOfTour, useGetAllUpcomingBookingsOfSameTour } from './useBookTour';
 import NotifBookingExisted from './NotifBookingExisted';
 import Spinner from '../../ui/Spinner';
 import { useBookingsOfUser } from '../bookings/useBookings';
@@ -353,6 +353,7 @@ import ReviewForm from '../reviews/ReviewForm';
 import { ReviewContext } from '../reviews/Reviews';
 import { UserContext } from '../../ui/userLayout/ProtectedRouteUser';
 import Empty from '../../ui/Empty';
+
 const CalendarContainer = styled.div`
   /* ~~~ container styles ~~~ */
   max-width: 600px;
@@ -438,12 +439,9 @@ const CalendarContainer = styled.div`
 const TourDetail = ({ tour, otherTours }) => {
   const dateArr = formatDateArrayAscOrDesc(tour.startDates, 1);
   console.log(dateArr);
-  const [selectedDate, setSelectedDate] = useState(
-    new Date(tour.startDates[0])
-  );
-
+  const [selectedDate, setSelectedDate] = useState('');
   const [isDateLocked, setIsDateLocked] = useState(true);
-  const [showMoreReviews, setShowMoreReviews] = useState(false); // State to toggle See More reviews
+  const [showMoreReviews, setShowMoreReviews] = useState(false); 
 
   const [schedule, setSchedule] = useState(['']);
   const [address, setAddress] = useState('');
@@ -461,6 +459,11 @@ const TourDetail = ({ tour, otherTours }) => {
   const userId = user?.id;
   const { bookings: bookingsOfUser, isLoading1 } = useBookingsOfUser(userId);
   const { reviews, isLoading: isLoading2, refetch } = useReviewsOfUser(userId);
+
+const {startDates,isLoading: isLoadingStartDate} = useGetAllStartDatesOfTour({tourId: tour.id});
+
+const {schedules,isLoadingSchedule} = useGetAllSchedules();
+const [guideShow,setGuideShow]=useState();
   const fetchAndSetTourLocations = async (tour) => {
     if (tour?.locations) {
       const locationAddresses = tour.locations.map(
@@ -479,23 +482,59 @@ const TourDetail = ({ tour, otherTours }) => {
   };
   useEffect(() => {
     window.scrollTo(0, 0);
+  
+    if (!isLoadingStartDate && startDates?.length > 0 && !isLoadingSchedule && schedules.length > 0) {
+    
+      const currentDate = new Date();
+      const futureStartDates = startDates.filter(
+        (startDate) => new Date(startDate.startDate) >= currentDate
+      );
+  
+      if (futureStartDates.length > 0) {
+    
+        setSelectedDate(new Date(futureStartDates[0].startDate));
+  
 
-    setSelectedDate(new Date(tour.startDates[0]));
+        const filteredSchedules = schedules.filter((sh) =>
+          futureStartDates.some((st) => st.id === sh.startDateId)
+        );
+        
+        const firstStartDateId = futureStartDates[0].id;
+        const initialGuide = filteredSchedules.filter(
+          (schedule) => schedule.startDateId === firstStartDateId
+        );
+        setGuideShow(initialGuide);
+      }
+    }
     fetchAndSetTourLocations(tour);
-  }, [tour, tour.startDates]);
+  }, [tour, isLoadingStartDate, startDates, isLoadingSchedule, schedules]);
+  
+  
   const handleToggleShowMore = () => {
     setShowMoreReviews(!showMoreReviews);
   };
-  const startDates = tour.startDates.map((date) => new Date(date));
 
+
+
+
+  if((isAuthenticated&&(isGetting || isLoading || isLoading1 || isLoading2 ) )|| isLoadingStartDate || isLoadingSchedule) return <Spinner />
+
+  const filteredSchedules = schedules.filter((sh) =>
+    startDates.some((st) => st.id === sh.startDateId)
+  );
+  console.log(filteredSchedules);
+  
+  // const startDates = tour.startDates.map((date) => new Date(date));
   const isStartDate = (date) => {
-    return startDates.some((startDate) => isSameDay(date, startDate));
+    // console.log( startDates.some((startDate) => isSameDay(date, startDate)));
+    
+    return startDates.some((startDate) => isSameDay(date, startDate.startDate));
   };
   const isStartMonth = (date) => {
-    return startDates.some((startDate) => isSameMonth(date, startDate));
+    return startDates.some((startDate) => isSameMonth(date, startDate.startDate));
   };
   const isStartYear = (date) => {
-    return startDates.some((startDate) => isSameYear(date, startDate));
+    return startDates.some((startDate) => isSameYear(date, startDate.startDate));
   };
   const tileDisabled = ({ date, view }) => {
     switch (view) {
@@ -510,7 +549,7 @@ const TourDetail = ({ tour, otherTours }) => {
 
       case 'century': {
         const startYears = startDates.map((startDate) =>
-          startDate.getFullYear()
+          startDate.startDate.getFullYear()
         );
         const startDecades = startYears.map(
           (year) => Math.floor(year / 10) * 10
@@ -533,31 +572,75 @@ const TourDetail = ({ tour, otherTours }) => {
     }
     setSelectedDate(date);
     setIsDateLocked(false);
+  
+    const selectedStartDateId = startDates.find(
+      (startDate) => startDate.startDate === date.toLocaleDateString('en-CA')
+    )?.id;
+  
+    console.log(selectedStartDateId);
+  
+    const selectedGuide = filteredSchedules.filter(
+      (schedule) => schedule.startDateId === selectedStartDateId
+    );
+  
+    setGuideShow(selectedGuide); 
   };
+  
+  
 
+  // const handleSelectAnotherDate = () => {
+  //   setIsDateLocked(false);
+  //   var currentDate = selectedDate;
+  //   console.log(currentDate.toLocaleDateString('en-CA'));
+  //   var index = Array.from(dateArr).indexOf(
+  //     currentDate.toLocaleDateString('en-CA')
+  //   );
+  //   console.log(index);
+  //   if (index + 1 < dateArr.length) {
+  //     setSelectedDate(new Date(dateArr[index + 1]));
+  //   } else {
+  //     setSelectedDate(new Date(dateArr[0]));
+  //   }
+  // };
+ 
   const handleSelectAnotherDate = () => {
     setIsDateLocked(false);
-    var currentDate = selectedDate;
-    console.log(currentDate.toLocaleDateString('en-CA'));
-    var index = Array.from(dateArr).indexOf(
-      currentDate.toLocaleDateString('en-CA')
-    );
-    console.log(index);
-    if (index + 1 < dateArr.length) {
-      setSelectedDate(new Date(dateArr[index + 1]));
+    const currentDate = selectedDate;
+    const formattedCurrentDate = currentDate.toLocaleDateString('en-CA');
+  
+   
+    const futureStartDates = startDates
+      .map((startDate) => startDate.startDate)
+      .filter((startDate) => new Date(startDate) >= new Date());
+  
+    const startDateList = formatDateArrayAscOrDesc(futureStartDates, 1);
+    const index = startDateList.indexOf(formattedCurrentDate);
+  
+   
+    let nextDate;
+    if (index + 1 < startDateList.length) {
+      nextDate = new Date(startDateList[index + 1]);
     } else {
-      setSelectedDate(new Date(dateArr[0]));
+      nextDate = new Date(startDateList[0]);
     }
+    setSelectedDate(nextDate);
+  
+    const nextStartDateId = startDates.find(
+      (startDate) => startDate.startDate === nextDate.toLocaleDateString('en-CA')
+    )?.id;
+    
+    const nextGuide = filteredSchedules.filter(
+      (schedule) => schedule.startDateId === nextStartDateId
+    );
+    setGuideShow(nextGuide);
   };
-
+  
   const handleSeeAllTours = () => {
     navigate('/tours');
   };
   const handleSeeTourDetail = (id) => {
     navigate(`/tours/tour-detail/${id}`);
   };
-
-  if(isAuthenticated&&(isGetting || isLoading || isLoading1 || isLoading2)) return <Spinner />
   
   let filteredBooking = [];
   if (bookings !== undefined && reviews !== undefined) {
@@ -577,6 +660,19 @@ const TourDetail = ({ tour, otherTours }) => {
       return currentDate > nearestDate ? current : nearest;
     })
     : null;
+    console.log(guideShow);
+
+    const sortReview = tour?.reviews.sort((a,b)=>{   
+                
+                
+      const dateA = new Date(a.updatedAt || a.createdAt);
+      const dateB = new Date(b.updatedAt || b.createdAt);
+     
+      return dateB - dateA;
+     })
+     console.log(sortReview);
+     
+    
   return (
     <Container>
       <section>
@@ -664,7 +760,7 @@ const TourDetail = ({ tour, otherTours }) => {
             </Typography>
             <Typography variant="h4">
               <strong>Start Date:</strong>{' '}
-              {selectedDate.toLocaleDateString('en-CA')}
+              {selectedDate !=='' && selectedDate.toLocaleDateString('en-CA')}
             </Typography>
             <Typography variant="h4">
               <strong>Price:</strong> {tour.price - tour.priceDiscount} $
@@ -673,14 +769,14 @@ const TourDetail = ({ tour, otherTours }) => {
             <Typography variant="h4" gutterBottom>
               <strong>Guides:</strong>
             </Typography>
-            {tour.guides.map((guide) => (
+            {guideShow?.map((guide) => (
               <Typography key={guide.id} variant="h5">
-                {guide.fullName} - {guide.nationality}
+                {guide.guideName} - {guide.countryName}
               </Typography>
             ))}
-
+          
             {/* {isDateLocked ? ( */}
-            <Box sx={{ margin: '20px' }} display={'flex'}>
+            {selectedDate !== "" && <Box sx={{ margin: '20px' }} display={'flex'}>
               {/* <Button variant="outlined" color="secondary" onClick={handleSelectAnotherDate} style={{ marginTop: '16px' }}>
                   Choose another
                 </Button> */}
@@ -743,7 +839,9 @@ const TourDetail = ({ tour, otherTours }) => {
                 </Box>
               )}
               {/* <Button36 label={"Book now"} disabled={!isDateLocked} /> */}
-            </Box>
+            </Box> }
+            {selectedDate === "" && <Typography color={'red'} variant='h3'>No start date yet</Typography> 
+            }
             {/* ) : null} */}
           </Box>
         </Box>
@@ -1030,11 +1128,9 @@ const TourDetail = ({ tour, otherTours }) => {
               }}
             >
                            {tour?.reviews && tour?.reviews.length > 0 ? (
-                tour?.reviews.sort((a,b)=>{
-                  return -1*(new Date(a.updatedAt||a.createdAt)-new Date(b.updatedAt||b.createdAt))
-                })
-                  .slice(0, showMoreReviews ? tour.reviews.length : 3)
+               sortReview.slice(0, showMoreReviews ? tour.reviews.length : 3)
                   .map((review, index) => (
+             
                     <Card
                       key={index}
                       sx={{
@@ -1060,7 +1156,7 @@ const TourDetail = ({ tour, otherTours }) => {
                               {review.userName || 'User Name'}
                             </Typography>
                             <Typography variant="caption" sx={{ color: 'gray' }}>
-                              {review.createdAt || 'Date'}
+                              {review.updatedAt || review.createdAt || 'Date'}
                             </Typography>
                           </Box>
                         </Box>
@@ -1073,7 +1169,7 @@ const TourDetail = ({ tour, otherTours }) => {
                         <Typography variant="h4" sx={{ marginTop: '10px' }}>
                           {review.review || 'This is the review content.'}
                         </Typography>
-                        {/* Nút Review nằm ở góc dưới bên phải */}
+                       
                         <Box
                           sx={{
                             position: 'absolute',
@@ -1121,76 +1217,7 @@ const TourDetail = ({ tour, otherTours }) => {
           </section>
         </ReviewContext.Provider>
       </UserContext.Provider>
-      {/* 
-      <section style={{ marginTop: '80px' }}>
       
-    
-        <hr />
-
-        <Grid container spacing={3}>
-          
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="h4" gutterBottom>
-                  Các Tour Quốc Tế
-                </Typography>
-                <ul style={{ listStyleType: 'none', padding: 0 }}>
-                  <li><Typography variant="h6">Tour Nhật Bản</Typography></li>
-                  <li><Typography variant="h6">Tour Hàn Quốc</Typography></li>
-                  <li><Typography variant="h6">Tour Pháp</Typography></li>
-                  <li><Typography variant="h6">Tour Úc</Typography></li>
-                  <li><Typography variant="h6">Tour Mỹ</Typography></li>
-                  <li><Typography variant="h6">Tour Canada</Typography></li>
-                 
-                </ul>
-              </CardContent>
-            </Card>
-          </Grid>
-
-        
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="h4" gutterBottom>
-                  Các Tour Nội Địa
-                </Typography>
-                <ul style={{ listStyleType: 'none', padding: 0 }}>
-                  <li><Typography variant="h6">Tour Hà Nội</Typography></li>
-                  <li><Typography variant="h6">Tour TP Hồ Chí Minh</Typography></li>
-                  <li><Typography variant="h6">Tour Đà Nẵng</Typography></li>
-                  <li><Typography variant="h6">Tour Huế</Typography></li>
-                  <li><Typography variant="h6">Tour Phú Quốc</Typography></li>
-                 
-                </ul>
-              </CardContent>
-            </Card>
-          </Grid>
-
-       
-          <Grid item xs={12} sm={6} md={4}>
-            <Card>
-              <CardContent>
-                <Typography variant="h4" gutterBottom>
-                  Thông Tin Liên Hệ
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                  Hotline: +123 456 7890
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                  Email: support@example.com
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                  Địa chỉ: 123 Main St, City, State, ZIP
-                </Typography>
-                <Typography variant="h6" gutterBottom>
-                  Website: www.example.com
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </section> */}
     </Container>
   );
 };

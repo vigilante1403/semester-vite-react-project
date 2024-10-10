@@ -27,7 +27,7 @@ import { UserContext } from '../../ui/userLayout/ProtectedRouteUser';
 import { getAllFavoriteUser } from '../../services/apiFavorite';
 
 const Tour = ({ tour, bookings  }) => {
-  const { user, isAuthenticated, isLoading } = useAuthenticate()
+  const { user, isAuthenticated, isLoading } = useContext(UserContext);
 
 
   const { addFavorite, isAdding } = useAddFavorite();
@@ -106,9 +106,6 @@ const Tour = ({ tour, bookings  }) => {
 
 
   };
-
-  if (isLoading) return <Spinner />
-
 
 
   return (
@@ -246,7 +243,7 @@ const Tour = ({ tour, bookings  }) => {
                 color="textSecondary"
                 sx={{ fontSize: '1.2rem' }}
               >
-                {dateShowing !== '' ? dateShowing : 'Contact Admin'}
+                {dateShowing !== '' ? dateShowing : 'No start date yet'}
               </Typography>
             </Box>
           </Box>

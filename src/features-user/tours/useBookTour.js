@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getAllStartDates, getAllStartDatesOfATour } from "../../services/apiTours";
+import { getAllSchedules, getAllStartDates, getAllStartDatesOfATour } from "../../services/apiTours";
 import { changeBookingPaymentSessionId, getAllUpcomingBookingOfSameTour } from "../../services/apiBookings";
 import toast from "react-hot-toast";
 
@@ -10,6 +10,7 @@ export function useGetAllStartDatesOfTour({tourId}){
         enabled:!!tourId
        
     })
+    
     return {startDates,isLoading}
 }
 export function useGetAllStartDates(){
@@ -33,4 +34,11 @@ export const useChangeBookingSessionId = ()=>{
         onError:(err)=>toast.error(err)
     })
     return {changeSession,isEditting}
+}
+export function useGetAllSchedules(){
+    const{data:schedules,isLoading:isLoadingSchedule}=useQuery({
+        queryKey:['schedules'],
+        queryFn:getAllSchedules
+    })
+    return {schedules,isLoadingSchedule}
 }

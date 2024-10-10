@@ -21,6 +21,7 @@ import {
 
 import OurPartner from '../../ui/userLayout/OurPartner';
 import { useTours } from '../../features/tours/useTours';
+import { useNavigate } from 'react-router-dom';
 
 const images = [
   'https://cdn.wallpapersafari.com/49/46/RafD82.jpg',
@@ -292,7 +293,7 @@ function ToursSection() {
   const { tours, isLoading } = useTours();
   const [currentPage, setCurrentPage] = useState(1);
   const toursPerPage = 3; // Số lượng tour hiển thị mỗi trang
-
+const navigate = useNavigate(); 
   if(isLoading) return <Spinner/>
   // Xử lý các trang
   const indexOfLastTour = currentPage * toursPerPage; // Chỉ số tour cuối cùng
@@ -341,6 +342,7 @@ function ToursSection() {
                     variant="outlined"
                     color="primary"
                     style={{ marginTop: '10px' }}
+                    onClick={() => navigate("/tours/tour-detail/" + tour.id)}
                   >
                     Book Now
                   </Button>

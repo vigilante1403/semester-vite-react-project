@@ -6,8 +6,8 @@ import { PAGE_SIZE } from "../../utils/constants";
 export function useTours(){
     const queryClient = useQueryClient()
     const [searchParams] = useSearchParams();
-    const searchDiscountValue = searchParams.get('discount') || 'all';
-    const sortBy = searchParams.get('sortBy') || 'name-asc';
+    // const searchDiscountValue = searchParams.get('discount') || 'all';
+    // const sortBy = searchParams.get('sortBy') || 'name-asc';
     const currentPage = !searchParams.get('page')?1:Number(searchParams.get('page'))
     const {data:tours,isLoading}=useQuery({
         queryKey:['tours',currentPage],
