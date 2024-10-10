@@ -13,7 +13,12 @@ export function useRecentBookings(){
     function extractMonthAndDate(dateString) {
         const date = new Date(dateString);
         const month = date.toLocaleString('default', { month: 'short' }); // For full month name, use 'short' for abbreviation
-        const day = date.getDate();
+        var dateShowing = date.getDate();
+        if(dateShowing>=1&&dateShowing<10){
+            dateShowing="0"+dateShowing
+        }
+        const day = dateShowing;
+
         return `${month} ${day}`;
       }
     let {data:bookings,isLoading}=useQuery({

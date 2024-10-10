@@ -9,6 +9,7 @@ import {
 } from '../../services/apiBookings';
 import { useParams, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { PAGE_SIZE } from '../../utils/constants';
 
 export function useBookingsTotal() {
   const queryClient = useQueryClient();
@@ -16,17 +17,26 @@ export function useBookingsTotal() {
   const tourName = searchParams.get('tour') || 'all';
   const searchStatusValue = searchParams.get('status') || 'all';
   const sortBy = searchParams.get('sortBy') || 'name-asc';
-  const currentPage = !searchParams.get('page')?1:Number(searchParams.get('page'))
+  const currentPage = !searchParams.get('page')
+    ? 1
+    : Number(searchParams.get('page'));
   const { data: bookings, isLoading } = useQuery({
-    queryKey: ['bookings',currentPage],
+    queryKey: ['bookings', currentPage],
     retry: false,
     queryFn: getAllBookings,
-    staleTime:0,
-    cacheTime: 0,  
-    refetchOnMount:true,
+    staleTime: 0,
+    cacheTime: 0,
+    refetchOnMount: true,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
   });
+  const pageCount = bookings ? Math.ceil(bookings.length / PAGE_SIZE) : 1;
+  if (currentPage < pageCount) {
+    queryClient.setQueryData(['tours', currentPage + 1], bookings);
+  }
+  if (currentPage > 1) {
+    queryClient.setQueryData(['tours', currentPage - 1], bookings);
+  }
   return { bookings, isLoading };
 }
 export function useBookingsByUser() {
@@ -59,14 +69,13 @@ export function useBookingById() {
 
 export function useCancelBookingById() {
   const queryClient = useQueryClient();
-  const { mutate: cancelBooking, isLoading:isCanceling } = useMutation({
+  const { mutate: cancelBooking, isLoading: isCanceling } = useMutation({
     mutationFn: cancelBookingApi,
     onError: (err) => toast.error(err.message),
     onSuccess: (id) => {
       toast.success('Booking canceled');
       queryClient.invalidateQueries({
-        predicate: (queries) =>
-            queries.queryKey[0].startsWith(`booking`)
+        predicate: (queries) => queries.queryKey[0].startsWith(`booking`),
       });
       queryClient.removeQueries({
         queryKey: [`booking-id-${id}`],
@@ -75,10 +84,10 @@ export function useCancelBookingById() {
   });
   return { cancelBooking, isCanceling };
 }
-export function useUpdateAllRelatedBookings(){
-  const{mutate:updateAllBookingsRelated,isLoading}=useMutation({
-    mutationFn:updateAllBookingsAfterUpdateTour,
-    onError:(err)=>toast.error(err)
-  })
-  return {updateAllBookingsRelated,isLoading}
+export function useUpdateAllRelatedBookings() {
+  const { mutate: updateAllBookingsRelated, isLoading } = useMutation({
+    mutationFn: updateAllBookingsAfterUpdateTour,
+    onError: (err) => toast.error(err),
+  });
+  return { updateAllBookingsRelated, isLoading };
 }

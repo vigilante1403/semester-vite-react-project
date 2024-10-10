@@ -16,12 +16,13 @@ import { useUpdateTour } from './useUpdateTour';
 import Spinner from '../../ui/Spinner';
 import { useEffect, useState } from 'react';
 import FormRowVertical from '../../ui/FormRowVertical';
-import { geocodeAddress } from '../../utils/helpers';
+import { compareTwoDates, geocodeAddress } from '../../utils/helpers';
 import useCountries from './useCountries';
 import { Typography, Box } from '@mui/material';
 import fetchFileFromUrl from '../../services/useFetchFileFromUrl';
 import { json } from 'react-router-dom';
 import { useUpdateAllRelatedBookings } from '../bookings/useBookings';
+import { useGetAllSchedules } from '../schedules/useSchedules';
 
 function CreateTourForm({ onClose, editTour }) {
   const { createTour, isCreating } = useCreateTour();
@@ -32,13 +33,16 @@ function CreateTourForm({ onClose, editTour }) {
   const{updateAllBookingsRelated}=useUpdateAllRelatedBookings()
   const [currentPhoto, setCurrentPhoto] = useState(null);
   const [currentImages, setCurrentImages] = useState([]);
-
+  const [changeCover,setChangeCover]=useState(null)
+  const [changeImages,setChangeImages]=useState([])
+  const {schedules,isLoading:isLoading1}=useGetAllSchedules({authorized:true});
   const [selectedGuideName1, setSelectedGuideName1] = useState('chooseValue');
   const [selectedGuideName2, setSelectedGuideName2] = useState('');
   const [isGuide2Added, setIsGuide2Added] = useState(false);
   const [selectedGuideTag, setSelectedGuideTag] = useState('guide1'); // Track which guide is selected
   const [selectedGuides, setSelectedGuides] = useState(['chooseValue', null]);
-
+  const [enabledAddGuide,setEnabledAddGuide]=useState(false)
+  const [guideError,setGuideError]=useState([])
   useEffect(() => {
     if (editTour && editTour.imageCover) {
       fetchFileFromUrl('tour', editTour.imageCover).then((file) =>
@@ -76,6 +80,7 @@ function CreateTourForm({ onClose, editTour }) {
 
   editTour ? console.log(editTour) : console.log('no editTour');
   const handleGuideSelectChange = (event) => {
+    setGuideError(prev=>[])
     const selectedGuide = guides.find(
       (guide) => guide.value === event.target.value
     );
@@ -93,8 +98,45 @@ function CreateTourForm({ onClose, editTour }) {
       setSelectedGuideName1(guideName); // Update guide1
     }
 
-    setSelectedGuides(newSelectedGuides); // Update state
+    setSelectedGuides(prev=>newSelectedGuides); // Update state
+    handleAddErrorWhenGuideBusy();
   };
+
+/////////////////////////
+const handleAddErrorWhenGuideBusy=()=>{
+  // filter guides busy in dates
+  var duration = coordinates.length;
+   Array.from(schedules).filter(sc=>sc.status).forEach(schedule=>{
+    Array.from(dates).forEach(date=>{
+      var from = new Date(date);
+      var to = new Date(date);
+    to.setDate(to.getDate() + duration);
+    if(!editTour){
+      if(!(compareTwoDates(to.toLocaleDateString('en-CA'),schedule.from.toString())==="before"||compareTwoDates(from.toLocaleDateString('en-CA'),schedule.to.toString())==='after')){
+        if(selectedGuides.includes(schedule.guideId)){
+          setGuideError(prev=>[`${schedule.guideName}-${schedule.guideEmail} has tour from ${schedule.from} to ${schedule.to}`])
+        }
+      }
+    }else{
+      var applyGuide = new Date(dateApplyGuide)
+      if(!(compareTwoDates(to.toLocaleDateString('en-CA'),schedule.from.toString())==="before"||compareTwoDates(from.toLocaleDateString('en-CA'),schedule.to.toString())==='after')
+        &&compareTwoDates(applyGuide.toLocaleDateString('en-CA'),schedule.from.toString())==='before'
+      &&schedule.tourId!==editTour.id){
+        if(selectedGuides.includes(schedule.guideId)){
+          setGuideError(prev=>[...prev,`${schedule.guideName}-${schedule.guideEmail} has tour from ${schedule.from} to ${schedule.to}`])
+        }
+      }
+    }
+    
+    })
+  });
+}
+
+
+
+
+
+///////////////////////////
 
   const handleAddGuide2 = () => {
     setIsGuide2Added(true);
@@ -154,6 +196,7 @@ function CreateTourForm({ onClose, editTour }) {
   const [showFormatted, setShowFormatted] = useState([]);
   const [dateApplyGuide,setDateApplyGuide]=useState('')
   const [dateApplyLocation,setDateApplyLocation]=useState('')
+  
 console.log(keys[0])
   const fetchAndSetTourLocations = async (editTour) => {
     if (editTour && editTour.locations) {
@@ -229,6 +272,7 @@ console.log(keys[0])
   };
 
   const handleInputDateChange = (index, event) => {
+    setSelectedGuides(prev=>[])
     const newInputs = dates.slice();
     newInputs[index] = event.target.value;
     if(!keys[index]||keys[index]===undefined){
@@ -251,6 +295,7 @@ console.log(keys[0])
     }
     setDates(newInputs);
   };
+  
   const handleInputChange = (index, event) => {
     const newInputs = inputs.slice();
     newInputs[index] = event.target.value;
@@ -290,7 +335,14 @@ console.log(keys[0])
   }, [subDescriptions]);
   const onSubmit = (data) => {
     console.log(selectedGuides);
-    if (selectedGuides == null || selectedGuides.length <= 0) {
+    if(!editTour){
+      handleAddErrorWhenGuideBusy()
+    }
+    if(!editTour&&guideError.length>0){
+      toast.error('Guides are busy in selected date! Submit fail')
+      return;
+    }
+    if (selectedGuides == null || selectedGuides.length == 0) {
       toast.error('Choose a guide');
       return;
     }
@@ -298,10 +350,7 @@ console.log(keys[0])
     const formData = new FormData();
     if (editTour !== undefined) {
       formData.append('id', editTour.id);
-      if(dateApplyGuide===''||dateApplyLocation===''){
-        toast.error('Please choose date apply for guides and locations')
-        return;
-      }
+      
       formData.append('dateOfLocationAfter',dateApplyLocation)
       formData.append('dateOfGuideAfter',dateApplyGuide)
     }
@@ -314,28 +363,46 @@ console.log(keys[0])
       formData.append('imageCoverCopy', data.imageCover);
     } else {
       const imageCoverFile = data.imageCover?.[0] || currentPhoto;
-      if (!imageCoverFile) {
+      if (!imageCoverFile&&!editTour) {
         toast.error('Image cover is empty');
         return;
       }
-      // if (data.images === undefined || data.images.length === 0) {
-      //   toast.error('Images is empty');
-      //   return;
-      // }
-      formData.append('imageCover', imageCoverFile);
+      if(editTour){
+        
+          formData.append('imageCover', changeCover);
+        
+      }else{
+        formData.append('imageCover', imageCoverFile);
+      }
+      
     }
-    if (imagesElement.files.length > 0) {
-      Array.from(imagesElement.files).forEach((file) => {
-        formData.append('images', file);
-      });
-    } else if (currentImages.length > 0) {
-      currentImages.forEach((file) => {
-        formData.append('images', file);
-      });
-    } else {
-      toast.error('Images are empty');
-      return;
+
+    if(editTour){
+      handleAddErrorWhenGuideBusy();
+      
+      if(changeImages.length>0){
+        changeImages.forEach((file)=>formData.append('images', file))
+      }else{
+        formData.append('images',null)
+      }
+    }else{
+      if (imagesElement.files.length > 0) {
+        Array.from(imagesElement.files).forEach((file) => {
+          formData.append('images', file);
+        });
+      } else if (currentImages.length > 0) {
+        currentImages.forEach((file) => {
+          formData.append('images', file);
+        });
+      } else {
+        toast.error('Images are empty');
+        return;
+      }
+      if(guideError.length>0){
+        toast.error('Guide apply is busy! Please select another guide to apply from apply date')
+      }
     }
+    
     // append each coor
     if (coordinates && coordinates.length > 0) {
       Array.from(coordinates).forEach((coor) => {
@@ -419,7 +486,7 @@ console.log(keys[0])
     if (editTour !== undefined) {
       updateTour(formData, {
         onSettled: () => {
-          updateAllBookingsRelated({tourId:editTour.id})
+          updateAllBookingsRelated({tourId:editTour.id,dateOfGuideAfter:dateApplyGuide,dateOfLocationAfter:dateApplyLocation})
           reset();
           onClose?.();
         },
@@ -487,7 +554,7 @@ console.log(keys[0])
   const handleTimeChange = (event) => {
     setTime(event.target.value); 
   };
-  if (isLoading || isCreating || isUpdating || isCountriesLoading)
+  if (isLoading || isCreating || isUpdating || isCountriesLoading || isLoading1)
     return <Spinner />;
 
   return (
@@ -573,60 +640,106 @@ console.log(keys[0])
           defaultValue=""
         />
       </FormRow>
-      {/* <FormRow label="Guide" error={errors?.guide?.message}>
-        <Select
-          options={guides}
-          {...register('guide', {
-            validate: (value) =>
-              String(value).length > 0 || 'This field is required',
-          })}
-          value={guides[0].value}
-          onChange={(e) => setValue('guide', e.target.value)}
-        />
-      </FormRow> */}
-      {/* <FormRow label="Available Guide" error={errors?.guide?.message}>
-        <Controller
-          name="guide"
-          control={control}
-          rules={{
-            validate: (value) =>
-              String(value).length > 0 || 'This field is required',
-          }}
-          defaultValue={editTour?.guides[0]?.id || ''} 
-          render={({ field }) => (
-            <Select
-              {...field}
-              options={guides}
-              value={field.value || guides[0]?.value} 
-              onChange={(e) => {
-                const selectedValue = e.target.value;
-                field.onChange(selectedValue);
-                setValue('guide', selectedValue);
-              }}
-            />
-          )}
-        />
-      </FormRow> */}
-      <FormRow label="Available Guide">
-        {/* <select
-          style={{color:'inherit', backgroundColor:'inherit'}}
-            value={selectedGuideTag === "guide2" ? selectedGuides[1] : selectedGuides[0]}
-            onChange={handleGuideSelectChange}
-          >
-            <option style={{color:'inherit', background:' var(--color-grey-0)'}} value="chooseValue">Choose a guide</option>
-            {guides
-              .filter(
-                (guide) => guide.value !== (selectedGuideTag === "guide1" ? selectedGuides[1] : selectedGuides[0]) // Exclude the other guide's selected value
-              )
-              .map((guide) => (
-                <option style={{color:'inherit', backgroundColor:' var(--color-grey-0)'}} key={guide.value} value={guide.value}>
-                  <span >{guide.label}</span>
-                </option>
-              ))}
-          </select> */}
 
+      {!editTour&&dates.map((input, index) => (
+        <FormRow label={`Date ${index + 1}`}>
+         
+            <Input
+              type="date"
+              // min={getTodayDate()}
+              value={input}
+              onChange={(event) => handleInputDateChange(index, event)}
+              placeholder={`Date ${index + 1}`}
+            />
+         
+        </FormRow>
+      ))}
+      <FormRow>
+      {dates && dates.length < 5 &&  <Button type="button" onClick={handleAddDates}>
+          Add Dates
+        </Button>}
+      </FormRow>
+      {inputs.map((input, index) => (
+        <>
+        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+            <label style={{ marginRight: '1rem' }}>
+              {`Location ${index + 1}`}
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+              <Input
+                type="text"
+                value={input}
+                onChange={(event) => handleInputChange(index, event)}
+                placeholder={`Address ${index + 1}`}
+                style={{ marginLeft: '19rem', marginRight: '5rem', flexGrow: 1 }}
+              />
+              {/* <Input
+                type="text"
+                value={descriptions[index]}
+                onChange={(event) =>
+                  handleInputDescriptionsChange(index, event)
+                }
+                placeholder={`Description ${index + 1}`}
+                //     {...register('descriptions', {
+                //   required:  'This field is required',
+                // })}
+              /> */}
+              <Button
+                type="button"
+                variation="secondary"
+                onClick={() => handleFetchCoordinates(index)}
+              >
+                Fetch loc
+              </Button>
+              {/* {coordinates[index] && (
+              <Input
+                type="text"
+                value={`[${coordinates[index].coor[0]},${coordinates[index].coor[1]}]`}
+                disabled
+                style={{ marginLeft: '1rem' }}
+              />
+            )} */}
+           
+           </div>
+           </div>
+           {showFormatted[index] &&
+            showFormatted[index].formatted
+          }
+          {subDescriptions[index].map((subDesc, subIndex) => (
+            <FormRow label={`Schedule ${subIndex + 1}`}>
+                          <Input
+                type="text"
+                value={subDesc}
+                onChange={(event) => handleSubDescriptionChange(index, subIndex, event.target.value)}
+                placeholder={`Schedule ${subIndex + 1}`}
+              />
+                          </FormRow>
+          ))}
+          <FormRow>
+          {subDescriptions[index] && subDescriptions[index].length < 5 && <Button type="button" onClick={() => { handleAddSubDescription(index) }}>
+              Add Schedule
+            
+            </Button>}
+          {/* {showFormatted[index] && showFormatted[index].formatted} */}
+          </FormRow>
+        </>
+      ))}
+      <FormRow>
+      {inputs && inputs.length < 5 && <Button type="button" onClick={handleAddInput}>
+          Add Location
+        </Button>}
+      </FormRow>
+      {editTour&&<FormRow label="Apply changes of location after selected date">
+        <Input
+              type="date"
+              min={getTodayDate()}
+              onChange={(event) => setDateApplyLocation(event.target.value)}
+              placeholder={`Location date`}
+            />
+        </FormRow>}
+      <FormRow label="Available Guide">
         <Select
-          options={guides.filter(
+          options={guides.filter( //guides filter based on schedule list
             (guide) =>
               guide.value !==
               (selectedGuideTag === 'guide1'
@@ -641,9 +754,6 @@ console.log(keys[0])
           // onChange={handleGuideSelectChange}
           text="Choose a guide"
           {...register('guide', {
-            required: 'required',
-            validate: (value) =>
-              String(value).length > 0 || 'This field is required',
             onChange: (e) => {
             
             handleGuideSelectChange(e);
@@ -755,6 +865,7 @@ console.log(keys[0])
           </div>
         )}
       </div>
+      {guideError&&<FormRow><span style={{ color:'red' }}>{guideError.join(', ')}</span></FormRow>}
         {editTour&&<FormRow label="Apply changes of guide after selected date">
         <Input
               type="date"
@@ -770,7 +881,7 @@ console.log(keys[0])
           {...register('imageCover', {
             required: editTour !== undefined ? false : 'This field is required',
           })}
-          onChange={(e) => setCurrentPhoto(e.target.files[0])}
+          onChange={(e) => {setCurrentPhoto(e.target.files[0]);setChangeCover(e.target.files[0])}}
         />
       </FormRow>
       {editTour && currentPhoto && (
@@ -788,7 +899,7 @@ console.log(keys[0])
           {...register('images', {
             required: editTour !== undefined ? false : 'This field is required',
           })}
-          onChange={(e) => setCurrentImages(Array.from(e.target.files))}
+          onChange={(e) => {setCurrentImages(Array.from(e.target.files));setChangeImages(Array.from(e.target.files))}}
         />
       </FormRow>
       {currentImages.length > 0 && (
@@ -813,24 +924,7 @@ console.log(keys[0])
      />
     
    </FormRow>
-      {!editTour&&dates.slice().reverse().map((input, index) => (
-        <FormRow label={`Date ${index + 1}`}>
-          <>
-            <Input
-              type="date"
-              // min={getTodayDate()}
-              value={input}
-              onChange={(event) => handleInputDateChange(index, event)}
-              placeholder={`Date ${index + 1}`}
-            />
-          </>
-        </FormRow>
-      )) &&
-      <FormRow>
-      {dates && dates.length < 5 &&  <Button type="button" onClick={handleAddDates}>
-          Add Dates
-        </Button>}
-      </FormRow>}
+      
       <FormRow label="Country">
         <Controller
           name="countryNameCommon"
@@ -882,84 +976,7 @@ console.log(keys[0])
         </FormRow>
       )}
 
-      {inputs.map((input, index) => (
-        <>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
-            <label style={{ marginRight: '1rem' }}>
-              {`Location ${index + 1}`}
-            </label>
-            <div style={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-              <Input
-                type="text"
-                value={input}
-                onChange={(event) => handleInputChange(index, event)}
-                placeholder={`Address ${index + 1}`}
-                style={{ marginLeft: '19rem', marginRight: '5rem', flexGrow: 1 }}
-              />
-              {/* <Input
-                type="text"
-                value={descriptions[index]}
-                onChange={(event) =>
-                  handleInputDescriptionsChange(index, event)
-                }
-                placeholder={`Description ${index + 1}`}
-                //     {...register('descriptions', {
-                //   required:  'This field is required',
-                // })}
-              /> */}
-              <Button
-                type="button"
-                variation="secondary"
-                onClick={() => handleFetchCoordinates(index)}
-              >
-                Fetch loc
-              </Button>
-              {/* {coordinates[index] && (
-              <Input
-                type="text"
-                value={`[${coordinates[index].coor[0]},${coordinates[index].coor[1]}]`}
-                disabled
-                style={{ marginLeft: '1rem' }}
-              />
-            )} */}
-           
-           </div>
-           </div>
-           {showFormatted[index] &&
-            showFormatted[index].formatted
-          }
-          {subDescriptions[index].map((subDesc, subIndex) => (
-            <FormRow label={`Schedule ${subIndex + 1}`}>
-                          <Input
-                type="text"
-                value={subDesc}
-                onChange={(event) => handleSubDescriptionChange(index, subIndex, event.target.value)}
-                placeholder={`Schedule ${subIndex + 1}`}
-              />
-                          </FormRow>
-          ))}
-          <FormRow>
-          {subDescriptions[index] && subDescriptions[index].length < 5 && <Button type="button" onClick={() => { handleAddSubDescription(index) }}>
-              Add Schedule
-            
-            </Button>}
-          {/* {showFormatted[index] && showFormatted[index].formatted} */}
-          </FormRow>
-        </>
-      ))}
-      <FormRow>
-      {inputs && inputs.length < 5 && <Button type="button" onClick={handleAddInput}>
-          Add Location
-        </Button>}
-      </FormRow>
-      {editTour&&<FormRow label="Apply changes of location after selected date">
-        <Input
-              type="date"
-              min={getTodayDate()}
-              onChange={(event) => setDateApplyLocation(event.target.value)}
-              placeholder={`Location date`}
-            />
-        </FormRow>}
+     
       <FormRow>
         {/* type is an HTML attribute! */}
         <Button variation="secondary" type="reset">

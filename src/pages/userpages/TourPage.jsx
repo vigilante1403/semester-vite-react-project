@@ -48,7 +48,8 @@ const TourPage = () => {
     const matchesSearch = tour.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesMinPrice = minPrice ? price >= Number(minPrice) : true;
     const matchesMaxPrice = maxPrice ? price <= Number(maxPrice) : true;
-    return matchesSearch && matchesMinPrice && matchesMaxPrice;
+    const active = tour.status==='active'?true:false;
+    return matchesSearch && matchesMinPrice && matchesMaxPrice&&active;
   });
 
   const sortedTours = filteredTours.sort((a, b) => {

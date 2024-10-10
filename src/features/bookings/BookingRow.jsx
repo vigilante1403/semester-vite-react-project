@@ -27,8 +27,6 @@ import { useContext } from 'react';
 import { Button } from '@mui/material';
 import ReviewForm from '../../features-user/reviews/ReviewForm';
 
-
-
 const Tour = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
@@ -70,15 +68,16 @@ function BookingRow({
     paid,
     numJoin,
     user: { name: guestName, email, id: userid },
-    tour: { name: tourName, id: tourId,summary },
+    tour: { name: tourName, id: tourId, summary },
     status,
-    sessionId,creationTime,
-    keysOfStartDate
+    sessionId,
+    creationTime,
+    keysOfStartDate,
   },
   require = null,
-  review=false
+  review = false,
 }) {
-  var valueAuthenticated=useContext(AdminContext)
+  var valueAuthenticated = useContext(AdminContext);
   const booking = {
     id: bookingId,
     startDate,
@@ -87,11 +86,12 @@ function BookingRow({
     priceFinal,
     paid,
     user: { name: guestName, email, id: userid },
-    tour: { name: tourName, id: tourId,summary },
+    tour: { name: tourName, id: tourId, summary },
     numJoin,
     status,
-    sessionId,creationTime,
-    keysOfStartDate
+    sessionId,
+    creationTime,
+    keysOfStartDate,
   };
 
   var isAdmin;
@@ -99,24 +99,27 @@ function BookingRow({
   var canEdit;
   var canDelete;
   var isGuide;
-  if(valueAuthenticated!=null){
-  
-   
-    isAdmin = valueAuthenticated.user.authorities.some(role => role.authority === 'ADMIN')
-    isLeadGuide = valueAuthenticated.user.authorities.some(role => role.authority === 'LEADGUIDE')
-    canEdit = isAdmin||isLeadGuide
-    canDelete = isAdmin
-    isGuide =valueAuthenticated.user.authorities.some(role => role.authority === 'GUIDE')
+  if (valueAuthenticated != null) {
+    isAdmin = valueAuthenticated.user.authorities.some(
+      (role) => role.authority === 'ADMIN'
+    );
+    isLeadGuide = valueAuthenticated.user.authorities.some(
+      (role) => role.authority === 'LEADGUIDE'
+    );
+    canEdit = isAdmin || isLeadGuide;
+    canDelete = isAdmin;
+    isGuide = valueAuthenticated.user.authorities.some(
+      (role) => role.authority === 'GUIDE'
+    );
   }
-  
+
   const tour = {
-    id:tourId,
-    price:priceOrigin,
-    priceDiscount:priceDiscount,
-    name:tourName,
-    summary
-    
-  }
+    id: tourId,
+    price: priceOrigin,
+    priceDiscount: priceDiscount,
+    name: tourName,
+    summary,
+  };
   const paidValue = paid ? 'paid' : 'unpaid';
   const statusToTagName = {
     unpaid: 'blue',
@@ -139,8 +142,8 @@ function BookingRow({
 
   const { deleteBooking, isDeleting } = useDeleteBooking();
   const { cancelBooking, isCanceling } = useCancelBookingById();
-  console.log(booking)
-  
+  console.log(booking);
+
   return (
     <Table.Row>
       <Tour>{tourName}</Tour>
@@ -167,97 +170,119 @@ function BookingRow({
         {formatCurrency(priceFinal)}&nbsp;&nbsp;
         <Tag type={statusToTagName[paidValue]}>{paidValue}</Tag>
       </Amount>
-      {!review&&<Tag type={activeStatus[status ? 'active' : 'inactive']}>
-        {status ? 'Active' : 'Inactive'}
-      </Tag>}
-      {review && <Modal><Modal.Open opens="review-form"><Button
-                    variant="contained"
-                    color="info"
-                    size="large"
-                    sx={{ borderRadius: '20px', px: 4 }}
-                  >
-                    Review
-                  </Button></Modal.Open>
-                  <Modal.Window name="review-form">
-                    <ReviewForm booking={booking} />
-                  </Modal.Window>
-                  </Modal>}
-      {!review&&<Modal>
-        <Menus.Menu>
-          <Menus.Toggle id={bookingId}></Menus.Toggle>
-          <Menus.List id={bookingId}>
-            <Menus.Button
-              icon={<HiEye />}
-              onClick={() => (isAdmin||isLeadGuide||isGuide) ? navigate(`/admin/bookings/${bookingId}`) : navigate(`/user/bookings/${bookingId}`)}
+      {!review && (
+        <Tag type={activeStatus[status ? 'active' : 'inactive']}>
+          {status ? 'Active' : 'Inactive'}
+        </Tag>
+      )}
+      {review && (
+        <Modal>
+          <Modal.Open opens="review-form">
+            <Button
+              variant="contained"
+              color="info"
+              size="large"
+              sx={{ borderRadius: '20px', px: 4 }}
             >
-              See details
-            </Menus.Button>
-            {paidValue === 'unpaid' && !require && (
+              Review
+            </Button>
+          </Modal.Open>
+          <Modal.Window name="review-form">
+            <ReviewForm booking={booking} />
+          </Modal.Window>
+        </Modal>
+      )}
+      {!review && (
+        <Modal>
+          <Menus.Menu>
+            <Menus.Toggle id={bookingId}></Menus.Toggle>
+            <Menus.List id={bookingId}>
               <Menus.Button
-                icon={<HiArrowDownOnSquare />}
-                onClick={() => navigate(`/admin/checkins/${bookingId}`)}
+                icon={<HiEye />}
+                onClick={() =>
+                  isAdmin || isLeadGuide || isGuide
+                    ? navigate(`/admin/bookings/${bookingId}`)
+                    : navigate(`/user/bookings/${bookingId}`)
+                }
               >
-                Paid bill
+                See details
               </Menus.Button>
-            )}
-            {paidValue === 'unpaid' && require && (
-              <CheckoutButton tour={tour} bill={booking} payAfter={true} />
-            )}
-            {paidValue === 'paid' && (
-              <Menus.Button
-                icon={<HiArrowUpOnSquare />}
-                // disable={isCheckingOut}
-                // onClick={() => {
-                //   checkout(bookingId);
-                // }}
-              >
-                Get ticket
-              </Menus.Button>
-            )}
-            {valid && status === true && (
-              <Modal.Open opens={`cancel-booking-${bookingId}`}>
-                <Menus.Button icon={<HiArrowDownOnSquare />}>
-                  Cancel booking
+              {paidValue === 'unpaid' && !require &&(isAdmin||isLeadGuide) && (
+                <Menus.Button
+                  icon={<HiArrowDownOnSquare />}
+                  onClick={() => navigate(`/admin/checkins/${bookingId}`)}
+                >
+                  Paid bill
                 </Menus.Button>
-              </Modal.Open>
-            )}
-            {(canEdit || require == null) && (
-              <>
-                <Modal.Open opens={`edit-${bookingId}`}>
-                  <Menus.Button icon={<HiPencil />}>Edit booking</Menus.Button>
+              )}
+              {paidValue === 'unpaid' && require && booking.status && (
+                <CheckoutButton
+                  tour={tour}
+                  bill={{ total: booking.priceFinal }}
+                  bookingId={booking.id}
+                  payAfter={true}
+                />
+              )}
+              {paidValue === 'paid' && (
+                <Menus.Button
+                  icon={<HiArrowUpOnSquare />}
+                  // disable={isCheckingOut}
+                  // onClick={() => {
+                  //   checkout(bookingId);
+                  // }}
+                >
+                  Get ticket
+                </Menus.Button>
+              )}
+              {valid && status === true &&  (
+                <Modal.Open opens={`cancel-booking-${bookingId}`}>
+                  <Menus.Button icon={<HiArrowDownOnSquare />}>
+                    Cancel booking
+                  </Menus.Button>
                 </Modal.Open>
-                {canDelete && (
-                  <Modal.Open opens={`delete-${bookingId}`}>
-                    <Menus.Button icon={<HiTrash />}>Delete booking</Menus.Button>
+              )}
+              {(canEdit || require == null)&&(isAdmin||isLeadGuide) && (
+                <>
+                  <Modal.Open opens={`edit-${bookingId}`}>
+                    <Menus.Button icon={<HiPencil />}>
+                      Edit booking
+                    </Menus.Button>
                   </Modal.Open>
-                )}
-              </>
-            )}
-          </Menus.List>
-        </Menus.Menu>
-        <Modal.Window name={`delete-${bookingId}`}>
-          <ConfirmDelete
-            onConfirm={() => {
-              deleteBooking(bookingId);
-            }}
-            disabled={isDeleting}
-            resourceName={bookingId}
-          />
-        </Modal.Window>
-        <Modal.Window name={`edit-${bookingId}`}>
-          <CreateBookingForm editBooking={booking} />
-        </Modal.Window>
-        <Modal.Window name={`cancel-booking-${bookingId}`}>
-          <ConfirmDelete
-            onConfirm={() => {
-              cancelBooking({ bookingId: bookingId });
-            }}
-            disabled={isCanceling}
-            resourceName="booking"
-            action="cancel"
-          />
-        </Modal.Window>
-      </Modal>}
+                  {canDelete && (isAdmin)&& (
+                    <Modal.Open opens={`delete-${bookingId}`}>
+                      <Menus.Button icon={<HiTrash />}>
+                        Delete booking
+                      </Menus.Button>
+                    </Modal.Open>
+                  )}
+                </>
+              )}
+            </Menus.List>
+          </Menus.Menu>
+          <Modal.Window name={`delete-${bookingId}`}>
+            <ConfirmDelete
+              onConfirm={() => {
+                deleteBooking(bookingId);
+              }}
+              disabled={isDeleting}
+              resourceName={bookingId}
+            />
+          </Modal.Window>
+          <Modal.Window name={`edit-${bookingId}`}>
+            <CreateBookingForm editBooking={booking} />
+          </Modal.Window>
+          <Modal.Window name={`cancel-booking-${bookingId}`}>
+            <ConfirmDelete
+              onConfirm={() => {
+                cancelBooking({ bookingId: bookingId });
+              }}
+              disabled={isCanceling}
+              resourceName="booking"
+              action="cancel"
+            />
+          </Modal.Window>
+        </Modal>
+      )}
     </Table.Row>
   );
 }

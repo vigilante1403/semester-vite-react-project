@@ -22,6 +22,7 @@ function Bookings() {
     const newData = data.toLowerCase();
     setSearchTour(newData);
     searchParams.set('tour', newData);
+    searchParams.set('page',1)
     setSearchParams(searchParams);
   };
   

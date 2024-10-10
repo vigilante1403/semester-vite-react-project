@@ -54,6 +54,7 @@ function Accounts() {
     const newData = data.toLowerCase();
     setSearchUser(newData);
     searchParams.set('user', newData);
+    searchParams.set('page',1)
     setSearchParams(searchParams);
   };
     return (

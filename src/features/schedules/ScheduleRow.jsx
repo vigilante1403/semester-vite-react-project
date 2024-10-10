@@ -2,10 +2,11 @@ import styled from "styled-components"
 import Table from "../../ui/Table";
 import Modal from "../../ui/Modal";
 import Menus from "../../ui/Menus";
-import { HiEye, HiTrash } from "react-icons/hi2";
+import { HiEye, HiPencil, HiTrash } from "react-icons/hi2";
 import { format } from "date-fns";
 import ShowDetailSchedule from "./ShowDetailSchedule";
 import { useSearchParams } from "react-router-dom";
+import { compareTwoDates } from "../../utils/helpers";
 const Guide = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
@@ -20,7 +21,12 @@ const Img = styled.img`
   object-position: center;
   transform: scale(1.5) translateX(-7px);
 `;
-
+const ScheduleId = styled.div`
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--color-grey-600);
+  font-family: 'Sono';
+`;
 
 
 const Price = styled.div`
@@ -71,7 +77,7 @@ countryName,guestList}=schedule
 const currentPage = searchParams.get('page')||1
     return (
         <Table.Row>
-      <span>{(index+1)*currentPage}</span>
+      <ScheduleId>{id.substring(0,7)}...</ScheduleId>
       <Guide>{guideName}</Guide>
       <span>{guideEmail}</span>
       <Stacked>
@@ -97,14 +103,17 @@ const currentPage = searchParams.get('page')||1
                 See details
               </Menus.Button>
               </Modal.Open>
-                <Modal.Open opens={`delete-${id}`}>
-                  <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
-                </Modal.Open>
+                {compareTwoDates(new Date(from).toLocaleDateString('en-CA'),Date.now())==='after'&&<Modal.Open opens={`edit-${id}`}>
+                  <Menus.Button icon={<HiPencil />}>Re-schedule</Menus.Button>
+                </Modal.Open>}
            
             </Menus.List>
           </Menus.Menu>
           <Modal.Window name={`detail-${id}`}>
             <ShowDetailSchedule scheduleId={id} />
+          </Modal.Window>
+          <Modal.Window name={`edit-${id}`}>
+        
           </Modal.Window>
           
         </Modal>

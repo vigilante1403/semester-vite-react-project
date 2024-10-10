@@ -7,7 +7,7 @@ import Modal from '../../ui/Modal';
 import ConfirmDelete from '../../ui/ConfirmDelete';
 import Menus from '../../ui/Menus';
 import CreateTourForm from './CreateTourForm';
-import { useDeleteTour } from './useDeleteTour';
+import { useDeleteTour, useDeleteTourTemp } from './useDeleteTour';
 import { useCreateTour } from './userCreateTour';
 import TourDetail from './TourDetails';
 import { useNavigate } from 'react-router-dom';
@@ -58,6 +58,7 @@ function TourRow({ tour }) {
   var valueAuthenticated=useContext(AdminContext)
   const navigate = useNavigate();
   const { deleteTour, isDeleting } = useDeleteTour();
+  const {deleteTourTemp,isDeleting:isDeleting1}=useDeleteTourTemp()
   const { createTour, isCreating } = useCreateTour();
   const {
     id,
@@ -171,8 +172,8 @@ function TourRow({ tour }) {
           <Modal.Window name={`delete-${id}`}>
             <ConfirmDelete
               resourceName={name}
-              onConfirm={() => deleteTour(id)}
-              disabled={isDeleting}
+              onConfirm={() => deleteTourTemp({tourId:id})}
+              disabled={isDeleting1}
             />
           </Modal.Window>
         </Modal>

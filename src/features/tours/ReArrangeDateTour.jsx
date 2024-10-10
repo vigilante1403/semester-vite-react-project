@@ -40,7 +40,7 @@ function ReArrangeDateTour({ tour,onClose }) {
   const [startDate, setStartDate] = useState('');
   const [busyGuides, setBusyGuides] = useState([]);
   const [chosenGuides,setChosenGuides]=useState([])
-  const { schedules, isLoading } = useGetAllSchedules()
+  const { schedules, isLoading } = useGetAllSchedules({authorized:true})
   const { guides, isLoading: isLoading1 } = useTourGuides();
   const {addDate,isAdding}=useAddStartDate();
   const {editDate,isEditting}=useEditStartDate()

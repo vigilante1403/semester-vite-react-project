@@ -9,14 +9,12 @@ import Pagination from '../../ui/Pagination';
 import { useContext } from 'react';
 import { AdminContext } from '../../ui/ProtectedRouteAdmin';
 import ScheduleRowGuide from './ScheduleRowGuide';
+import { ScheduleContext } from '../../pages/Schedules';
 
 function ScheduleTableGuide() {
-  const { user } = useContext(AdminContext);
-  const { schedules, isLoading } = useGetAllSchedulesOfAGuide({
-    guideId: user.id,
-  });
+  const {filteredSchedules:schedules}=useContext(ScheduleContext)
   const [searchParams] = useSearchParams();
-  if (isLoading) return <Spinner />;
+
   const geo = searchParams.get('geo') || 'all';
   const status = searchParams.get('status') || 'all';
   const sortBy =
@@ -70,7 +68,7 @@ function ScheduleTableGuide() {
     <Menus>
       <Table columns="0.4fr 2.1fr 2fr 1.2fr 1fr ">
         <Table.Header role="row">
-          <div>ID</div>
+          <div>SID</div>
           <div>Tour</div>
           <div>Place</div>
           <div>Status</div>

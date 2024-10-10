@@ -4,9 +4,9 @@ export const getAllBookings = async () => {
   if (error) throw new Error(error.message);
   return data;
 };
-export const getBookingsOfUser = async ({userId}) => {
+export const getBookingsOfUser = async ({ userId }) => {
   // console.log('userId la:'+userId)
-  const { data, error } = await axios.get(`/bookings/user/${userId+""}`);
+  const { data, error } = await axios.get(`/bookings/user/${userId + ''}`);
   if (error) throw new Error(error.message);
   return data;
 };
@@ -35,23 +35,48 @@ export const getBookingById = async (id) => {
   if (error) throw new Error(error.message);
   return data;
 };
-export const getBookingsByDate = async(bookingForm)=>{
-  const {data,error}=await axios.post('/bookings/from-to-dates',bookingForm)
-  if(error) throw new Error(error.message)
-  return data;
-}
-export const cancelBooking = async({bookingId})=>{
-  const {  error } = await axios.put(`/bookings/cancel-booking?bookingId=${bookingId}`);
+export const getBookingsByDate = async (bookingForm) => {
+  const { data, error } = await axios.post(
+    '/bookings/from-to-dates',
+    bookingForm
+  );
   if (error) throw new Error(error.message);
-}
-export const updateAllBookingsAfterUpdateTour=async({tourId})=>{
-  const {data,error}=await axios.post(`/bookings/changing-related-booking-after-update-tour?tourId=${tourId}`);
-  if(error) throw new Error(error.message)
-    return data
-}
-export const getAllUpcomingBookingOfSameTour = async({userId,tourId})=>{
-  const {data,error}=await axios.get(`/bookings/user/booking-upcoming-related?userId=${userId}&tourId=${tourId}`);
-  if(error) throw new Error(error.message)
-    return data;
-
-}
+  return data;
+};
+export const cancelBooking = async ({ bookingId }) => {
+  const { error } = await axios.put(
+    `/bookings/cancel-booking?bookingId=${bookingId}`
+  );
+  if (error) throw new Error(error.message);
+};
+export const updateAllBookingsAfterUpdateTour = async ({
+  tourId,
+  dateOfLocationAfter,
+  dateOfGuideAfter,
+}) => {
+  const { data, error } = await axios.post(
+    `/bookings/changing-related-booking-after-update-tour?tourId=${tourId}&dateOfLocationAfter=${dateOfLocationAfter}&dateOfGuideAfter=${dateOfGuideAfter}`
+  );
+  if (error) throw new Error(error.message);
+  return data;
+};
+export const getAllUpcomingBookingOfSameTour = async ({ userId, tourId }) => {
+  const { data, error } = await axios.get(
+    `/bookings/user/booking-upcoming-related?userId=${userId}&tourId=${tourId}`
+  );
+  if (error) throw new Error(error.message);
+  return data;
+};
+export const changeBookingPaymentSessionId = async ({
+  bookingId,
+  sessionId,
+}) => {
+  const { data, error } = await axios.post('/bookings/change-session', null, {
+    params: {
+      bookingId: bookingId,
+      sessionId: sessionId,
+    },
+  });
+  if (error) throw new Error(error.message);
+  return data;
+};

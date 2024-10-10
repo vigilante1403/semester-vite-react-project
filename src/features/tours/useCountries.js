@@ -7,7 +7,7 @@ function useCountries() {
   const { data: countries, isLoading } = useQuery({
     queryKey: ['countries'],
     queryFn: getAllCountries,
-    retry: false
+    
   });
 
   return { countries, isLoading };

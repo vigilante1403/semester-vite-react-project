@@ -346,6 +346,7 @@ import StepConfirmBookingTour from './StepConfirmBookingTour';
 import { formatDateArrayAscOrDesc } from '../../utils/helpers';
 import { useGetAllUpcomingBookingsOfSameTour } from './useBookTour';
 import NotifBookingExisted from './NotifBookingExisted';
+import Spinner from '../../ui/Spinner';
 const CalendarContainer = styled.div`
   /* ~~~ container styles ~~~ */
   max-width: 600px;
@@ -559,7 +560,7 @@ const TourDetail = ({ tour, otherTours }) => {
 
   const [schedule, setSchedule] = useState(['']);
   const [address, setAddress] = useState('');
-
+  if(isAuthenticated&&isGetting) return <Spinner />
   return (
     <Container>
       <section>
@@ -674,7 +675,7 @@ const TourDetail = ({ tour, otherTours }) => {
                 onClick={handleSelectAnotherDate}
                 label={'Another Day'}
               />
-              {isAuthenticated ? !isAgree&&bookings!==undefined? (<Modal>
+              {isAuthenticated ? !isAgree&&bookings!==null&&bookings.length>0? (<Modal>
                 <Modal.Open opens={"agreement"}>
                 <Button
                       variant="contained"

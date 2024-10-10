@@ -12,24 +12,27 @@ export function useUsers(){
     const sortBy = searchParams.get('sortBy') || 'name-asc';
     const currentPage = !searchParams.get('page')?1:Number(searchParams.get('page'))
     const {data:users,isLoading}=useQuery({
-        queryKey:['users',searchRoleValue,sortBy,currentPage],
+        // queryKey:['users',searchRoleValue,sortBy,currentPage],
+        queryKey:['users',currentPage],
         retry:false,
         queryFn:getAllUsers
     })
     const pageCount = users? Math.ceil(users.length/PAGE_SIZE):1
     if(currentPage<pageCount){
-        queryClient.prefetchQuery({
-            queryKey:['users',searchRoleValue,sortBy,currentPage+1],
-            retry:false,
-            queryFn: getAllUsers
-        })
+        // queryClient.prefetchQuery({
+        //     queryKey:['users',searchRoleValue,sortBy,currentPage+1],
+        //     retry:false,
+        //     queryFn: getAllUsers
+        // })
+        queryClient.setQueryData(['users',currentPage+1],users)
     }
     if(currentPage>1){
-        queryClient.prefetchQuery({
-            queryKey:['users',searchRoleValue,sortBy,currentPage-1],
-            retry:false,
-            queryFn: getAllUsers
-        })
+        // queryClient.prefetchQuery({
+        //     queryKey:['users',searchRoleValue,sortBy,currentPage-1],
+        //     retry:false,
+        //     queryFn: getAllUsers
+        // })
+        queryClient.setQueryData(['users',currentPage-1],users)
     }
     return {users,isLoading};
    

@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Grid, Box, Button, Divider, Container, Avatar } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBookingById } from '../../features/bookings/useBookings';
 import { useMoveBack } from '../../hooks/useMoveBack';
 import Spinner from '../../ui/Spinner';
@@ -21,21 +21,41 @@ import PaymentIcon from '@mui/icons-material/Payment';
 import { useTourGuides } from '../../features/tours/useTourGuides';
 import { useUsers } from '../../features/authentication/useUsers';
 import { SimpleTreeView, TreeItem } from '@mui/x-tree-view';
+import { useGetAllSchedulesFromASingleBookingId } from './useBookings';
 
 export default function BookingDetailUser({bookingFromComponent}) {
+  const { bookingId } = useParams()
+  const [searchParams]=useSearchParams()
   const [schedule, setSchedule] = useState(['']);
   const [address, setAddress] = useState('');
   const navigate = useNavigate();
   let { booking, isLoading } = useBookingById();
   const { users, isLoading: isLoadingUser } = useUsers();
+  const {schedules,isLoading1}=useGetAllSchedulesFromASingleBookingId({bookingId:bookingId})
   const moveBack = useMoveBack();
+  const fetchAndSetTourLocations = async (tour) => {
+    if (tour?.locations) {
+
+      const locationAddresses = tour.locations.map((location) => location.address);
+      const newSubDescriptions = tour.locations.map((location) =>
+        location.description.split(", ").map((desc) => desc.trim())
+      );
+
+      setSchedule(newSubDescriptions);
+      setAddress(locationAddresses);
+
+    } else {
+      setAddress('');
+      setSchedule(['']);
+    }
+  };
   useEffect(() => {
     if (booking?.tour) {
       fetchAndSetTourLocations(booking.tour);
 
     }
   }, [booking?.tour]);
-  if (isLoading || isLoadingUser) return <Spinner />;
+  if (isLoading || isLoadingUser||isLoading1) return <Spinner />;
   if(bookingFromComponent!=null){
     booking=bookingFromComponent;
   }
@@ -54,23 +74,8 @@ export default function BookingDetailUser({bookingFromComponent}) {
     status
   } = booking;
 
-  const guidesList = users.filter(g => booking.tour.guides.some(guide => guide === g.id));
-  const fetchAndSetTourLocations = async (tour) => {
-    if (tour?.locations) {
-
-      const locationAddresses = tour.locations.map((location) => location.address);
-      const newSubDescriptions = tour.locations.map((location) =>
-        location.description.split(", ").map((desc) => desc.trim())
-      );
-
-      setSchedule(newSubDescriptions);
-      setAddress(locationAddresses);
-
-    } else {
-      setAddress('');
-      setSchedule(['']);
-    }
-  };
+  const guidesList = users.filter(g => schedules.some(sc => sc.guideId === g.id));
+  
   console.log(guidesList);
 
   return (
