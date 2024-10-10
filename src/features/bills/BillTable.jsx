@@ -7,13 +7,31 @@ import BillRow from './BillRow';
 import Empty from '../../ui/Empty';
 import { PAGE_SIZE } from '../../utils/constants';
 import Pagination from '../../ui/Pagination';
+import { useContext } from 'react';
+import { BillContext } from '../../pages/Bills';
 function BillTable() {
-  const { bills, isLoading } = useBills();
+
   const [searchParams] = useSearchParams();
+  const {filteredBills:bills}=useContext(BillContext)
 
-
-  if (isLoading) return <Spinner />;
  
+  const sortBy = searchParams.get('sortBy') || 'amount-asc';
+  const [field, direction] = sortBy.split('-');
+  console.log(field, direction);
+  const modifier = direction === 'asc' ? 1 : -1;
+  let sortedBills = bills;
+  if(field==='amount'){
+    sortedBills=bills.sort((a,b)=>modifier*(a['booking']['priceFinal']-b['booking']['priceFinal']))
+  }
+  // let sortedBills = bills.sort(
+  //   (a, b) => (a[field] - b[field]) * modifier
+  // );
+
+  if (field === 'paid') {
+    sortedBills = bills.sort(
+      (a, b) => modifier * (new Date(a['paidAt'])-new Date(b['paidAt']))
+    );
+  }
   const currentPage = !searchParams.get('page')
     ? 1
     : Number(searchParams.get('page'));

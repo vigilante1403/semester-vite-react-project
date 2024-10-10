@@ -40,7 +40,7 @@ function ReArrangeDateTour({ tour,onClose }) {
   const [startDate, setStartDate] = useState('');
   const [busyGuides, setBusyGuides] = useState([]);
   const [chosenGuides,setChosenGuides]=useState([])
-  const { schedules, isLoading } = useGetAllSchedules()
+  const { schedules, isLoading } = useGetAllSchedules({authorized:true})
   const { guides, isLoading: isLoading1 } = useTourGuides();
   const {addDate,isAdding}=useAddStartDate();
   const {editDate,isEditting}=useEditStartDate()
@@ -58,6 +58,7 @@ function ReArrangeDateTour({ tour,onClose }) {
   const handleSetBusyGuides = (event) => {
     setStartDate((prev) => event.target.value);
     setChosenGuides(prev=>[])
+    setBusyGuides(prev=>[])
     var date2 = new Date(event.target.value);
     date2.setDate(date2.getDate() + tour.locations.length - 1);
 
@@ -67,21 +68,24 @@ function ReArrangeDateTour({ tour,onClose }) {
     var guidesBusy = schedules
       .filter(
         (schedule) =>schedule.status&&
-          !(
-          compareTwoDates(event.target.value,schedule.to.toString())==='after') &&
-            !(
-              compareTwoDates(event.target.value, schedule.from.toString()) === 'before'&&compareTwoDates(date2.toLocaleDateString('en-CA'),schedule.from.toString())==='before')
+          (
+          compareTwoDates(event.target.value,schedule.to.toString())!=='after')
+          //  &&
+          //   !(
+          //     compareTwoDates(event.target.value, schedule.from.toString()) === 'before'&&compareTwoDates(date2.toLocaleDateString('en-CA'),schedule.from.toString())==='before')
       )
       .map((schedule) => {
         
         return schedule.guideId});
     setBusyGuides((prev) => guidesBusy);
+    
     if(startId!==''){
-      var guideIdList =schedules.filter(sc=>sc.startDateId===startId).map(sc=>sc.guideId)
+      var guideIdList =schedules.filter(sc=>sc.startDateId===startId&&sc.status).map(sc=>sc.guideId)
       console.log('aaaa',guideIdList)
-      var temp2=busyGuides
-      console.log(busyGuides)
+      var temp2=guidesBusy
+      console.log(guidesBusy)
     temp2=temp2.filter(busy=>!guideIdList.includes(busy))
+    console.log('temp2',temp2)
     setBusyGuides(prev=>[...temp2])
     }
   };
@@ -104,7 +108,8 @@ function ReArrangeDateTour({ tour,onClose }) {
       .filter(
         (schedule) =>schedule.status&&
           !(
-          compareTwoDates(dateFind,schedule.to.toString())==='after') &&
+          compareTwoDates(dateFind,schedule.to.toString())==='after') 
+          &&
             !(
               compareTwoDates(dateFind, schedule.from.toString()) === 'before'&&compareTwoDates(endDateFind.toLocaleDateString('en-CA'),schedule.from.toString())==='before')
       )
@@ -260,7 +265,7 @@ function ReArrangeDateTour({ tour,onClose }) {
       {clickedButton === 2 && (
         <Form onSubmit={handleSubmit(handleSubmit2)}>
           <FormRow label="Current Start Date">
-            <Select options={startDates.filter(start=>start.status).map(start=>({label:start.startDate,value:start.id}))}
+            <Select options={startDates.filter(start=>start.status&&compareTwoDates(start.startDate.toString(),new Date().toLocaleDateString('en-CA'))==='after').map(start=>({label:start.startDate,value:start.id}))}
              onChange={(e)=>handleSelectStartDate(e)}  />
           </FormRow>
           {startId&&<FormRow label="Change To Start Date">
@@ -291,7 +296,7 @@ function ReArrangeDateTour({ tour,onClose }) {
       {clickedButton === 3 && (
         <Form onSubmit={handleSubmit(handleSubmit3)}>
           <FormRow label="Current Start Date">
-            <Select options={startDates.filter(start=>start.status).map(start=>({label:start.startDate,value:start.id}))}
+            <Select options={startDates.filter(start=>start.status&&compareTwoDates(start.startDate.toString(),new Date().toLocaleDateString('en-CA'))==='after').map(start=>({label:start.startDate,value:start.id}))}
              onChange={(e)=>handleSelectStartDate(e)}  />
           </FormRow>
           

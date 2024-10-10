@@ -297,10 +297,10 @@ function ToursSection() {
   // Xử lý các trang
   const indexOfLastTour = currentPage * toursPerPage; // Chỉ số tour cuối cùng
   const indexOfFirstTour = indexOfLastTour - toursPerPage; // Chỉ số tour đầu tiên
-  const currentTours = tours.slice(indexOfFirstTour, indexOfLastTour); // Các tour hiện tại
+  const currentTours = tours.filter(tour=>tour.status==='active').slice(indexOfFirstTour, indexOfLastTour); // Các tour hiện tại
 
   // Tính toán số trang
-  const totalPages = Math.ceil(tours.length / toursPerPage);
+  const totalPages = Math.ceil(tours.filter(tour=>tour.status==='active').length / toursPerPage);
 
   const handleNext = () => {
     if (currentPage < totalPages) {
@@ -498,7 +498,6 @@ const ImageGallery = () => {
     </div>
   );
 };
-
 
 
 

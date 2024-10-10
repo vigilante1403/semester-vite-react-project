@@ -156,4 +156,3 @@ function SearchBarMap({onSetCenter,onSetCenterDisplay,centerDisplay,nearbyData})
 export default SearchBarMap
 
 
-

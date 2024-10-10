@@ -39,6 +39,10 @@ export const deleteTour = async (id) => {
   // if (error) throw new Error(error.message);
   return id;
 };
+export const deleteTourTemp=async ({tourId})=>{
+  await axios.delete(`/tours/tour/hidden-temp?tourId=${tourId}`)
+  return tourId
+}
 export const getTourNearMe = async (locationForm) => {
   const { data, error } = await axios.post('/tours/tourNearByMe', locationForm);
   if (error) throw new Error(error.message);
@@ -47,9 +51,9 @@ export const getTourNearMe = async (locationForm) => {
 const API_URL = 'https://restcountries.com/v3.1/all?fields=name,flags,region,ccn3';
 
 export const getAllCountries = async () => {
-  const response = await axios.get(API_URL);
-  const sortedCountries = response.data.sort((a, b) => a.name.common.localeCompare(b.name.common));
-
+  const {data,error} = await axios.get(API_URL);
+  const sortedCountries = data.sort((a, b) => a.name.common.localeCompare(b.name.common));
+  if(error) throw new Error(error.message)
   return sortedCountries;
 };
 export const addStartDatesOfTour = async(form)=>{
@@ -125,5 +129,10 @@ export const fetchAddress = async ()=>{
   // 3) Then we return an object with the data that we are interested in
   //payload of fulfilled state
   return { position, address };
+}
+export const getAllSchedulesFromASingleBookingId= async({bookingId})=>{
+  const {data,error}=await axios.get(`/tours/schedules/from-a-bookingId?bookingId=${bookingId}`);
+  if(error) throw new Error(error.message)
+    return data;
 }
 

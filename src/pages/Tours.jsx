@@ -8,6 +8,7 @@ import { useTours } from '../features/tours/useTours';
 import { createContext, useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Spinner from '../ui/Spinner';
+import Empty from '../ui/Empty';
 export const TourContext=createContext();
 function Tours() {
   const { tours, isLoading } = useTours();
@@ -22,7 +23,7 @@ function Tours() {
     setTimeout(() => setShowTours(true), 0); // Re-mount after a delay
   };
   if (isLoading ) return <Spinner />;
-  if (!tours) return <Spinner />;
+  if (!tours) return <Empty resourceName={'tour'} />;
   if (searchParams.get('tour') !== 'all' && searchParams.get('tour') !== '' && searchParams.get('tour')!==null) {
     filteredTours = [];
     var temptours = tours;
@@ -30,7 +31,7 @@ function Tours() {
       const name = tour.name.toLowerCase();
       console.log(tour);
       
-      return name.startsWith(searchTour) ? name : null;
+      return name.startsWith(searchTour) ? tour : null;
     });
     
   } else {
@@ -55,6 +56,7 @@ function Tours() {
     const newData = data.toLowerCase();
     setSearchTour(newData);
     searchParams.set('tour', newData);
+    searchParams.set('page',1)
     setSearchParams(searchParams);
   };
     return (

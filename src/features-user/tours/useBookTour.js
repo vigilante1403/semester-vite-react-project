@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { getAllStartDates, getAllStartDatesOfATour } from "../../services/apiTours";
-import { getAllUpcomingBookingOfSameTour } from "../../services/apiBookings";
+import { changeBookingPaymentSessionId, getAllUpcomingBookingOfSameTour } from "../../services/apiBookings";
+import toast from "react-hot-toast";
 
 export function useGetAllStartDatesOfTour({tourId}){
     const {data:startDates,isLoading}=useQuery({
@@ -25,4 +26,11 @@ export function useGetAllUpcomingBookingsOfSameTour({userId,tourId}){
         enabled:!!userId&&!!tourId
     })
     return {bookings,isGetting}
+}
+export const useChangeBookingSessionId = ()=>{
+    const {mutate:changeSession,isLoading:isEditting}=useMutation({
+        mutationFn:changeBookingPaymentSessionId,
+        onError:(err)=>toast.error(err)
+    })
+    return {changeSession,isEditting}
 }

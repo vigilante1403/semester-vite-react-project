@@ -1,24 +1,25 @@
 import { useSearchParams } from "react-router-dom";
-import Spinner from "../../ui/Spinner";
-import { useGetAllSchedules } from "./useSchedules"
+
 import Empty from "../../ui/Empty";
 import { PAGE_SIZE } from "../../utils/constants";
 import Menus from "../../ui/Menus";
 import Table from "../../ui/Table";
 import ScheduleRow from "./ScheduleRow";
 import Pagination from "../../ui/Pagination";
+import { useContext } from "react";
+import { ScheduleContext } from "../../pages/Schedules";
 
 
 function ScheduleTableAuthorized() {
     
-    const {schedules,isLoading}=useGetAllSchedules();
+    const {filteredSchedules:schedules1}=useContext(ScheduleContext)
     const [searchParams] = useSearchParams();
-    if(isLoading) return <Spinner />
     const geo = searchParams.get('geo')||'all'
     const status = searchParams.get('status')||'all'
   const sortBy = searchParams.get('sortBy')&&searchParams.get('sortBy')!==''?searchParams.get('sortBy') : 'startDate-asc';
   const [field, direction] = sortBy.split('-');  
-  let filteredSchedules =schedules
+  let filteredSchedules =schedules1
+  console.log(schedules1)
     if(geo!=='all'){
       if(geo==='in-vietnam'){
         filteredSchedules=filteredSchedules.filter(schedule=>schedule.countryName==='Vietnam')
@@ -33,7 +34,7 @@ function ScheduleTableAuthorized() {
   filteredSchedules = filteredSchedules.sort((a, b) => {
     if (field === 'startDate') {
       const dateA = new Date(a.from);
-      console.log(a.from);
+     
       const dateB = new Date(b.from);
       return modifier * (dateA - dateB);
     }
@@ -56,7 +57,7 @@ function ScheduleTableAuthorized() {
         <Menus>
       <Table columns="auto 0.8fr 2.1fr 2fr 1.2fr auto 1fr">
         <Table.Header role="row">
-          <div>ID</div>
+          <div>SID</div>
           <div>Guide name</div>
           <div>email</div>
           <div>Tour</div>

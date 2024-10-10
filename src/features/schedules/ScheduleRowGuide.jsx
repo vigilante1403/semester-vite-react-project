@@ -14,6 +14,12 @@ const Guide = styled.div`
   color: var(--color-grey-600);
   font-family: 'Sono';
 `;
+const ScheduleId = styled.div`
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--color-grey-600);
+  font-family: 'Sono';
+`;
 const Img = styled.img`
   display: block;
   width: 6.4rem;
@@ -79,7 +85,7 @@ const scheduleStatus = {
 const currentPage = searchParams.get('page')||1
     return (
         <Table.Row>
-      <span>x</span>
+      <ScheduleId>{id.substring(0,7)}...</ScheduleId>
       
       <Stacked>
         <Guide>{tourName}</Guide>

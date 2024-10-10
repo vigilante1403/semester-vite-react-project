@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Typography, Container, Grid } from '@mui/material';
 import Tour from './Tour';
 import Empty from '../../ui/Empty';
-import { getAllFavoriteUser } from '../../services/apiFavorite';
-import { useAuthenticate } from '../security/useAuthenticate';
 const TourShowing = ({ tours,bookings }) => {
- 
-if (tours.length <= 0) return <Empty resourceName="tours" />;
-
+  if (!tours||!tours.length) return <Empty resourceName="tours" />;
+  
 
   return (
     <Container>

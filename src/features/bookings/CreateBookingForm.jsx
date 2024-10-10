@@ -16,8 +16,9 @@ import { useUpdateBooking } from './useUpdateBooking';
 import Spinner from '../../ui/Spinner';
 import { useState } from 'react';
 import { useGetAllStartDates } from '../../features-user/tours/useBookTour';
+import { convertToReadableDateTimeFromISOTimestamp } from '../../utils/helpers';
 
-function CreateBookingForm({ onClose, editBooking }) {
+function CreateBookingForm({ onClose, editBooking,fixed=false,fixedStart=null }) {
   const { createBooking, isCreating } = useCreateBooking();
   const { tours, isLoading } = useTours();
   const { users, isLoading: isLoading2 } = useUsers();
@@ -96,7 +97,7 @@ function CreateBookingForm({ onClose, editBooking }) {
       toast.error('Please choose user');
       return;
     }
-    if (dateChose === '' || dateChose === '#') {
+    if (!fixed&&(dateChose === '' || dateChose === '#')) {
       toast.error('Please choose date');
       return;
     }
@@ -114,7 +115,7 @@ function CreateBookingForm({ onClose, editBooking }) {
     console.log(keys);
     formData.append('tour', tourChose);
     formData.append('user', userChose);
-    formData.append('date', dateChose);
+    formData.append('date',!fixed? dateChose:formatDate(fixedStart).toString());
     formData.append('paid', isPaid);
     formData.append('priceOrigin', price);
     formData.append('priceDiscount', priceDiscount);
@@ -263,7 +264,12 @@ function CreateBookingForm({ onClose, editBooking }) {
           min={1}
         />
       </FormRow>
-      <FormRow label="Start date">
+      {fixed&&<FormRow label="Start date">
+        <p>{formatDate(fixedStart)}</p>
+      </FormRow>}
+      
+      {!fixed&&<FormRow label="Start date">
+      
         <Controller
           name="date"
           control={control}
@@ -301,7 +307,7 @@ function CreateBookingForm({ onClose, editBooking }) {
             />
           )}
         />
-      </FormRow>
+      </FormRow>}
 
       <FormRow label="Price">
         <Input

@@ -10,16 +10,17 @@ import { useCreateBooking } from '../../features/bookings/useCreateBooking';
 import Menus from '../../ui/Menus';
 import { HiArrowDownOnSquare } from 'react-icons/hi2';
 import toast from 'react-hot-toast';
+import { useChangeBookingSessionId } from './useBookTour';
 
 // Replace with your Stripe publishable key
 const stripePromise = loadStripe(
   'pk_test_51PoLUhJTj4obgyzzmX3gZQzIeD4CxRuGPoRYRrtGmlBZ5Svj62DpbjITJeTneTJBBuEqJOKHz7NCvhUJDFq0bN2B005BINmu7i'
 );
 
-const CheckoutButton = ({ tour, payAfter = null,bill=null }) => {
+const CheckoutButton = ({ tour, payAfter = null,bill=null,bookingId=null }) => {
   const { user, isAuthenticated, isLoading } = useAuthenticate();
   const { createBooking, isCreating } = useCreateBooking();
-
+  const {changeSession,isEditting}=useChangeBookingSessionId()
    const stripeRedirect = async (sessionId, stripe) => {
     const { error } = await stripe.redirectToCheckout({// con meo
       sessionId: sessionId,
@@ -60,7 +61,9 @@ const CheckoutButton = ({ tour, payAfter = null,bill=null }) => {
           onSuccess: () => stripeRedirect(sessionId, stripe),
         });
       }else{
-        stripeRedirect(sessionId,stripe);
+        changeSession({bookingId:bookingId,sessionId:sessionId},{
+          onSuccess:()=>stripeRedirect(sessionId,stripe)
+        })
       }
 
       // Redirect to Stripe Checkout

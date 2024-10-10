@@ -14,7 +14,7 @@ function TourTableOperations() {
           },
           { value: 'GUIDE', label: 'Guide Role' },
           { value: 'LEADGUIDE', label: 'LeadGuide Role' },
-          { value: 'ADMIN', label: 'Admin Role' },
+         
         ]}
       />
       <SortBy options={[{ value: 'name-asc', label: 'Sort by name (A-Z)' },{
