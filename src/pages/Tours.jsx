@@ -36,14 +36,10 @@ function Tours() {
     
   } else {
     
-    // filteredTours = [];
-    
-    // filteredTours = tours;
     if(filteredTours.length===0){
       
       filteredTours=tours
     }
-    // console.log('filter tours',filteredTours)
   }
   const handleSearch = (data) => {
     if(data.trim()===''){

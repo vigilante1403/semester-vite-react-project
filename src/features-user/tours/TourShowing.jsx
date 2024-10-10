@@ -2,8 +2,9 @@ import React from 'react';
 import { Typography, Container, Grid } from '@mui/material';
 import Tour from './Tour';
 import Empty from '../../ui/Empty';
+import Spinner from '../../ui/Spinner';
 const TourShowing = ({ tours,bookings }) => {
-  if (!tours||!tours.length) return <Empty resourceName="tours" />;
+  if (!tours||!tours.length) return <Spinner/>
   
 
   return (
