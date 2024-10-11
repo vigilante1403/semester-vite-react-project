@@ -9,6 +9,7 @@ import { useTours } from '../tours/useTours';
 import { useSearchParams } from 'react-router-dom';
 import { useRecentBookings } from './useRecentBookings';
 import BillDataBox from './BillDataBox';
+import { useRecentBills } from './useBills';
 
 const StyledDashboardLayout = styled.div`
   display: grid;
@@ -22,14 +23,14 @@ function DashboardLayout() {
   const [searchParams] = useSearchParams();
   const numDays = Number(searchParams.get('last')) || 7;
   const { bookings, isLoading } = useRecentBookings();
-
+  const {bills,isLoading:isLoading1}=useRecentBills();
  
-  if (isLoadingTour || isLoading) return <Spinner />;
+  if (isLoadingTour || isLoading||isLoading1) return <Spinner />;
   if (!tours || !bookings) return <Empty resourceName="tours" />;
   return (
     <StyledDashboardLayout>
       <Stats bookings={bookings} confirmStays={[...bookings].filter(booking=>booking.paid)} />
-      <BillDataBox />
+      <BillDataBox bills={bills} />
       <DurationChart confirmedStays={tours} />
       <SalesChart
         bookings={bookings}

@@ -32,10 +32,10 @@ export function useBookingsTotal() {
   });
   const pageCount = bookings ? Math.ceil(bookings.length / PAGE_SIZE) : 1;
   if (currentPage < pageCount) {
-    queryClient.setQueryData(['tours', currentPage + 1], bookings);
+    queryClient.setQueryData(['bookings', currentPage + 1], bookings);
   }
   if (currentPage > 1) {
-    queryClient.setQueryData(['tours', currentPage - 1], bookings);
+    queryClient.setQueryData(['bookings', currentPage - 1], bookings);
   }
   return { bookings, isLoading };
 }

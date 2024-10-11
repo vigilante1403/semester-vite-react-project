@@ -6,6 +6,7 @@ import { formatCurrency } from '../../utils/helpers';
 import styled from 'styled-components';
 import { useContext } from 'react';
 import { AdminContext } from '../../ui/ProtectedRouteAdmin';
+import BillModal from '../dashboard/BillModal';
 const Bill = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
@@ -61,13 +62,16 @@ function BillRow({ bill }) {
           <Menus.Menu>
             <Menus.Toggle id={id} />
             <Menus.List id={id}>
+            <Modal.Open opens={`bill-${id}`}>
               <Menus.Button onClick={() => {}} icon={<HiEye />}>
                 See details
               </Menus.Button>
-              
+              </Modal.Open>
             </Menus.List>
           </Menus.Menu>
-          <Modal.Window name={`edit-${id}`}></Modal.Window>
+          <Modal.Window name={`bill-${id}`}>
+            <BillModal selectedPayment={bill} />
+          </Modal.Window>
        
         </Modal>
       </div>

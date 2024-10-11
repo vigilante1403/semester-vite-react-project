@@ -343,8 +343,12 @@ import { LoginContext } from '../../context/LoginContext';
 import { useAuthenticate } from '../security/useAuthenticate';
 import Modal from '../../ui/Modal';
 import StepConfirmBookingTour from './StepConfirmBookingTour';
-import { compareTwoDates, formatDateArrayAscOrDesc } from '../../utils/helpers';
-import { useGetAllSchedules, useGetAllStartDatesOfTour, useGetAllUpcomingBookingsOfSameTour } from './useBookTour';
+import { formatDateArrayAscOrDesc, compareTwoDates } from '../../utils/helpers';
+import {
+  useGetAllSchedules,
+  useGetAllStartDatesOfTour,
+  useGetAllUpcomingBookingsOfSameTour,
+} from './useBookTour';
 import NotifBookingExisted from './NotifBookingExisted';
 import Spinner from '../../ui/Spinner';
 import { useBookingsOfUser } from '../bookings/useBookings';
@@ -353,7 +357,6 @@ import ReviewForm from '../reviews/ReviewForm';
 import { ReviewContext } from '../reviews/Reviews';
 import { UserContext } from '../../ui/userLayout/ProtectedRouteUser';
 import Empty from '../../ui/Empty';
-
 const CalendarContainer = styled.div`
   /* ~~~ container styles ~~~ */
   max-width: 600px;
@@ -438,10 +441,13 @@ const CalendarContainer = styled.div`
 
 const TourDetail = ({ tour, otherTours }) => {
   const dateArr = formatDateArrayAscOrDesc(tour.startDates, 1);
-  console.log(dateArr);
+  // console.log(dateArr);
+  // const [selectedDate, setSelectedDate] = useState(
+  //   new Date(tour.startDates[0])
+  // );
   const [selectedDate, setSelectedDate] = useState('');
   const [isDateLocked, setIsDateLocked] = useState(true);
-  const [showMoreReviews, setShowMoreReviews] = useState(false); 
+  const [showMoreReviews, setShowMoreReviews] = useState(false); // State to toggle See More reviews
 
   const [schedule, setSchedule] = useState(['']);
   const [address, setAddress] = useState('');
@@ -459,11 +465,12 @@ const TourDetail = ({ tour, otherTours }) => {
   const userId = user?.id;
   const { bookings: bookingsOfUser, isLoading1 } = useBookingsOfUser(userId);
   const { reviews, isLoading: isLoading2, refetch } = useReviewsOfUser(userId);
-
-const {startDates,isLoading: isLoadingStartDate} = useGetAllStartDatesOfTour({tourId: tour.id});
-
-const {schedules,isLoadingSchedule} = useGetAllSchedules();
-const [guideShow,setGuideShow]=useState();
+  const {
+    startDates,
+    isLoading: isLoadingStartDate,
+  } = useGetAllStartDatesOfTour({ tourId: tour.id });
+  const { schedules, isLoadingSchedule } = useGetAllSchedules();
+  const [guideShow, setGuideShow] = useState();
   const fetchAndSetTourLocations = async (tour) => {
     if (tour?.locations) {
       const locationAddresses = tour.locations.map(
@@ -482,7 +489,7 @@ const [guideShow,setGuideShow]=useState();
   };
   useEffect(() => {
     window.scrollTo(0, 0);
-  
+
     if (!isLoadingStartDate && startDates?.length > 0 && !isLoadingSchedule && schedules.length > 0) {
     
       const currentDate = new Date();
@@ -508,31 +515,21 @@ const [guideShow,setGuideShow]=useState();
     }
     fetchAndSetTourLocations(tour);
   }, [tour, isLoadingStartDate, startDates, isLoadingSchedule, schedules]);
-  
-  
   const handleToggleShowMore = () => {
     setShowMoreReviews(!showMoreReviews);
   };
-
-
-
-
+  // const startDates = tour.startDates.map((date) => new Date(date));
   if((isAuthenticated&&(isGetting || isLoading || isLoading1 || isLoading2 ) )|| isLoadingStartDate || isLoadingSchedule) return <Spinner />
-
   const filteredSchedules = schedules.filter((sh) =>
     startDates.some((st) => st.id === sh.startDateId)
   );
   console.log(filteredSchedules);
-  
-  // const startDates = tour.startDates.map((date) => new Date(date));
   const isStartDate = (date) => {
-    // console.log( startDates.some((startDate) => isSameDay(date, startDate)));
-    
     return startDates.some((startDate) => isSameDay(date, startDate.startDate));
   };
   const isStartMonth = (date) => {
     return startDates.some((startDate) => isSameMonth(date, startDate.startDate));
-  };
+  }
   const isStartYear = (date) => {
     return startDates.some((startDate) => isSameYear(date, startDate.startDate));
   };
@@ -560,7 +557,6 @@ const [guideShow,setGuideShow]=useState();
         return false;
     }
   };
-  
 
   const handleChangeImage = (image) => {
     setSelectedImage(image);
@@ -572,7 +568,6 @@ const [guideShow,setGuideShow]=useState();
     }
     setSelectedDate(date);
     setIsDateLocked(false);
-  
     const selectedStartDateId = startDates.find(
       (startDate) => startDate.startDate === date.toLocaleDateString('en-CA')
     )?.id;
@@ -585,24 +580,7 @@ const [guideShow,setGuideShow]=useState();
   
     setGuideShow(selectedGuide); 
   };
-  
-  
 
-  // const handleSelectAnotherDate = () => {
-  //   setIsDateLocked(false);
-  //   var currentDate = selectedDate;
-  //   console.log(currentDate.toLocaleDateString('en-CA'));
-  //   var index = Array.from(dateArr).indexOf(
-  //     currentDate.toLocaleDateString('en-CA')
-  //   );
-  //   console.log(index);
-  //   if (index + 1 < dateArr.length) {
-  //     setSelectedDate(new Date(dateArr[index + 1]));
-  //   } else {
-  //     setSelectedDate(new Date(dateArr[0]));
-  //   }
-  // };
- 
   const handleSelectAnotherDate = () => {
     setIsDateLocked(false);
     const currentDate = selectedDate;
@@ -634,14 +612,15 @@ const [guideShow,setGuideShow]=useState();
     );
     setGuideShow(nextGuide);
   };
-  
+
   const handleSeeAllTours = () => {
     navigate('/tours');
   };
   const handleSeeTourDetail = (id) => {
     navigate(`/tours/tour-detail/${id}`);
   };
-  
+
+
   let filteredBooking = [];
   if (bookings !== undefined && reviews !== undefined) {
     const reviewsToursId = reviews.map((review) => review.tourId);
@@ -651,28 +630,24 @@ const [guideShow,setGuideShow]=useState();
       return isSameTour && hasNoReview;
     });
   }
-  const handleReload = () => {
-  }
+  const handleReload = () => {};
   const nearestBooking = filteredBooking.length
     ? filteredBooking.reduce((nearest, current) => {
-      const nearestDate = new Date(nearest.startDate);
-      const currentDate = new Date(current.startDate);
-      return currentDate > nearestDate ? current : nearest;
-    })
+        const nearestDate = new Date(nearest.startDate);
+        const currentDate = new Date(current.startDate);
+        return currentDate > nearestDate ? current : nearest;
+      })
     : null;
     console.log(guideShow);
-
-    const sortReview = tour?.reviews.sort((a,b)=>{   
+    const sortReview = tour.reviews?tour?.reviews.sort((a,b)=>{   
                 
                 
       const dateA = new Date(a.updatedAt || a.createdAt);
       const dateB = new Date(b.updatedAt || b.createdAt);
      
       return dateB - dateA;
-     })
-     console.log(sortReview);
+     }):[]
      
-    
   return (
     <Container>
       <section>
@@ -760,7 +735,7 @@ const [guideShow,setGuideShow]=useState();
             </Typography>
             <Typography variant="h4">
               <strong>Start Date:</strong>{' '}
-              {selectedDate !=='' && selectedDate.toLocaleDateString('en-CA')}
+              {selectedDate !=='' &&selectedDate.toLocaleDateString('en-CA')}
             </Typography>
             <Typography variant="h4">
               <strong>Price:</strong> {tour.price - tour.priceDiscount} $
@@ -771,10 +746,10 @@ const [guideShow,setGuideShow]=useState();
             </Typography>
             {guideShow?.map((guide) => (
               <Typography key={guide.id} variant="h5">
-                {guide.guideName} - {guide.countryName}
+              {guide.guideName} - {guide.countryName}
               </Typography>
             ))}
-          
+
             {/* {isDateLocked ? ( */}
             {selectedDate !== "" && <Box sx={{ margin: '20px' }} display={'flex'}>
               {/* <Button variant="outlined" color="secondary" onClick={handleSelectAnotherDate} style={{ marginTop: '16px' }}>
@@ -784,39 +759,48 @@ const [guideShow,setGuideShow]=useState();
                   Book now
                 </Button> */}
               <Button75
-                onClick={() => { handleSelectAnotherDate() }}
+                onClick={() => {
+                  handleSelectAnotherDate();
+                }}
                 label={'Another Day'}
               />
-              {isAuthenticated ? !isAgree&&bookings!==null&&bookings.length>0? (<Modal>
-                <Modal.Open opens={"agreement"}>
-                {/* <Button
+              {isAuthenticated ? (
+                !isAgree && bookings !== null && bookings.length > 0 ? (
+                  <Modal>
+                    <Modal.Open opens={'agreement'}>
+                      {/* <Button
                       variant="contained"
                       color="primary"
                       sx={{ marginTop: '1rem', fontSize: '1.2rem' }}
                     >
                       Book now
                     </Button> */}
-                    <Button36 label={'Book now'} onClick={() => { }} />
-                </Modal.Open>
-                <Modal.Window name={"agreement"}>
-                  <NotifBookingExisted onSetAgreement={setIsAgree} bookings={bookings} />
-                </Modal.Window>
-              </Modal>): (
-                <Modal>
-                  <Modal.Open opens={`book-tour-${tour.id}`}>
-                    {/* <Button
+                      <Button36 label={'Book now'} onClick={() => {}} />
+                    </Modal.Open>
+                    <Modal.Window name={'agreement'}>
+                      <NotifBookingExisted
+                        onSetAgreement={setIsAgree}
+                        bookings={bookings}
+                      />
+                    </Modal.Window>
+                  </Modal>
+                ) : (
+                  <Modal>
+                    <Modal.Open opens={`book-tour-${tour.id}`}>
+                      {/* <Button
                       variant="contained"
                       color="primary"
                       sx={{ marginTop: '1rem', fontSize: '1.2rem' }}
                     >
                       Book now
                     </Button> */}
-                    <Button36 label={'Book now'} onClick={() => { }} />
-                  </Modal.Open>
-                  <Modal.Window name={`book-tour-${tour.id}`}>
-                    <StepConfirmBookingTour tour={tour} user={user} />
-                  </Modal.Window>
-                </Modal>
+                      <Button36 label={'Book now'} onClick={() => {}} />
+                    </Modal.Open>
+                    <Modal.Window name={`book-tour-${tour.id}`}>
+                      <StepConfirmBookingTour tour={tour} user={user} />
+                    </Modal.Window>
+                  </Modal>
+                )
               ) : (
                 <Box
                   // {isAuthenticated ? <CheckoutButton tour={tour}/> : <Box
@@ -839,7 +823,7 @@ const [guideShow,setGuideShow]=useState();
                 </Box>
               )}
               {/* <Button36 label={"Book now"} disabled={!isDateLocked} /> */}
-            </Box> }
+              </Box> }
             {selectedDate === "" && <Typography color={'red'} variant='h3'>No start date yet</Typography> 
             }
             {/* ) : null} */}
@@ -1043,21 +1027,19 @@ const [guideShow,setGuideShow]=useState();
           Map
         </Typography>
         <hr></hr>
-        {tour.locations&&<Box sx={{ margin: '50px' }}>
-          {tour.locations.length > 0 && (
-            <MapComponent
-              styleDefault="mapbox://styles/vytruong1812/cm1c6ma7h02hc01o3azvg0h6e"
-              locations={tour.locations}
-            />
-          )}
-          
-        </Box>}
-        {!tour.locations.length&&<Empty resourceName={'map'} />}
-
+        {tour.locations && (
+          <Box sx={{ margin: '50px' }}>
+            {tour.locations.length > 0 && (
+              <MapComponent
+                styleDefault="mapbox://styles/vytruong1812/cm1c6ma7h02hc01o3azvg0h6e"
+                locations={tour.locations}
+              />
+            )}
+          </Box>
+        )}
+        {!tour.locations.length && <Empty resourceName={'map'} />}
       </section>
-      <UserContext.Provider
-        value={{ isAuthenticated, user, isLoading }}
-      >
+      <UserContext.Provider value={{ isAuthenticated, user, isLoading }}>
         <ReviewContext.Provider value={{ reviews, handleReload }}>
           <section style={{ marginTop: '80px' }}>
             {nearestBooking && (
@@ -1084,16 +1066,22 @@ const [guideShow,setGuideShow]=useState();
                   stroke="currentColor"
                   style={{ width: '30px', height: '30px', color: '#D32F2F' }}
                 >
-                                    <path
+                  <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
                     d="M13 16h-1v-4h-1m1-4h.01M21 12.5A9.5 9.5 0 1112.5 3 9.5 9.5 0 0121 12.5z"
                   />
                 </svg>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '18px' }}>
-                  Bạn có booking của tour "{nearestBooking.tour.name}" chưa review!{" "}
-                  <span style={{ textDecoration: 'underline', cursor: 'pointer' }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 'bold', fontSize: '18px' }}
+                >
+                  Bạn có booking của tour "{nearestBooking.tour.name}" chưa
+                  review!{' '}
+                  <span
+                    style={{ textDecoration: 'underline', cursor: 'pointer' }}
+                  >
                     <Modal>
                       <Modal.Open opens="review-form">
                         <Button
@@ -1112,7 +1100,6 @@ const [guideShow,setGuideShow]=useState();
                   </span>
                 </Typography>
               </Box>
-
             )}
             <Typography variant="h2">Reviews</Typography>
             <hr />
@@ -1127,10 +1114,9 @@ const [guideShow,setGuideShow]=useState();
                 backgroundColor: '#ADCB8B',
               }}
             >
-                           {tour?.reviews && tour?.reviews.length > 0 ? (
-               sortReview.slice(0, showMoreReviews ? tour.reviews.length : 3)
+              {tour?.reviews && tour?.reviews.length > 0 ? (
+                sortReview.slice(0, showMoreReviews ? tour.reviews.length : 3)
                   .map((review, index) => (
-             
                     <Card
                       key={index}
                       sx={{
@@ -1152,11 +1138,17 @@ const [guideShow,setGuideShow]=useState();
                             sx={{ width: 40, height: 40, marginRight: '10px' }}
                           />
                           <Box>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontWeight: 600 }}
+                            >
                               {review.userName || 'User Name'}
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'gray' }}>
-                              {review.updatedAt || review.createdAt || 'Date'}
+                            <Typography
+                              variant="caption"
+                              sx={{ color: 'gray' }}
+                            >
+                             {review.updatedAt || review.createdAt || 'Date'}
                             </Typography>
                           </Box>
                         </Box>
@@ -1169,7 +1161,7 @@ const [guideShow,setGuideShow]=useState();
                         <Typography variant="h4" sx={{ marginTop: '10px' }}>
                           {review.review || 'This is the review content.'}
                         </Typography>
-                       
+                        {/* Nút Review nằm ở góc dưới bên phải */}
                         <Box
                           sx={{
                             position: 'absolute',
@@ -1177,21 +1169,23 @@ const [guideShow,setGuideShow]=useState();
                             right: '10px',
                           }}
                         >
-                          {isAuthenticated && user.id === review.userId && <Modal>
-                            <Modal.Open opens="review-form">
-                              <Button
-                                variant="contained"
-                                color="info"
-                                size="small" // Chỉnh sửa kích thước nút
-                                sx={{ borderRadius: '20px', px: 2 }}
-                              >
-                                Change Review
-                              </Button>
-                            </Modal.Open>
-                            <Modal.Window name="review-form">
-                              <ReviewForm review={review} />
-                            </Modal.Window>
-                          </Modal>}
+                          {isAuthenticated && user.id === review.userId && (
+                            <Modal>
+                              <Modal.Open opens="review-form">
+                                <Button
+                                  variant="contained"
+                                  color="info"
+                                  size="small" // Chỉnh sửa kích thước nút
+                                  sx={{ borderRadius: '20px', px: 2 }}
+                                >
+                                  Change Review
+                                </Button>
+                              </Modal.Open>
+                              <Modal.Window name="review-form">
+                                <ReviewForm review={review} />
+                              </Modal.Window>
+                            </Modal>
+                          )}
                         </Box>
                       </CardContent>
                     </Card>
@@ -1203,7 +1197,7 @@ const [guideShow,setGuideShow]=useState();
               )}
             </Box>
             {/* Nút See More / See Less */}
-            {tour.reviews&& tour.reviews.length > 3 && (
+            {tour.reviews && tour.reviews.length > 3 && (
               <Box textAlign="center" mt={2}>
                 <Button
                   onClick={handleToggleShowMore}
@@ -1217,7 +1211,76 @@ const [guideShow,setGuideShow]=useState();
           </section>
         </ReviewContext.Provider>
       </UserContext.Provider>
+      {/* 
+      <section style={{ marginTop: '80px' }}>
       
+    
+        <hr />
+
+        <Grid container spacing={3}>
+          
+          <Grid item xs={12} sm={6} md={4}>
+            <Card>
+              <CardContent>
+                <Typography variant="h4" gutterBottom>
+                  Các Tour Quốc Tế
+                </Typography>
+                <ul style={{ listStyleType: 'none', padding: 0 }}>
+                  <li><Typography variant="h6">Tour Nhật Bản</Typography></li>
+                  <li><Typography variant="h6">Tour Hàn Quốc</Typography></li>
+                  <li><Typography variant="h6">Tour Pháp</Typography></li>
+                  <li><Typography variant="h6">Tour Úc</Typography></li>
+                  <li><Typography variant="h6">Tour Mỹ</Typography></li>
+                  <li><Typography variant="h6">Tour Canada</Typography></li>
+                 
+                </ul>
+              </CardContent>
+            </Card>
+          </Grid>
+
+        
+          <Grid item xs={12} sm={6} md={4}>
+            <Card>
+              <CardContent>
+                <Typography variant="h4" gutterBottom>
+                  Các Tour Nội Địa
+                </Typography>
+                <ul style={{ listStyleType: 'none', padding: 0 }}>
+                  <li><Typography variant="h6">Tour Hà Nội</Typography></li>
+                  <li><Typography variant="h6">Tour TP Hồ Chí Minh</Typography></li>
+                  <li><Typography variant="h6">Tour Đà Nẵng</Typography></li>
+                  <li><Typography variant="h6">Tour Huế</Typography></li>
+                  <li><Typography variant="h6">Tour Phú Quốc</Typography></li>
+                 
+                </ul>
+              </CardContent>
+            </Card>
+          </Grid>
+
+       
+          <Grid item xs={12} sm={6} md={4}>
+            <Card>
+              <CardContent>
+                <Typography variant="h4" gutterBottom>
+                  Thông Tin Liên Hệ
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  Hotline: +123 456 7890
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  Email: support@example.com
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  Địa chỉ: 123 Main St, City, State, ZIP
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  Website: www.example.com
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </section> */}
     </Container>
   );
 };

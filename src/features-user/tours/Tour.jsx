@@ -26,20 +26,20 @@ import Spinner from '../../ui/Spinner';
 import { UserContext } from '../../ui/userLayout/ProtectedRouteUser';
 import { getAllFavoriteUser } from '../../services/apiFavorite';
 
-const Tour = ({ tour, bookings  }) => {
-  const { user, isAuthenticated, isLoading } = useContext(UserContext);
-
+const Tour = ({ tour, bookings=null  }) => {
+  // const { user, isAuthenticated, isLoading } = useAuthenticate()
+  const { user, isAuthenticated, isLoading } = useContext(UserContext)
 
   const { addFavorite, isAdding } = useAddFavorite();
   const { changeFavorite, isUpdating } = useUpdateFavorite();
 
-  const bookingsCount = bookings.filter(
-    (booking) => booking.tour.id === tour.id && booking.status === true
-  );
-  var participantCount = 0;
-  Array.from(bookingsCount).forEach((booking) => {
-    participantCount += booking.numJoin;
-  });
+  // const bookingsCount = bookings.filter(
+  //   (booking) => booking.tour.id === tour.id && booking.status === true
+  // );
+  // var participantCount = 0;
+  // Array.from(bookingsCount).forEach((booking) => {
+  //   participantCount += booking.numJoin;
+  // });
   const [dateShowing, setDateShowing] = useState('')
   if (tour.startDates != null && tour.startDates.length > 0) {
     Array.from(tour.startDates).forEach(date => {
@@ -106,6 +106,9 @@ const Tour = ({ tour, bookings  }) => {
 
 
   };
+
+  // if (isLoading) return <Spinner />
+
 
 
   return (

@@ -23,7 +23,6 @@ import { Typography } from '@mui/material';
 import OurPartner from '../../ui/userLayout/OurPartner';
 import { useAuthenticate } from '../../features-user/security/useAuthenticate';
 import { UserContext } from '../../ui/userLayout/ProtectedRouteUser';
-
 const TourPage = () => {
   const { user, isAuthenticated, isLoading:isLoadingUser } = useAuthenticate()
   const theme = useTheme();
@@ -44,14 +43,14 @@ const TourPage = () => {
 
   const [searchParams] = useSearchParams();
   const { tours, isLoading } = useTours();
-  const { bookings, isLoading: isBookingLoading } = useBookingsTotal();
+  // const { bookings, isLoading: isBookingLoading } = useBookingsTotal();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [sortOrder, setSortOrder] = useState('name');
 
-  if (isLoading || isBookingLoading|| isLoadingUser) return <Spinner />;
+  if (isLoading || isLoadingUser) return <Spinner />;
   if (!tours) return <Empty resourceName="tours" />;
   const handleDefault = () => {
     setSearchTerm('');
@@ -212,10 +211,9 @@ const TourPage = () => {
               borderRadius: 2,
               padding: 2,
             }}
-          > <UserContext.Provider value={{ isAuthenticated,user,isLoading }}>
-             {paginatedTours && paginatedTours.length > 0 ? <TourShowing tours={paginatedTours} bookings={bookings} /> : <Spinner/>}
+            > <UserContext.Provider value={{ isAuthenticated,user,isLoading }}>
+             {paginatedTours && paginatedTours.length > 0 ? <TourShowing tours={paginatedTours}  /> : <Empty resourceName={'tour'} />}
           </UserContext.Provider>
-          
           </Box>
 
           <Box

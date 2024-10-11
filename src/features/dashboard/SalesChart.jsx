@@ -65,7 +65,7 @@ const fakeData = [
 
 function SalesChart({ bookings, numDays }) {
   const { isDarkMode } = useDarkMode();
-  console.log(bookings);
+ 
 
   const allDates = eachDayOfInterval({
     start: subDays(new Date(), numDays - 1),
@@ -75,11 +75,9 @@ function SalesChart({ bookings, numDays }) {
     const formattedDate = format(date, 'MMM dd').toString();
     const filteredBookings = bookings.filter((booking) => {
       const bookingDate = booking.label;
-      console.log(bookingDate)
-      console.log(formattedDate)
       return bookingDate === formattedDate;
     });
-    console.log('total: '+filteredBookings)
+
     const totalSales = filteredBookings.reduce(
       (acc, cur) => acc + cur.priceOrigin,
       0

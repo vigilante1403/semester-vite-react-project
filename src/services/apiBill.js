@@ -1,5 +1,5 @@
-import axios from "axios";
-import toast from "react-hot-toast";
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 export const getAllBills = async () => {
   const { data, error } = await axios.get('/bills');
@@ -14,8 +14,15 @@ export const fetchPaymentHistory = async (userEmail) => {
     return toast.error(error.response.data.message);
   }
 };
-  export const addBill = async (billForm) => {
-    const { data, error } = await axios.post('/bills', billForm);
-    if (error) throw new Error(error.message);
-    return data;
-  };
+export const addBill = async (billForm) => {
+  const { data, error } = await axios.post('/bills', billForm);
+  if (error) throw new Error(error.message);
+  return data;
+};
+export const getBillsFromDate = async ({ date }) => {
+  const { data, error } = await axios.get(
+    `/bills/from-to-dates?dateFrom=${date}`
+  );
+  if (error) throw new Error(error.message);
+  return data;
+};
