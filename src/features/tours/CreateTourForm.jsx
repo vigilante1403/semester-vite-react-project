@@ -1,6 +1,6 @@
 /*eslint-disable*/
 import styled from 'styled-components';
-
+import { Button as ButtonDefault } from '@mui/material';
 import Input from '../../ui/Input';
 import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
@@ -23,6 +23,7 @@ import fetchFileFromUrl from '../../services/useFetchFileFromUrl';
 import { json } from 'react-router-dom';
 import { useUpdateAllRelatedBookings } from '../bookings/useBookings';
 import { useGetAllSchedules } from '../schedules/useSchedules';
+import { HiTrash } from 'react-icons/hi2';
 
 function CreateTourForm({ onClose, editTour }) {
   const { createTour, isCreating } = useCreateTour();
@@ -35,13 +36,18 @@ function CreateTourForm({ onClose, editTour }) {
   const [currentImages, setCurrentImages] = useState([]);
   const [changeCover,setChangeCover]=useState(null)
   const [changeImages,setChangeImages]=useState([])
+
   const {schedules,isLoading:isLoading1}=useGetAllSchedules({authorized:true});
-  const [selectedGuideName1, setSelectedGuideName1] = useState('chooseValue');
-  const [selectedGuideName2, setSelectedGuideName2] = useState('');
-  const [isGuide2Added, setIsGuide2Added] = useState(false);
-  const [selectedGuideTag, setSelectedGuideTag] = useState('guide1'); // Track which guide is selected
-  const [selectedGuides, setSelectedGuides] = useState(['chooseValue', null]);
-  const [enabledAddGuide,setEnabledAddGuide]=useState(false)
+  const [startDate, setStartDate] = useState('');
+  const [busyGuides, setBusyGuides] = useState([]);
+  const [chosenGuides,setChosenGuides]=useState([]);
+
+  // const [selectedGuideName1, setSelectedGuideName1] = useState('chooseValue');
+  // const [selectedGuideName2, setSelectedGuideName2] = useState('');
+  // const [isGuide2Added, setIsGuide2Added] = useState(false);
+  // const [selectedGuideTag, setSelectedGuideTag] = useState('guide1'); 
+  // const [selectedGuides, setSelectedGuides] = useState(['chooseValue', null]);
+  // const [enabledAddGuide,setEnabledAddGuide]=useState(false)
   const [guideError,setGuideError]=useState([])
   useEffect(() => {
     if (editTour && editTour.imageCover) {
@@ -64,45 +70,91 @@ function CreateTourForm({ onClose, editTour }) {
       setSelectedCountry(editTour.countryNameCommon || null);
     }
     if (editTour && editTour.guides) {
+      console.log(editTour.guides);
+      
       const idArrays = editTour.guides.map((item) => item.id);
-      const guideName = editTour.guides
-        ? editTour.guides.map((item) => item.name)
-        : 'chooseValue';
-      setSelectedGuides(idArrays);
-      setSelectedGuideName1(guideName[0]);
-      if (idArrays.length > 1) {
-        setIsGuide2Added(true);
-        setSelectedGuideName2(guideName[1] || 'chooseValue');
-      } // set guides từ editTour vào state
+      // const guideName = editTour.guides
+        // ? editTour.guides.map((item) => item.name)
+        // : 'chooseValue';
+console.log(guides);
+
+if(!isLoading) {
+      const guidesList = guides.filter((guide) => idArrays.includes(guide.value));
+     
+      // console.log(guidesList);
+      
+      // setSelectedGuides(idArrays);
+      // setSelectedGuideName1(guideName[0]);
+setChosenGuides(guidesList)
+    }  
+    // if (idArrays.length > 1) {
+      //   setIsGuide2Added(true);
+      //   setSelectedGuideName2(guideName[1] || 'chooseValue');
+      // } 
     }
     fetchAndSetTourLocations(editTour);
-  }, [editTour]);
+  }, [editTour,isLoading]);
 
-  editTour ? console.log(editTour) : console.log('no editTour');
-  const handleGuideSelectChange = (event) => {
-    setGuideError(prev=>[])
-    const selectedGuide = guides.find(
-      (guide) => guide.value === event.target.value
-    );
-    const guideName = selectedGuide
-      ? selectedGuide.label.split('-')[0]
-      : 'chooseValue';
 
-    const newSelectedGuides = [...selectedGuides]; // Clone the array
+  const handleSetBusyGuides = (event) => {
+    setStartDate((prev) => event.target.value);
+    setChosenGuides(prev=>[])
+    setBusyGuides(prev=>[])
+    // var date2 = new Date(event.target.value);
+    // date2.setDate(date2.getDate() + tour.locations.length - 1);
 
-    if (selectedGuideTag === 'guide2') {
-      newSelectedGuides[1] = event.target.value;
-      setSelectedGuideName2(guideName); // Update guide2
-    } else {
-      newSelectedGuides[0] = event.target.value;
-      setSelectedGuideName1(guideName); // Update guide1
-    }
+    // console.log(date2.toLocaleDateString('en-CA'))
 
-    setSelectedGuides(prev=>newSelectedGuides); // Update state
-    handleAddErrorWhenGuideBusy();
+   
+    var guidesBusy = schedules
+      .filter(
+        (schedule) =>schedule.status&&
+          (
+          compareTwoDates(event.target.value,schedule.to.toString())!=='after')
+     )
+      .map((schedule) => {
+        
+        return schedule.guideId});
+    setBusyGuides((prev) => guidesBusy);
+    
+    // if(startId!==''){
+    //   var guideIdList =schedules.filter(sc=>sc.startDateId===startId&&sc.status).map(sc=>sc.guideId)
+    //   console.log('aaaa',guideIdList)
+    //   var temp2=guidesBusy
+    //   console.log(guidesBusy)
+    // temp2=temp2.filter(busy=>!guideIdList.includes(busy))
+    // console.log('temp2',temp2)
+    // setBusyGuides(prev=>[...temp2])
+    // }
   };
 
-/////////////////////////
+
+
+  editTour ? console.log(editTour) : console.log('no editTour');
+
+  // const handleGuideSelectChange = (event) => {
+  //   setGuideError(prev=>[])
+  //   const selectedGuide = guides.find(
+  //     (guide) => guide.value === event.target.value
+  //   );
+  //   const guideName = selectedGuide
+  //     ? selectedGuide.label.split('-')[0]
+  //     : 'chooseValue';
+
+  //   const newSelectedGuides = [...selectedGuides]; 
+
+    // if (selectedGuideTag === 'guide2') {
+    //   newSelectedGuides[1] = event.target.value;
+    //   setSelectedGuideName2(guideName); 
+    // } else {
+    //   newSelectedGuides[0] = event.target.value;
+    //   setSelectedGuideName1(guideName); 
+    // }
+
+  //   setSelectedGuides(prev=>newSelectedGuides); 
+  //   handleAddErrorWhenGuideBusy();
+  // };
+
 const handleAddErrorWhenGuideBusy=()=>{
   // filter guides busy in dates
   var duration = coordinates.length;
@@ -112,8 +164,12 @@ const handleAddErrorWhenGuideBusy=()=>{
       var to = new Date(date);
     to.setDate(to.getDate() + duration-1);
     if(!editTour){
+      if(chosenGuides ==null || chosenGuides ==="" || chosenGuides == undefined) {
+        setGuideError(prev => "Choose a guide first")
+
+      }
       if(!(compareTwoDates(to.toLocaleDateString('en-CA'),schedule.from.toString())==="before"||compareTwoDates(from.toLocaleDateString('en-CA'),schedule.to.toString())==='after')){
-        if(selectedGuides.includes(schedule.guideId)){
+        if(chosenGuides.includes(schedule.guideId)){
           setGuideError(prev=>[...`${schedule.guideName}-${schedule.guideEmail} has tour from ${schedule.from} to ${schedule.to}`])
         }
       }
@@ -122,7 +178,7 @@ const handleAddErrorWhenGuideBusy=()=>{
       if(!(compareTwoDates(to.toLocaleDateString('en-CA'),schedule.from.toString())==="before"||compareTwoDates(from.toLocaleDateString('en-CA'),schedule.to.toString())==='after')
         &&compareTwoDates(applyGuide.toLocaleDateString('en-CA'),schedule.from.toString())==='before'
       &&schedule.tourId!==editTour.id){
-        if(selectedGuides.includes(schedule.guideId)){
+        if(chosenGuides.includes(schedule.guideId)){
           setGuideError(prev=>[...prev,`${schedule.guideName}-${schedule.guideEmail} has tour from ${schedule.from} to ${schedule.to}`])
         }
       }
@@ -132,29 +188,23 @@ const handleAddErrorWhenGuideBusy=()=>{
   });
 }
 
+  // const handleAddGuide2 = () => {
+  //   setIsGuide2Added(true);
 
+  //   setSelectedGuides([selectedGuides[0], 'chooseValue']);
+  //   setSelectedGuideName2('chooseValue'); // Initialize guide2
+  // };
 
+  // const handleRemoveGuide1 = () => {
+  //   setSelectedGuides(['chooseValue', selectedGuides[1]]);
+  //   setSelectedGuideName1('chooseValue'); // Reset guide1
+  // };
 
-
-///////////////////////////
-
-  const handleAddGuide2 = () => {
-    setIsGuide2Added(true);
-
-    setSelectedGuides([selectedGuides[0], 'chooseValue']);
-    setSelectedGuideName2('chooseValue'); // Initialize guide2
-  };
-
-  const handleRemoveGuide1 = () => {
-    setSelectedGuides(['chooseValue', selectedGuides[1]]);
-    setSelectedGuideName1('chooseValue'); // Reset guide1
-  };
-
-  const handleRemoveGuide2 = () => {
-    setIsGuide2Added(false);
-    setSelectedGuides([selectedGuides[0], null]); // Reset guide2
-    setSelectedGuideName2('');
-  };
+  // const handleRemoveGuide2 = () => {
+  //   setIsGuide2Added(false);
+  //   setSelectedGuides([selectedGuides[0], null]); // Reset guide2
+  //   setSelectedGuideName2('');
+  // };
 
   ///
 
@@ -176,7 +226,7 @@ const handleAddErrorWhenGuideBusy=()=>{
       description: editTour?.description || '',
       guide: editTour?.guides[0].id || '',
       imageCover: null,
-      images: [], // No default file input, handled separately
+      images: [], 
       countryNameCommon: editTour?.countryNameCommon || '',
     },
   });
@@ -272,7 +322,7 @@ console.log(keys[0])
   };
 
   const handleInputDateChange = (index, event) => {
-    setSelectedGuides(prev=>[])
+    // setSelectedGuides(prev=>[])
     const newInputs = dates.slice();
     newInputs[index] = event.target.value;
     if(!keys[index]||keys[index]===undefined){
@@ -294,8 +344,27 @@ console.log(keys[0])
 
     }
     setDates(newInputs);
+    handleSetBusyGuides(event)
+    console.log(busyGuides);
+    console.log(startDate);
+    
+    
   };
-  
+  const handleAddGuides = (data)=>{
+    setChosenGuides(prev=>[...prev,{label:data.label.split('-')[1],value:data.value}])
+    setBusyGuides(prev=>[...prev,data.value])
+
+  }
+  const handleRevertGuideList = (data)=>{
+    var temp = chosenGuides
+    temp=temp.filter(guide=>guide.label!==data.label)
+    setChosenGuides(prev=>[...temp])
+    var temp2=busyGuides
+    temp2=temp2.filter(busy=>busy!==data.value)
+    setBusyGuides(prev=>[...temp2])
+
+  }
+
   const handleInputChange = (index, event) => {
     const newInputs = inputs.slice();
     newInputs[index] = event.target.value;
@@ -334,7 +403,9 @@ console.log(keys[0])
     return () => clearTimeout(timer);
   }, [subDescriptions]);
   const onSubmit = (data) => {
-    console.log(selectedGuides);
+    // console.log(selectedGuides);
+    console.log(chosenGuides);
+
     if(!editTour){
       handleAddErrorWhenGuideBusy()
     }
@@ -342,7 +413,7 @@ console.log(keys[0])
       toast.error('Guides are busy in selected date! Submit fail')
       return;
     }
-    if (selectedGuides == null || selectedGuides.length == 0) {
+    if (chosenGuides == null || chosenGuides.length == 0) {
       toast.error('Choose a guide');
       return;
     }
@@ -456,9 +527,9 @@ console.log(keys[0])
     // data.guide = data.guide !== undefined ? data.guide : guides[0].value;
     // formData.append('guides', data.guide);
 
-    selectedGuides.forEach((guide) => {
-      if ((guide !== 'chooseValue' || guide !== '#') && guide) {
-        formData.append('guides', guide);
+    chosenGuides.forEach((guide) => {
+      if ((guide !== '' || guide !== '#' || guide != null) && guide) {
+        formData.append('guides', guide.value);
       }
     });
 
@@ -655,10 +726,104 @@ console.log(keys[0])
         </FormRow>
       ))}
       <FormRow>
-      {dates && dates.length < 5 &&  <Button type="button" onClick={handleAddDates}>
+      {!editTour&&dates && dates.length < 5 &&  <Button type="button" onClick={handleAddDates}>
           Add Dates
         </Button>}
       </FormRow>
+
+
+      <FormRow label="Available Guide">
+      <Select onChange={(event)=>{
+                const user = guides.filter(guide=>guide.value===event.target.value)[0]
+                handleAddGuides(user)
+            }}  options={startDate!==''?guides.filter(guide=>!busyGuides.includes(guide.value)):[]} />
+        {/* <Select
+          options={guides.filter( 
+            (guide) =>
+              guide.value !==
+              (selectedGuideTag === 'guide1'
+                ? selectedGuides[1]
+                : selectedGuides[0])
+          )}
+          value={
+            selectedGuideTag === 'guide2'
+              ? selectedGuides[1]
+              : selectedGuides[0]
+          }
+        
+          text="Choose a guide"
+          {...register('guide', {
+            onChange: (e) => {
+            
+            handleGuideSelectChange(e);
+          }
+          })} 
+        /> */}
+      </FormRow>
+      <FormRow label="">
+                <div style={{ display:'flex',justifyContent:'flex-start',alignItems:'center' }}>{chosenGuides.map(guide=><ButtonDefault onClick={()=>handleRevertGuideList({label:guide.label,value:guide.value})} style={{ display:'flex', alignItems:'center' }} endIcon={<HiTrash/>}>{guide.label}</ButtonDefault>)}</div>
+            </FormRow>
+            {guideError&&<FormRow><span style={{ color:'red' }}>{guideError.join(', ')}</span></FormRow>}
+        {editTour&&<FormRow label="Apply changes of guide after selected date">
+        <Input
+              type="date"
+              min={getTodayDate()}
+              onChange={(event) => setDateApplyGuide(event.target.value)}
+              placeholder={`Guide date`}
+            />
+        </FormRow>}
+
+
+      <FormRow label="Country">
+        <Controller
+          name="countryNameCommon"
+          control={control}
+          rules={{
+            validate: (value) =>
+              String(value).length > 0 || 'This field is required',
+          }}
+          render={({ field }) => (
+            <Select
+              {...field}
+              value={selectedCountry}
+              options={Array.from(countries).map((c) => ({
+                label: c.name.common,
+                value: c.name.common,
+              }))}
+              text="Choose country"
+              onChange={(e) => {
+                const selected = e.target.value;
+                field.onChange(selected);
+                // const country = countries.find(c => c.name.common === selectedCountry);
+
+                setSelectedCountry((prev) => selected);
+                // setValue('countryNameCommon'), selected.name.common;
+
+                // setValue('region', selected.region);
+                // setValue('countryFlag', selected.flags.svg);
+                // setValue('countryNameOfficial'), selected.name.official;
+                // setChange((prev) => true);
+              }}
+            />
+          )}
+        />
+      </FormRow>
+
+      {selectedCountry && selectedCountry !== '#' && countries && (
+        <FormRow>
+          <img
+            src={
+              countries.find((c) => c.name.common === selectedCountry)?.flags
+                .svg
+            }
+            alt="Country flag"
+            width={50}
+          />
+          <Typography variant="h5">
+            {countries.find((c) => c.name.common === selectedCountry)?.region}
+          </Typography>
+        </FormRow>
+      )}
       {inputs.map((input, index) => (
         <>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
@@ -729,6 +894,7 @@ console.log(keys[0])
           Add Location
         </Button>}
       </FormRow>
+      
       {editTour&&<FormRow label="Apply changes of location after selected date">
         <Input
               type="date"
@@ -737,51 +903,27 @@ console.log(keys[0])
               placeholder={`Location date`}
             />
         </FormRow>}
-      <FormRow label="Available Guide">
-        <Select
-          options={guides.filter( //guides filter based on schedule list
-            (guide) =>
-              guide.value !==
-              (selectedGuideTag === 'guide1'
-                ? selectedGuides[1]
-                : selectedGuides[0])
-          )}
-          value={
-            selectedGuideTag === 'guide2'
-              ? selectedGuides[1]
-              : selectedGuides[0]
-          }
-          // onChange={handleGuideSelectChange}
-          text="Choose a guide"
-          {...register('guide', {
-            onChange: (e) => {
-            
-            handleGuideSelectChange(e);
-          }
-          })} // useForm hook register
-        />
-      </FormRow>
-
-      {selectedGuides[0] !== 'chooseValue' && !isGuide2Added && (
+    
+      {/* {selectedGuides[0] !== 'chooseValue' && !isGuide2Added && (
         <FormRow>
           <Button type="button" onClick={handleAddGuide2}>
             Add Guide2
           </Button>
         </FormRow>
-      )}
+      )} */}
       {/* Display Selected Guides */}
 
-      {editTour?.guides && selectedGuides[0].email}
-      <div
+      {/* {editTour?.guides && selectedGuides[0].email} */}
+      {/* <div
         style={{
           marginTop: '10px',
           display: 'flex',
           justifyContent: 'flex-start',
         }}
-      >
+      > */}
         {/* Guide 1 with Remove Option */}
 
-        <div
+        {/* <div
           style={{
             display: 'inline-block',
             marginRight: '10px',
@@ -795,10 +937,10 @@ console.log(keys[0])
             onClick={handleRemoveGuide1}
             type="button"
             style={{
-              position: 'relative', // Đặt position relative để điều chỉnh vị trí bên trong button
+              position: 'relative',
               cursor: 'pointer',
-              background: 'inherit', // Màu xám nhạt
-              color: 'var(--color-grey-400)', // Màu của dấu 'x' là xám nhạt
+              background: 'inherit',
+              color: 'var(--color-grey-400)', 
               border: 'none',
               borderRadius: '50%',
               width: '20px',
@@ -810,20 +952,20 @@ console.log(keys[0])
             <span
               style={{
                 position: 'absolute',
-                top: '-5px', // Di chuyển dấu 'x' lên góc trên
-                right: '-5px', // Di chuyển dấu 'x' sang phải
-                color: 'var(--color-grey-400)', // Màu xám nhạt cho chữ 'x'
+                top: '-5px',
+                right: '-5px', 
+                color: 'var(--color-grey-400)',
                 fontSize: '16px',
-                lineHeight: '20px', // Đảm bảo dấu 'x' căn giữa theo chiều dọc
+                lineHeight: '20px',
               }}
             >
               x
             </span>
           </button>
-        </div>
+        </div> */}
 
         {/* Guide 2 with Remove Option */}
-        {isGuide2Added && (
+        {/* {isGuide2Added && (
           <div
             style={{
               display: 'inline-block',
@@ -864,16 +1006,8 @@ console.log(keys[0])
             </button>
           </div>
         )}
-      </div>
-      {guideError&&<FormRow><span style={{ color:'red' }}>{guideError.join(', ')}</span></FormRow>}
-        {editTour&&<FormRow label="Apply changes of guide after selected date">
-        <Input
-              type="date"
-              min={getTodayDate()}
-              onChange={(event) => setDateApplyGuide(event.target.value)}
-              placeholder={`Guide date`}
-            />
-        </FormRow>}
+      </div> */}
+    
       <FormRow label="Tour Photo">
         <FileInput
           id="imageCover"
@@ -925,56 +1059,7 @@ console.log(keys[0])
     
    </FormRow>
       
-      <FormRow label="Country">
-        <Controller
-          name="countryNameCommon"
-          control={control}
-          rules={{
-            validate: (value) =>
-              String(value).length > 0 || 'This field is required',
-          }}
-          render={({ field }) => (
-            <Select
-              {...field}
-              value={selectedCountry}
-              options={Array.from(countries).map((c) => ({
-                label: c.name.common,
-                value: c.name.common,
-              }))}
-              text="Choose country"
-              onChange={(e) => {
-                const selected = e.target.value;
-                field.onChange(selected);
-                // const country = countries.find(c => c.name.common === selectedCountry);
-
-                setSelectedCountry((prev) => selected);
-                // setValue('countryNameCommon'), selected.name.common;
-
-                // setValue('region', selected.region);
-                // setValue('countryFlag', selected.flags.svg);
-                // setValue('countryNameOfficial'), selected.name.official;
-                // setChange((prev) => true);
-              }}
-            />
-          )}
-        />
-      </FormRow>
-
-      {selectedCountry && selectedCountry !== '#' && countries && (
-        <FormRow>
-          <img
-            src={
-              countries.find((c) => c.name.common === selectedCountry)?.flags
-                .svg
-            }
-            alt="Country flag"
-            width={50}
-          />
-          <Typography variant="h5">
-            {countries.find((c) => c.name.common === selectedCountry)?.region}
-          </Typography>
-        </FormRow>
-      )}
+      
 
      
       <FormRow>

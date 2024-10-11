@@ -24,6 +24,7 @@ export const useReviewsOfUser = (userId) => {
     refetchOnMount:true,
     refetchOnWindowFocus: true,
   refetchOnReconnect: true,
+  enabled:!!userId&&userId!==undefined
  
   });
 

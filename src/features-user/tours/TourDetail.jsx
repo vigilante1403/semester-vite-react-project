@@ -343,8 +343,12 @@ import { LoginContext } from '../../context/LoginContext';
 import { useAuthenticate } from '../security/useAuthenticate';
 import Modal from '../../ui/Modal';
 import StepConfirmBookingTour from './StepConfirmBookingTour';
-import { formatDateArrayAscOrDesc } from '../../utils/helpers';
-import { useGetAllUpcomingBookingsOfSameTour } from './useBookTour';
+import { formatDateArrayAscOrDesc, compareTwoDates } from '../../utils/helpers';
+import {
+  useGetAllSchedules,
+  useGetAllStartDatesOfTour,
+  useGetAllUpcomingBookingsOfSameTour,
+} from './useBookTour';
 import NotifBookingExisted from './NotifBookingExisted';
 import Spinner from '../../ui/Spinner';
 import { useBookingsOfUser } from '../bookings/useBookings';
@@ -437,11 +441,11 @@ const CalendarContainer = styled.div`
 
 const TourDetail = ({ tour, otherTours }) => {
   const dateArr = formatDateArrayAscOrDesc(tour.startDates, 1);
-  console.log(dateArr);
-  const [selectedDate, setSelectedDate] = useState(
-    new Date(tour.startDates[0])
-  );
-
+  // console.log(dateArr);
+  // const [selectedDate, setSelectedDate] = useState(
+  //   new Date(tour.startDates[0])
+  // );
+  const [selectedDate, setSelectedDate] = useState('');
   const [isDateLocked, setIsDateLocked] = useState(true);
   const [showMoreReviews, setShowMoreReviews] = useState(false); // State to toggle See More reviews
 
@@ -461,6 +465,12 @@ const TourDetail = ({ tour, otherTours }) => {
   const userId = user?.id;
   const { bookings: bookingsOfUser, isLoading1 } = useBookingsOfUser(userId);
   const { reviews, isLoading: isLoading2, refetch } = useReviewsOfUser(userId);
+  const {
+    startDates,
+    isLoading: isLoadingStartDate,
+  } = useGetAllStartDatesOfTour({ tourId: tour.id });
+  const { schedules, isLoadingSchedule } = useGetAllSchedules();
+  const [guideShow, setGuideShow] = useState();
   const fetchAndSetTourLocations = async (tour) => {
     if (tour?.locations) {
       const locationAddresses = tour.locations.map(
@@ -480,22 +490,48 @@ const TourDetail = ({ tour, otherTours }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    setSelectedDate(new Date(tour.startDates[0]));
+    if (!isLoadingStartDate && startDates?.length > 0 && !isLoadingSchedule && schedules.length > 0) {
+    
+      const currentDate = new Date();
+      const futureStartDates = startDates.filter(
+        (startDate) => new Date(startDate.startDate) >= currentDate
+      );
+  
+      if (futureStartDates.length > 0) {
+    
+        setSelectedDate(new Date(futureStartDates[0].startDate));
+  
+
+        const filteredSchedules = schedules.filter((sh) =>
+          futureStartDates.some((st) => st.id === sh.startDateId)
+        );
+        
+        const firstStartDateId = futureStartDates[0].id;
+        const initialGuide = filteredSchedules.filter(
+          (schedule) => schedule.startDateId === firstStartDateId
+        );
+        setGuideShow(initialGuide);
+      }
+    }
     fetchAndSetTourLocations(tour);
-  }, [tour, tour.startDates]);
+  }, [tour, isLoadingStartDate, startDates, isLoadingSchedule, schedules]);
   const handleToggleShowMore = () => {
     setShowMoreReviews(!showMoreReviews);
   };
-  const startDates = tour.startDates.map((date) => new Date(date));
-
+  // const startDates = tour.startDates.map((date) => new Date(date));
+  if((isAuthenticated&&(isGetting || isLoading || isLoading1 || isLoading2 ) )|| isLoadingStartDate || isLoadingSchedule) return <Spinner />
+  const filteredSchedules = schedules.filter((sh) =>
+    startDates.some((st) => st.id === sh.startDateId)
+  );
+  console.log(filteredSchedules);
   const isStartDate = (date) => {
-    return startDates.some((startDate) => isSameDay(date, startDate));
+    return startDates.some((startDate) => isSameDay(date, startDate.startDate));
   };
   const isStartMonth = (date) => {
-    return startDates.some((startDate) => isSameMonth(date, startDate));
-  };
+    return startDates.some((startDate) => isSameMonth(date, startDate.startDate));
+  }
   const isStartYear = (date) => {
-    return startDates.some((startDate) => isSameYear(date, startDate));
+    return startDates.some((startDate) => isSameYear(date, startDate.startDate));
   };
   const tileDisabled = ({ date, view }) => {
     switch (view) {
@@ -510,7 +546,7 @@ const TourDetail = ({ tour, otherTours }) => {
 
       case 'century': {
         const startYears = startDates.map((startDate) =>
-          startDate.getFullYear()
+          startDate.startDate.getFullYear()
         );
         const startDecades = startYears.map(
           (year) => Math.floor(year / 10) * 10
@@ -521,7 +557,6 @@ const TourDetail = ({ tour, otherTours }) => {
         return false;
     }
   };
-  
 
   const handleChangeImage = (image) => {
     setSelectedImage(image);
@@ -533,21 +568,49 @@ const TourDetail = ({ tour, otherTours }) => {
     }
     setSelectedDate(date);
     setIsDateLocked(false);
+    const selectedStartDateId = startDates.find(
+      (startDate) => startDate.startDate === date.toLocaleDateString('en-CA')
+    )?.id;
+  
+    console.log(selectedStartDateId);
+  
+    const selectedGuide = filteredSchedules.filter(
+      (schedule) => schedule.startDateId === selectedStartDateId
+    );
+  
+    setGuideShow(selectedGuide); 
   };
 
   const handleSelectAnotherDate = () => {
     setIsDateLocked(false);
-    var currentDate = selectedDate;
-    console.log(currentDate.toLocaleDateString('en-CA'));
-    var index = Array.from(dateArr).indexOf(
-      currentDate.toLocaleDateString('en-CA')
-    );
-    console.log(index);
-    if (index + 1 < dateArr.length) {
-      setSelectedDate(new Date(dateArr[index + 1]));
+    const currentDate = selectedDate;
+    const formattedCurrentDate = currentDate.toLocaleDateString('en-CA');
+  
+   
+    const futureStartDates = startDates
+      .map((startDate) => startDate.startDate)
+      .filter((startDate) => new Date(startDate) >= new Date());
+  
+    const startDateList = formatDateArrayAscOrDesc(futureStartDates, 1);
+    const index = startDateList.indexOf(formattedCurrentDate);
+  
+   
+    let nextDate;
+    if (index + 1 < startDateList.length) {
+      nextDate = new Date(startDateList[index + 1]);
     } else {
-      setSelectedDate(new Date(dateArr[0]));
+      nextDate = new Date(startDateList[0]);
     }
+    setSelectedDate(nextDate);
+  
+    const nextStartDateId = startDates.find(
+      (startDate) => startDate.startDate === nextDate.toLocaleDateString('en-CA')
+    )?.id;
+    
+    const nextGuide = filteredSchedules.filter(
+      (schedule) => schedule.startDateId === nextStartDateId
+    );
+    setGuideShow(nextGuide);
   };
 
   const handleSeeAllTours = () => {
@@ -557,8 +620,7 @@ const TourDetail = ({ tour, otherTours }) => {
     navigate(`/tours/tour-detail/${id}`);
   };
 
-  if(isAuthenticated&&(isGetting || isLoading || isLoading1 || isLoading2)) return <Spinner />
-  
+
   let filteredBooking = [];
   if (bookings !== undefined && reviews !== undefined) {
     const reviewsToursId = reviews.map((review) => review.tourId);
@@ -568,15 +630,24 @@ const TourDetail = ({ tour, otherTours }) => {
       return isSameTour && hasNoReview;
     });
   }
-  const handleReload = () => {
-  }
+  const handleReload = () => {};
   const nearestBooking = filteredBooking.length
     ? filteredBooking.reduce((nearest, current) => {
-      const nearestDate = new Date(nearest.startDate);
-      const currentDate = new Date(current.startDate);
-      return currentDate > nearestDate ? current : nearest;
-    })
+        const nearestDate = new Date(nearest.startDate);
+        const currentDate = new Date(current.startDate);
+        return currentDate > nearestDate ? current : nearest;
+      })
     : null;
+    console.log(guideShow);
+    const sortReview = tour.reviews?tour?.reviews.sort((a,b)=>{   
+                
+                
+      const dateA = new Date(a.updatedAt || a.createdAt);
+      const dateB = new Date(b.updatedAt || b.createdAt);
+     
+      return dateB - dateA;
+     }):[]
+     
   return (
     <Container>
       <section>
@@ -664,7 +735,7 @@ const TourDetail = ({ tour, otherTours }) => {
             </Typography>
             <Typography variant="h4">
               <strong>Start Date:</strong>{' '}
-              {selectedDate.toLocaleDateString('en-CA')}
+              {selectedDate !=='' &&selectedDate.toLocaleDateString('en-CA')}
             </Typography>
             <Typography variant="h4">
               <strong>Price:</strong> {tour.price - tour.priceDiscount} $
@@ -673,14 +744,14 @@ const TourDetail = ({ tour, otherTours }) => {
             <Typography variant="h4" gutterBottom>
               <strong>Guides:</strong>
             </Typography>
-            {tour.guides.map((guide) => (
+            {guideShow?.map((guide) => (
               <Typography key={guide.id} variant="h5">
-                {guide.fullName} - {guide.nationality}
+              {guide.guideName} - {guide.countryName}
               </Typography>
             ))}
 
             {/* {isDateLocked ? ( */}
-            <Box sx={{ margin: '20px' }} display={'flex'}>
+            {selectedDate !== "" && <Box sx={{ margin: '20px' }} display={'flex'}>
               {/* <Button variant="outlined" color="secondary" onClick={handleSelectAnotherDate} style={{ marginTop: '16px' }}>
                   Choose another
                 </Button> */}
@@ -688,39 +759,48 @@ const TourDetail = ({ tour, otherTours }) => {
                   Book now
                 </Button> */}
               <Button75
-                onClick={() => { handleSelectAnotherDate() }}
+                onClick={() => {
+                  handleSelectAnotherDate();
+                }}
                 label={'Another Day'}
               />
-              {isAuthenticated ? !isAgree&&bookings!==null&&bookings.length>0? (<Modal>
-                <Modal.Open opens={"agreement"}>
-                {/* <Button
+              {isAuthenticated ? (
+                !isAgree && bookings !== null && bookings.length > 0 ? (
+                  <Modal>
+                    <Modal.Open opens={'agreement'}>
+                      {/* <Button
                       variant="contained"
                       color="primary"
                       sx={{ marginTop: '1rem', fontSize: '1.2rem' }}
                     >
                       Book now
                     </Button> */}
-                    <Button36 label={'Book now'} onClick={() => { }} />
-                </Modal.Open>
-                <Modal.Window name={"agreement"}>
-                  <NotifBookingExisted onSetAgreement={setIsAgree} bookings={bookings} />
-                </Modal.Window>
-              </Modal>): (
-                <Modal>
-                  <Modal.Open opens={`book-tour-${tour.id}`}>
-                    {/* <Button
+                      <Button36 label={'Book now'} onClick={() => {}} />
+                    </Modal.Open>
+                    <Modal.Window name={'agreement'}>
+                      <NotifBookingExisted
+                        onSetAgreement={setIsAgree}
+                        bookings={bookings}
+                      />
+                    </Modal.Window>
+                  </Modal>
+                ) : (
+                  <Modal>
+                    <Modal.Open opens={`book-tour-${tour.id}`}>
+                      {/* <Button
                       variant="contained"
                       color="primary"
                       sx={{ marginTop: '1rem', fontSize: '1.2rem' }}
                     >
                       Book now
                     </Button> */}
-                    <Button36 label={'Book now'} onClick={() => { }} />
-                  </Modal.Open>
-                  <Modal.Window name={`book-tour-${tour.id}`}>
-                    <StepConfirmBookingTour tour={tour} user={user} />
-                  </Modal.Window>
-                </Modal>
+                      <Button36 label={'Book now'} onClick={() => {}} />
+                    </Modal.Open>
+                    <Modal.Window name={`book-tour-${tour.id}`}>
+                      <StepConfirmBookingTour tour={tour} user={user} />
+                    </Modal.Window>
+                  </Modal>
+                )
               ) : (
                 <Box
                   // {isAuthenticated ? <CheckoutButton tour={tour}/> : <Box
@@ -743,7 +823,9 @@ const TourDetail = ({ tour, otherTours }) => {
                 </Box>
               )}
               {/* <Button36 label={"Book now"} disabled={!isDateLocked} /> */}
-            </Box>
+              </Box> }
+            {selectedDate === "" && <Typography color={'red'} variant='h3'>No start date yet</Typography> 
+            }
             {/* ) : null} */}
           </Box>
         </Box>
@@ -945,21 +1027,19 @@ const TourDetail = ({ tour, otherTours }) => {
           Map
         </Typography>
         <hr></hr>
-        {tour.locations&&<Box sx={{ margin: '50px' }}>
-          {tour.locations.length > 0 && (
-            <MapComponent
-              styleDefault="mapbox://styles/vytruong1812/cm1c6ma7h02hc01o3azvg0h6e"
-              locations={tour.locations}
-            />
-          )}
-          
-        </Box>}
-        {!tour.locations.length&&<Empty resourceName={'map'} />}
-
+        {tour.locations && (
+          <Box sx={{ margin: '50px' }}>
+            {tour.locations.length > 0 && (
+              <MapComponent
+                styleDefault="mapbox://styles/vytruong1812/cm1c6ma7h02hc01o3azvg0h6e"
+                locations={tour.locations}
+              />
+            )}
+          </Box>
+        )}
+        {!tour.locations.length && <Empty resourceName={'map'} />}
       </section>
-      <UserContext.Provider
-        value={{ isAuthenticated, user, isLoading }}
-      >
+      <UserContext.Provider value={{ isAuthenticated, user, isLoading }}>
         <ReviewContext.Provider value={{ reviews, handleReload }}>
           <section style={{ marginTop: '80px' }}>
             {nearestBooking && (
@@ -986,16 +1066,22 @@ const TourDetail = ({ tour, otherTours }) => {
                   stroke="currentColor"
                   style={{ width: '30px', height: '30px', color: '#D32F2F' }}
                 >
-                                    <path
+                  <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
                     d="M13 16h-1v-4h-1m1-4h.01M21 12.5A9.5 9.5 0 1112.5 3 9.5 9.5 0 0121 12.5z"
                   />
                 </svg>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', fontSize: '18px' }}>
-                  Bạn có booking của tour "{nearestBooking.tour.name}" chưa review!{" "}
-                  <span style={{ textDecoration: 'underline', cursor: 'pointer' }}>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 'bold', fontSize: '18px' }}
+                >
+                  Bạn có booking của tour "{nearestBooking.tour.name}" chưa
+                  review!{' '}
+                  <span
+                    style={{ textDecoration: 'underline', cursor: 'pointer' }}
+                  >
                     <Modal>
                       <Modal.Open opens="review-form">
                         <Button
@@ -1014,7 +1100,6 @@ const TourDetail = ({ tour, otherTours }) => {
                   </span>
                 </Typography>
               </Box>
-
             )}
             <Typography variant="h2">Reviews</Typography>
             <hr />
@@ -1029,11 +1114,8 @@ const TourDetail = ({ tour, otherTours }) => {
                 backgroundColor: '#ADCB8B',
               }}
             >
-                           {tour?.reviews && tour?.reviews.length > 0 ? (
-                tour?.reviews.sort((a,b)=>{
-                  return -1*(new Date(a.updatedAt||a.createdAt)-new Date(b.updatedAt||b.createdAt))
-                })
-                  .slice(0, showMoreReviews ? tour.reviews.length : 3)
+              {tour?.reviews && tour?.reviews.length > 0 ? (
+                sortReview.slice(0, showMoreReviews ? tour.reviews.length : 3)
                   .map((review, index) => (
                     <Card
                       key={index}
@@ -1056,11 +1138,17 @@ const TourDetail = ({ tour, otherTours }) => {
                             sx={{ width: 40, height: 40, marginRight: '10px' }}
                           />
                           <Box>
-                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ fontWeight: 600 }}
+                            >
                               {review.userName || 'User Name'}
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'gray' }}>
-                              {review.createdAt || 'Date'}
+                            <Typography
+                              variant="caption"
+                              sx={{ color: 'gray' }}
+                            >
+                             {review.updatedAt || review.createdAt || 'Date'}
                             </Typography>
                           </Box>
                         </Box>
@@ -1081,21 +1169,23 @@ const TourDetail = ({ tour, otherTours }) => {
                             right: '10px',
                           }}
                         >
-                          {isAuthenticated && user.id === review.userId && <Modal>
-                            <Modal.Open opens="review-form">
-                              <Button
-                                variant="contained"
-                                color="info"
-                                size="small" // Chỉnh sửa kích thước nút
-                                sx={{ borderRadius: '20px', px: 2 }}
-                              >
-                                Change Review
-                              </Button>
-                            </Modal.Open>
-                            <Modal.Window name="review-form">
-                              <ReviewForm review={review} />
-                            </Modal.Window>
-                          </Modal>}
+                          {isAuthenticated && user.id === review.userId && (
+                            <Modal>
+                              <Modal.Open opens="review-form">
+                                <Button
+                                  variant="contained"
+                                  color="info"
+                                  size="small" // Chỉnh sửa kích thước nút
+                                  sx={{ borderRadius: '20px', px: 2 }}
+                                >
+                                  Change Review
+                                </Button>
+                              </Modal.Open>
+                              <Modal.Window name="review-form">
+                                <ReviewForm review={review} />
+                              </Modal.Window>
+                            </Modal>
+                          )}
                         </Box>
                       </CardContent>
                     </Card>
@@ -1107,7 +1197,7 @@ const TourDetail = ({ tour, otherTours }) => {
               )}
             </Box>
             {/* Nút See More / See Less */}
-            {tour.reviews&& tour.reviews.length > 3 && (
+            {tour.reviews && tour.reviews.length > 3 && (
               <Box textAlign="center" mt={2}>
                 <Button
                   onClick={handleToggleShowMore}
