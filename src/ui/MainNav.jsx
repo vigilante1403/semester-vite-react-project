@@ -108,12 +108,12 @@ function MainNav() {
             <span>Profile</span>
           </StyledNavLink>
         </li>
-        <li>
+        {/* <li>
           <StyledNavLink to="/admin/settings">
             <HiOutlineCog6Tooth />
             <span>Settings</span>
           </StyledNavLink>
-        </li>
+        </li> */}
       </NavList>
     </nav>
   );
