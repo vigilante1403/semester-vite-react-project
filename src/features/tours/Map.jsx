@@ -74,7 +74,7 @@ const MapComponent = ({ locations, centerDisplay = null, centerDefault = [10.762
     if (locations) {
      
       locations.forEach((location, index) => {
-        const offset = 0.0001 * index; 
+        const offset = 0.00001 * index; 
         const lng = location.coordinates[0];
         const lat = location.coordinates[1];
 
@@ -86,7 +86,7 @@ const MapComponent = ({ locations, centerDisplay = null, centerDefault = [10.762
               const popupElement = document.querySelector('.mapboxgl-popup');
               if (popupElement) {
                 popupElement.addEventListener('click', () => {
-                  console.log(`Navigating to details for ${location.name}`);
+                 
                   window.location.href = `/tours/tour-detail/${location.id}`;
                 });
               }

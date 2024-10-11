@@ -74,9 +74,9 @@ function HeroSection() {
         <Typography variant="h4" paragraph>
           Join us on an unforgettable journey to the most beautiful places in the world.
         </Typography>
-        <Button variant="contained">
+        {/* <Button variant="contained">
           <Typography color="var(--color-grey-900)">Book now</Typography>
-        </Button>
+        </Button> */}
       </Container>
     </section>
   );
