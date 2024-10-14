@@ -440,7 +440,7 @@ const CalendarContainer = styled.div`
 `;
 
 const TourDetail = ({ tour, otherTours }) => {
-  const dateArr = formatDateArrayAscOrDesc(tour.startDates, 1);
+  
   // console.log(dateArr);
   // const [selectedDate, setSelectedDate] = useState(
   //   new Date(tour.startDates[0])
@@ -490,11 +490,11 @@ const TourDetail = ({ tour, otherTours }) => {
   useEffect(() => {
     window.scrollTo(0, 0);
 
-    if (!isLoadingStartDate && startDates?.length > 0 && !isLoadingSchedule && schedules.length > 0) {
+    if (!isLoadingStartDate && startDates?.filter(start=>start.status).length > 0 && !isLoadingSchedule && schedules.length > 0) {
     
       const currentDate = new Date();
       const futureStartDates = startDates.filter(
-        (startDate) => new Date(startDate.startDate) >= currentDate
+        (startDate) => new Date(startDate.startDate) >= currentDate &&startDate.status
       );
   
       if (futureStartDates.length > 0) {
@@ -525,13 +525,13 @@ const TourDetail = ({ tour, otherTours }) => {
   );
   console.log(filteredSchedules);
   const isStartDate = (date) => {
-    return startDates.some((startDate) => isSameDay(date, startDate.startDate));
+    return startDates.filter(start=>start.status).some((startDate) => isSameDay(date, startDate.startDate));
   };
   const isStartMonth = (date) => {
-    return startDates.some((startDate) => isSameMonth(date, startDate.startDate));
+    return startDates.filter(start=>start.status).some((startDate) => isSameMonth(date, startDate.startDate));
   }
   const isStartYear = (date) => {
-    return startDates.some((startDate) => isSameYear(date, startDate.startDate));
+    return startDates.filter(start=>start.status).some((startDate) => isSameYear(date, startDate.startDate));
   };
   const tileDisabled = ({ date, view }) => {
     switch (view) {
@@ -546,7 +546,7 @@ const TourDetail = ({ tour, otherTours }) => {
 
       case 'century': {
         const startYears = startDates.map((startDate) =>
-          startDate.startDate.getFullYear()
+          startDate.startDate.getFullYear() &&startDate.status
         );
         const startDecades = startYears.map(
           (year) => Math.floor(year / 10) * 10
@@ -569,7 +569,7 @@ const TourDetail = ({ tour, otherTours }) => {
     setSelectedDate(date);
     setIsDateLocked(false);
     const selectedStartDateId = startDates.find(
-      (startDate) => startDate.startDate === date.toLocaleDateString('en-CA')
+      (startDate) => startDate.startDate === date.toLocaleDateString('en-CA') &&startDate.status
     )?.id;
   
     console.log(selectedStartDateId);
@@ -587,7 +587,7 @@ const TourDetail = ({ tour, otherTours }) => {
     const formattedCurrentDate = currentDate.toLocaleDateString('en-CA');
   
    
-    const futureStartDates = startDates
+    const futureStartDates = startDates.filter(start=>start.status)
       .map((startDate) => startDate.startDate)
       .filter((startDate) => new Date(startDate) >= new Date());
   
@@ -596,7 +596,7 @@ const TourDetail = ({ tour, otherTours }) => {
   
    
     let nextDate;
-    if (index + 1 < startDateList.length) {
+    if (index+1 < startDateList.length) {
       nextDate = new Date(startDateList[index + 1]);
     } else {
       nextDate = new Date(startDateList[0]);
@@ -604,7 +604,7 @@ const TourDetail = ({ tour, otherTours }) => {
     setSelectedDate(nextDate);
   
     const nextStartDateId = startDates.find(
-      (startDate) => startDate.startDate === nextDate.toLocaleDateString('en-CA')
+      (startDate) => startDate.startDate === nextDate.toLocaleDateString('en-CA') &&startDate.status
     )?.id;
     
     const nextGuide = filteredSchedules.filter(

@@ -246,7 +246,7 @@ const Tour = ({ tour, bookings=null  }) => {
                 color="textSecondary"
                 sx={{ fontSize: '1.2rem' }}
               >
-                {dateShowing !== '' ? dateShowing : 'No start date yet'}
+                Click to view
               </Typography>
             </Box>
           </Box>
